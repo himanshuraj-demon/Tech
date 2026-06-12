@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob'
+import { put, list } from '@vercel/blob'
 
 export interface AdminEmailsData {
   emails: string[]
@@ -68,10 +68,14 @@ export async function getAdminEmails(): Promise<AdminEmailsData> {
 
     // Production: use blob storage
     try {
-      const response = await fetch(`https://b7ajqrsrmgst9onj.public.blob.vercel-storage.com/${BLOB_FILENAME}`)
-      if (response.ok) {
-        const data = await response.json()
-        return data
+      const { blobs } = await list({ prefix: BLOB_FILENAME })
+      const match = blobs.find(blob => blob.pathname === BLOB_FILENAME)
+      if (match) {
+        const response = await fetch(match.url)
+        if (response.ok) {
+          const data = await response.json()
+          return data
+        }
       }
     } catch (error) {
       console.warn('Failed to fetch admin emails from blob storage:', error)
