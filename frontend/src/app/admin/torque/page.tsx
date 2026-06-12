@@ -65,7 +65,7 @@ export default function TorqueAdminPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/torque/${magazineId}`, {
+      const response = await api.fetch(`/api/admin/torque/${magazineId}`, {
         method: "DELETE",
       });
 
@@ -82,7 +82,7 @@ export default function TorqueAdminPage() {
 
   const handleSetLatest = async (magazineId: string) => {
     try {
-      const response = await fetch(`/api/admin/torque/${magazineId}/set-latest`, {
+      const response = await api.fetch(`/api/admin/torque/${magazineId}/set-latest`, {
         method: "POST",
       });
 

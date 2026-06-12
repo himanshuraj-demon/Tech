@@ -50,9 +50,9 @@ export function AdminDashboardClient() {
 
       // Fetch all data in parallel
       const [eventsRes, clubsRes, magazinesRes] = await Promise.all([
-        fetch("/api/admin/events"),
-        fetch("/api/admin/clubs"),
-        fetch("/api/admin/torque")
+        api.fetch("/api/admin/events"),
+        api.fetch("/api/admin/clubs"),
+        api.fetch("/api/admin/torque")
       ]);
 
       if (!eventsRes.ok) throw new Error("Failed to fetch events");

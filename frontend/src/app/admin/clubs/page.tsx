@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Users, Building } from "lucide-react";
 import { Club } from "@/lib/clubs-data";
+import { api } from "../../../../services/api";
 
 export default function ClubsAdminPage() {
   const { data: session, status } = useSession();
@@ -33,7 +34,7 @@ export default function ClubsAdminPage() {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch("/api/admin/clubs");
+      const response = await api.fetch("/api/admin/clubs");
       if (!response.ok) {
         throw new Error("Failed to fetch clubs");
       }

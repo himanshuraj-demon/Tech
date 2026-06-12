@@ -66,7 +66,7 @@ export default function EventsManagement() {
     try {
       console.log('Deleting event:', eventId);
       
-      const response = await fetch(`/api/admin/events/${eventId}`, {
+      const response = await api.fetch(`/api/admin/events/${eventId}`, {
         method: "DELETE",
         headers: {
           'Content-Type': 'application/json'
