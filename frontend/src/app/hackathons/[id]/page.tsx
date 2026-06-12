@@ -13,12 +13,11 @@ interface HackathonPageProps {
 }
 
 import { defaultHackathonsData } from "@/lib/hackathons-data";
-import { api } from "../../../../services/api";
 
 export async function generateStaticParams() {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-    const res = await api.fetch(`${API_URL}/api/hackathons`);
+    const res = await fetch(`${API_URL}/api/hackathons`);
     if (res.ok) {
       const hackathons = await res.json();
       if (Array.isArray(hackathons) && hackathons.length > 0) {

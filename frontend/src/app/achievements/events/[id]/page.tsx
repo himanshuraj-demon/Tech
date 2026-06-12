@@ -13,12 +13,11 @@ interface PageProps {
 }
 
 import { defaultEventsData } from "@/lib/events-data";
-import { api } from "../../../../../services/api";
 
 export async function generateStaticParams() {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-    const res = await api.fetch(`${API_URL}/api/events`);
+    const res = await fetch(`${API_URL}/api/events`);
     if (res.ok) {
       const events = await res.json();
       if (Array.isArray(events) && events.length > 0) {
