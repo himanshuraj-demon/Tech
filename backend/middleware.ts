@@ -78,9 +78,7 @@ export async function middleware(req: NextRequest) {
       const email = payload.email as string;
       const isAdmin =
         payload.isAdmin === true ||
-        (email &&
-          (email.endsWith("@iitgn.ac.in") ||
-            email === "mukulmee771@gmail.com"));
+        (email &&(email === "technical.secretary@iitgn.ac.in") || email==="naveen.pal@iitgn.ac.in" ||email==="himanshu.raj@iitgn.ac.in");
 
       if (!isAdmin) {
         const response = NextResponse.json(

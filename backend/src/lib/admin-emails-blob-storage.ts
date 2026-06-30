@@ -11,8 +11,9 @@ export interface AdminEmailsData {
 // Default admin emails
 const defaultAdminEmails: AdminEmailsData = {
   emails: [
-    "mukul.meena@iitgn.ac.in",
+    "naveen.pal@iitgn.ac.in",
     "technical.secretary@iitgn.ac.in",
+    "himanshu.raj@iitgn.ac.in"
   ],
   lastModified: new Date().toISOString(),
   modifiedBy: 'system',

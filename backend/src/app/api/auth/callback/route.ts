@@ -13,7 +13,7 @@ async function getAuthorizedEmails(): Promise<string[]> {
     return adminEmails.emails;
   } catch (error) {
     console.error("Error loading admin emails, using fallback:", error);
-    return ["mukul.meena@iitgn.ac.in", "technical.secretary@iitgn.ac.in"];
+    return ["naveen.pal@iitgn.ac.in", "technical.secretary@iitgn.ac.in"];
   }
 }
 
@@ -76,10 +76,7 @@ export async function GET(request: NextRequest) {
 
     // Verify admin access
     const authorizedEmails = await getAuthorizedEmails();
-    const isAllowed = authorizedEmails.includes(email ?? "") || (email && (
-      email.endsWith('@iitgn.ac.in') || 
-      email === 'mukulmee771@gmail.com'
-    ));
+    const isAllowed = authorizedEmails.includes(email ?? "") || (email && (email === "technical.secretary@iitgn.ac.in") || email==="naveen.pal@iitgn.ac.in" ||email==="himanshu.raj@iitgn.ac.in");
 
     if (!isAllowed) {
       console.warn(`Unauthorized login attempt by email: ${email}`);
