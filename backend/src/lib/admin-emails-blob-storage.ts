@@ -13,7 +13,8 @@ const defaultAdminEmails: AdminEmailsData = {
   emails: [
     "naveen.pal@iitgn.ac.in",
     "technical.secretary@iitgn.ac.in",
-    "himanshu.raj@iitgn.ac.in"
+    "himanshu.raj@iitgn.ac.in",
+    "vishal.boliwal@iitgn.ac.in",
   ],
   lastModified: new Date().toISOString(),
   modifiedBy: 'system',

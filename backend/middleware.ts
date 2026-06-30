@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "tech-web-iitgn-dev-fallback-secret-key-12345"
+  process.env.NEXTAUTH_SECRET || "tech-web-iitgn-dev-fallback-secret-key-12345",
 );
 
 export async function middleware(req: NextRequest) {
@@ -14,8 +14,7 @@ export async function middleware(req: NextRequest) {
       status: 200,
       headers: {
         "Access-Control-Allow-Origin":
-          process.env.FRONTEND_URL ||
-          "https://tech-henna-six.vercel.app",
+          process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
         "Access-Control-Allow-Methods":
           "GET, POST, PUT, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers":
@@ -35,7 +34,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const malformedApiMatch = url.match(
-    /\/api\/admin\/clubs\/([^\/]+):(\d+)(\/.*)?/
+    /\/api\/admin\/clubs\/([^\/]+):(\d+)(\/.*)?/,
   );
   if (malformedApiMatch) {
     const cleanId = malformedApiMatch[1];
@@ -51,21 +50,20 @@ export async function middleware(req: NextRequest) {
     if (!token) {
       const response = NextResponse.json(
         { error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
 
       response.headers.set(
         "Access-Control-Allow-Origin",
-        process.env.FRONTEND_URL ||
-          "https://tech-henna-six.vercel.app"
+        process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
       );
       response.headers.set(
         "Access-Control-Allow-Methods",
-        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS",
       );
       response.headers.set(
         "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-Requested-With"
+        "Content-Type, Authorization, X-Requested-With",
       );
       response.headers.set("Access-Control-Allow-Credentials", "true");
 
@@ -78,26 +76,30 @@ export async function middleware(req: NextRequest) {
       const email = payload.email as string;
       const isAdmin =
         payload.isAdmin === true ||
-        (email &&(email === "technical.secretary@iitgn.ac.in") || email==="naveen.pal@iitgn.ac.in" ||email==="himanshu.raj@iitgn.ac.in");
+        [
+          "technical.secretary@iitgn.ac.in",
+          "naveen.pal@iitgn.ac.in",
+          "himanshu.raj@iitgn.ac.in",
+          "vishal.boliwal@iitgn.ac.in",
+        ].includes(email);
 
       if (!isAdmin) {
         const response = NextResponse.json(
           { error: "Unauthorized" },
-          { status: 401 }
+          { status: 401 },
         );
 
         response.headers.set(
           "Access-Control-Allow-Origin",
-          process.env.FRONTEND_URL ||
-            "https://tech-henna-six.vercel.app"
+          process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
         );
         response.headers.set(
           "Access-Control-Allow-Methods",
-          "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+          "GET, POST, PUT, PATCH, DELETE, OPTIONS",
         );
         response.headers.set(
           "Access-Control-Allow-Headers",
-          "Content-Type, Authorization, X-Requested-With"
+          "Content-Type, Authorization, X-Requested-With",
         );
         response.headers.set("Access-Control-Allow-Credentials", "true");
 
@@ -108,21 +110,20 @@ export async function middleware(req: NextRequest) {
 
       const response = NextResponse.json(
         { error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
 
       response.headers.set(
         "Access-Control-Allow-Origin",
-        process.env.FRONTEND_URL ||
-          "https://tech-henna-six.vercel.app"
+        process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
       );
       response.headers.set(
         "Access-Control-Allow-Methods",
-        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS",
       );
       response.headers.set(
         "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-Requested-With"
+        "Content-Type, Authorization, X-Requested-With",
       );
       response.headers.set("Access-Control-Allow-Credentials", "true");
 
@@ -134,16 +135,15 @@ export async function middleware(req: NextRequest) {
 
   response.headers.set(
     "Access-Control-Allow-Origin",
-    process.env.FRONTEND_URL ||
-      "https://tech-henna-six.vercel.app"
+    process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
   );
   response.headers.set(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   );
   response.headers.set(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With"
+    "Content-Type, Authorization, X-Requested-With",
   );
   response.headers.set("Access-Control-Allow-Credentials", "true");
 

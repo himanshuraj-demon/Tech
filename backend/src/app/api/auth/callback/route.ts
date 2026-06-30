@@ -76,7 +76,8 @@ export async function GET(request: NextRequest) {
 
     // Verify admin access
     const authorizedEmails = await getAuthorizedEmails();
-    const isAllowed = authorizedEmails.includes(email ?? "") || (email && (email === "technical.secretary@iitgn.ac.in") || email==="naveen.pal@iitgn.ac.in" ||email==="himanshu.raj@iitgn.ac.in");
+    const isAllowed = authorizedEmails.includes(email ?? "") || (email && (email === "technical.secretary@iitgn.ac.in") || email==="naveen.pal@iitgn.ac.in" ||email==="himanshu.raj@iitgn.ac.in" ||email==="vishal.boliwal@iitgn.ac.in");
+    
 
     if (!isAllowed) {
       console.warn(`Unauthorized login attempt by email: ${email}`);
