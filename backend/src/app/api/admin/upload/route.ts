@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { put } from '@vercel/blob'
+import { uploadToCloudinary } from '@/lib/cloudinary'
 
-// POST - Upload files to blob storage
+// POST - Upload files to Cloudinary
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -43,20 +43,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
     // Create filename with timestamp to avoid conflicts
     const timestamp = Date.now()
     const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const filename = `${folder}/${timestamp}-${safeFilename}`
+    const filename = `${timestamp}-${safeFilename}`
 
-    // Upload to Vercel Blob
-    const blob = await put(filename, file, {
-      access: 'public',
-      contentType: file.type
-    })
+    // Upload to Cloudinary
+    const result = await uploadToCloudinary(buffer, folder, filename)
 
     return NextResponse.json({
       message: 'File uploaded successfully',
-      url: blob.url,
+      url: result.url,
       filename: filename,
       size: file.size,
       type: file.type

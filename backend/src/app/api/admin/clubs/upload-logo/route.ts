@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { put } from '@vercel/blob';
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       fileName: file?.name,
       fileSize: file?.size,
       fileType: file?.type,
-      hasToken: !!process.env.BLOB_READ_WRITE_TOKEN
+      hasCloudinaryConfig: !!process.env.CLOUDINARY_CLOUD_NAME
     });
 
     if (!file) {
@@ -42,9 +42,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Club ID is required" }, { status: 400 });
     }
 
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      console.error('BLOB_READ_WRITE_TOKEN not found');
-      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      console.error('Cloudinary environment variables not found');
+      return NextResponse.json({ error: "Server configuration error - missing Cloudinary credentials" }, { status: 500 });
     }
 
     // Validate file type
@@ -59,27 +59,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File too large. Maximum size is 5MB." }, { status: 400 });
     }
 
-    // Create a filename based on club type and ID
-    const fileExtension = file.name.split('.').pop();
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Create a folder and filename based on club type and ID
+    const fileExtension = file.name.split('.').pop() || 'png';
     const logoType = clubType === 'club' ? 'clubs' : 
                     clubType === 'hobby-group' ? 'hobby-groups' : 
                     'technical-council-groups';
-    const fileName = `logos/${logoType}/${cleanClubId}.${fileExtension}`;
+    const folder = `logos/${logoType}`;
+    const fileName = `${cleanClubId}.${fileExtension}`;
 
-    console.log('Uploading to blob:', { fileName, logoType, fileExtension });
+    console.log('Uploading to Cloudinary:', { folder, fileName, logoType, fileExtension });
 
-    // Upload to Vercel Blob
-    const blob = await put(fileName, file, {
-      access: 'public',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      addRandomSuffix: false, // Ensure consistent file naming
-      allowOverwrite: true, // Allow overwriting existing logos
+    // Upload to Cloudinary
+    const result = await uploadToCloudinary(buffer, folder, fileName, {
+      overwrite: true,
+      invalidate: true, // Invalidate CDN cache so the new logo shows up immediately
     });
 
-    console.log('Logo uploaded successfully:', { url: blob.url, fileName });
+    console.log('Logo uploaded successfully:', { url: result.url, fileName });
 
     return NextResponse.json({ 
-      url: blob.url,
+      url: result.url,
       message: "Logo uploaded successfully" 
     });
 

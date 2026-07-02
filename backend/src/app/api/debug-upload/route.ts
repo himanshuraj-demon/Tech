@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from '@vercel/blob';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 // Simplified logo upload for testing - bypasses auth temporarily
 export async function POST(request: NextRequest) {
@@ -7,17 +7,17 @@ export async function POST(request: NextRequest) {
     console.log('=== LOGO UPLOAD DEBUG START ===');
     
     // Check environment
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    const hasConfig = !!process.env.CLOUDINARY_CLOUD_NAME;
     console.log('Environment check:', {
-      hasToken: !!token,
+      hasConfig,
       nodeEnv: process.env.NODE_ENV,
       timestamp: new Date().toISOString()
     });
 
-    if (!token) {
-      console.error('BLOB_READ_WRITE_TOKEN not found in environment');
+    if (!hasConfig) {
+      console.error('Cloudinary credentials not found in environment');
       return NextResponse.json({ 
-        error: "Server configuration error - missing blob token" 
+        error: "Server configuration error - missing Cloudinary credentials" 
       }, { status: 500 });
     }
 
@@ -74,14 +74,20 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Create filename
-    const fileExtension = file.name.split('.').pop();
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Create folder and filename
+    const fileExtension = file.name.split('.').pop() || 'png';
     const logoType = clubType === 'club' ? 'clubs' : 
                     clubType === 'hobby-group' ? 'hobby-groups' : 
                     'technical-council-groups';
-    const fileName = `logos/${logoType}/${cleanClubId}.${fileExtension}`;
+    const folder = `logos/${logoType}`;
+    const fileName = `${cleanClubId}.${fileExtension}`;
 
     console.log('Upload parameters:', {
+      folder,
       fileName,
       logoType,
       fileExtension,
@@ -90,23 +96,21 @@ export async function POST(request: NextRequest) {
     });
 
     // Attempt upload
-    console.log('Starting blob upload...');
-    const blob = await put(fileName, file, {
-      access: 'public',
-      token: token,
-      addRandomSuffix: false,
-      allowOverwrite: true, // Allow overwriting existing logos
+    console.log('Starting Cloudinary upload...');
+    const result = await uploadToCloudinary(buffer, folder, fileName, {
+      overwrite: true,
+      invalidate: true
     });
 
     console.log('Upload successful:', {
-      url: blob.url,
+      url: result.url,
       fileName
     });
 
     console.log('=== LOGO UPLOAD DEBUG END ===');
 
     return NextResponse.json({ 
-      url: blob.url,
+      url: result.url,
       message: "Logo uploaded successfully",
       debug: {
         fileName,
