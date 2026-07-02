@@ -131,3 +131,61 @@ export const adminEmails = pgTable('admin_emails', {
 
 export type AdminEmail = typeof adminEmails.$inferSelect;
 export type NewAdminEmail = typeof adminEmails.$inferInsert;
+
+// Torque Magazines Table
+export const torqueMagazines = pgTable('torque_magazines', {
+  id: text('id').primaryKey(),
+  year: text('year').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  pages: integer('pages').notNull(),
+  articles: integer('articles').notNull(),
+  featured: text('featured').notNull(),
+  filePath: text('file_path').notNull(),
+  fileName: text('file_name').notNull(),
+  fileSize: integer('file_size').notNull(),
+  coverPhoto: text('cover_photo'),
+  coverPhotoFileName: text('cover_photo_file_name'),
+  isLatest: boolean('is_latest').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type TorqueMagazine = typeof torqueMagazines.$inferSelect;
+export type NewTorqueMagazine = typeof torqueMagazines.$inferInsert;
+
+// Hackathons Table
+export const hackathons = pgTable('hackathons', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  longDescription: text('long_description').notNull(),
+  date: text('date').notNull(),
+  startTime: text('start_time'),
+  endTime: text('end_time'),
+  location: text('location').notNull(),
+  category: text('category').notNull(),
+  status: text('status').notNull(), // 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+  registrationLink: text('registration_link'),
+  organizerName: text('organizer_name'),
+  organizerEmail: text('organizer_email'),
+  organizerPhone: text('organizer_phone'),
+  organizerWebsite: text('organizer_website'),
+  requirements: text('requirements'),
+  eligibility: text('eligibility'),
+  teamSize: text('team_size'),
+  firstPrize: text('first_prize'),
+  secondPrize: text('second_prize'),
+  thirdPrize: text('third_prize'),
+  specialPrizes: text('special_prizes'),
+  timeline: text('timeline'),
+  importantNotes: text('important_notes'),
+  themes: text('themes'),
+  judingCriteria: text('juding_criteria'),
+  submissionGuidelines: text('submission_guidelines'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type Hackathon = typeof hackathons.$inferSelect;
+export type NewHackathon = typeof hackathons.$inferInsert;

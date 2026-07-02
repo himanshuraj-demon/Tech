@@ -13,7 +13,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Upload, FileText, Image, CheckCircle, AlertCircle } from "lucide-react";
 import { maxFileSize, maxImageSize } from "@/lib/torque-data";
-import { upload } from "@vercel/blob/client";
 import { api } from "../../../../../services/api";
 
 export default function NewMagazinePage() {
@@ -81,14 +80,44 @@ export default function NewMagazinePage() {
     }
   };
 
-  // Direct-to-blob upload for PDF and cover photo
-  const uploadToBlob = async (file: File, pathPrefix: string) => {
-    const filename = `${pathPrefix}/${Date.now()}-${file.name}`;
-    const result = await upload(filename, file, {
-      access: 'public',
-      handleUploadUrl: '/api/vercel/blob/upload',
+  // Helper to upload PDF to backend Cloudinary endpoint
+  const uploadFile = async (file: File, year: string) => {
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('year', year);
+
+    const response = await api.fetch('/api/admin/torque/upload', {
+      method: 'POST',
+      body: uploadFormData,
     });
-    return result.url;
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Failed to upload PDF file');
+    }
+
+    const data = await response.json();
+    return data.filePath; // returns secure_url
+  };
+
+  // Helper to upload cover photo to backend Cloudinary endpoint
+  const uploadCoverPhoto = async (file: File, magazineId: string) => {
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('magazineId', magazineId);
+
+    const response = await api.fetch('/api/admin/torque/upload-cover', {
+      method: 'POST',
+      body: uploadFormData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Failed to upload cover photo');
+    }
+
+    const data = await response.json();
+    return data.filePath; // returns secure_url
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,16 +132,24 @@ export default function NewMagazinePage() {
     setErrorMessage('');
     try {
       setUploadProgress(20);
-      // Upload PDF to Vercel Blob
-      const pdfUrl = await uploadToBlob(selectedFile, `magazines/${formData.year}`);
+      
+      // Generate a magazine ID on frontend to link files
+      const magazineId = `mag_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+      // Upload PDF to Cloudinary via backend
+      const pdfUrl = await uploadFile(selectedFile, formData.year);
       setUploadProgress(50);
+      
       let coverPhotoUrl: string | undefined = undefined;
       if (selectedCoverPhoto) {
-        coverPhotoUrl = await uploadToBlob(selectedCoverPhoto, `magazines/${formData.year}/covers`);
+        // Upload Cover to Cloudinary via backend
+        coverPhotoUrl = await uploadCoverPhoto(selectedCoverPhoto, magazineId);
         setUploadProgress(70);
       }
+      
       // Create magazine record
       const magazineData = {
+        id: magazineId,
         year: formData.year,
         title: formData.title,
         description: formData.description,
@@ -126,16 +163,19 @@ export default function NewMagazinePage() {
         coverPhotoFileName: selectedCoverPhoto?.name,
         isLatest: formData.isLatest
       };
-      const response = await  api.fetch("/api/admin/torque", {
+      
+      const response = await api.fetch("/api/admin/torque", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(magazineData),
       });
+      
       if (!response.ok) {
         throw new Error("Failed to create magazine record");
       }
+      
       setUploadProgress(100);
       setUploadStatus('success');
       setTimeout(() => {

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -10,7 +9,7 @@ async function checkAdminAuth() {
   return session?.user?.isAdmin || false;
 }
 
-// POST /api/admin/torque/upload-cover - Upload magazine cover photo
+// POST /api/admin/torque/upload-cover - Upload magazine cover photo to Cloudinary
 export async function POST(request: NextRequest) {
   try {
     const isAdmin = await checkAdminAuth();
@@ -37,51 +36,36 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json({ error: "File size too large. Maximum size is 10MB" }, { status: 400 });
     }
 
-    // Create covers directory if it doesn't exist
-    const coversDir = path.join(process.cwd(), "public", "torque", "covers");
-    try {
-      await fs.access(coversDir);
-    } catch {
-      await fs.mkdir(coversDir, { recursive: true });
-    }
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Get file extension
     const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    
-    // Generate filename based on magazine ID
-    const fileName = `${magazineId}-cover.${extension}`;
-    const filePath = path.join(coversDir, fileName);
+    const folder = `magazines/covers`;
+    const filename = `${magazineId}-cover.${extension}`;
 
-    // Delete existing cover photo if it exists
-    const extensions = ['jpg', 'jpeg', 'png', 'webp'];
-    for (const ext of extensions) {
-      const existingFile = path.join(coversDir, `${magazineId}-cover.${ext}`);
-      try {
-        await fs.access(existingFile);
-        await fs.unlink(existingFile);
-      } catch {
-        // File doesn't exist, continue
-      }
-    }
+    console.log(`[Torque Cover Upload] Uploading cover to Cloudinary: folder=${folder}, filename=${filename}`);
 
-    // Save file
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
+    // Upload to Cloudinary (allow overwriting cover photos for the same magazine)
+    const result = await uploadToCloudinary(buffer, folder, filename, {
+      overwrite: true,
+      invalidate: true
+    });
 
-    // Return file info
+    // Return the expected file info structure
     return NextResponse.json({
-      filePath: `/torque/covers/${fileName}`,
+      filePath: result.url,
       fileName: file.name
     });
   } catch (error) {
     console.error("Error uploading cover photo:", error);
     return NextResponse.json(
-      { error: "Failed to upload cover photo" },
+      { error: "Failed to upload cover photo", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
