@@ -120,3 +120,14 @@ export type ClubTeamMember = {
 
 export type Club = typeof clubs.$inferSelect;
 export type NewClub = typeof clubs.$inferInsert;
+
+// Admin Emails Table
+export const adminEmails = pgTable('admin_emails', {
+  email: text('email').primaryKey(),
+  modifiedBy: text('modified_by').notNull().default('system'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type AdminEmail = typeof adminEmails.$inferSelect;
+export type NewAdminEmail = typeof adminEmails.$inferInsert;

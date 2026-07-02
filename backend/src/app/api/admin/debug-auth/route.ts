@@ -1,25 +1,23 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import fs from 'fs';
-import path from 'path';
+import { getAdminEmails } from "@/lib/admin-emails-blob-storage";
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     
-    // Read admin emails
-    let adminEmails: string[] = [];
+    // Read admin emails from database
+    let adminEmailsList: string[] = [];
     try {
-      const adminEmailsPath = path.join(process.cwd(), 'data', 'admin-emails.json');
-      const adminData = JSON.parse(fs.readFileSync(adminEmailsPath, 'utf8'));
-      adminEmails = adminData.emails || [];
+      const adminData = await getAdminEmails();
+      adminEmailsList = adminData.emails || [];
     } catch (error) {
       console.error('Error reading admin emails:', error);
     }
 
     const userEmail = session?.user?.email;
-    const isAdmin = userEmail ? adminEmails.includes(userEmail) : false;
+    const isAdmin = userEmail ? adminEmailsList.includes(userEmail) : false;
 
     return NextResponse.json({
       session: {
@@ -30,7 +28,7 @@ export async function GET() {
           image: session.user.image
         } : null
       },
-      adminEmails: adminEmails,
+      adminEmails: adminEmailsList,
       isAdmin,
       timestamp: new Date().toISOString()
     });

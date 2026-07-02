@@ -1,4 +1,5 @@
-import { put, list } from '@vercel/blob'
+import { db, adminEmails } from '@/lib/db';
+import { eq } from 'drizzle-orm';
 
 export interface AdminEmailsData {
   emails: string[]
@@ -8,7 +9,7 @@ export interface AdminEmailsData {
   updatedAt: string
 }
 
-// Default admin emails
+// Default admin emails (seeding/fallback)
 const defaultAdminEmails: AdminEmailsData = {
   emails: [
     "naveen.pal@iitgn.ac.in",
@@ -22,196 +23,231 @@ const defaultAdminEmails: AdminEmailsData = {
   updatedAt: new Date().toISOString()
 }
 
-const BLOB_FILENAME = 'admin-emails.json'
-
-// Check if we're in development mode
-const isDevelopment = process.env.NODE_ENV === 'development'
-
-// Development fallback using local file system
-async function getAdminEmailsFromFile(): Promise<AdminEmailsData> {
-  if (isDevelopment) {
-    try {
-      const fs = await import('fs/promises')
-      const path = await import('path')
-      const filePath = path.join(process.cwd(), 'data', 'admin-emails.json')
-      const data = await fs.readFile(filePath, 'utf-8')
-      return JSON.parse(data)
-    } catch {
-      await saveAdminEmailsToFile(defaultAdminEmails)
-      return defaultAdminEmails
-    }
-  }
-  throw new Error('Not in development mode')
-}
-
-async function saveAdminEmailsToFile(data: AdminEmailsData): Promise<void> {
-  if (isDevelopment) {
-    const fs = await import('fs/promises')
-    const path = await import('path')
-    const dataDir = path.join(process.cwd(), 'data')
-    const filePath = path.join(dataDir, 'admin-emails.json')
-    
-    try {
-      await fs.access(dataDir)
-    } catch {
-      await fs.mkdir(dataDir, { recursive: true })
-    }
-    
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2))
-  }
-}
-
-// Get admin emails from blob storage or file system
+// Get admin emails from Neon database
 export async function getAdminEmails(): Promise<AdminEmailsData> {
   try {
-    if (isDevelopment) {
-      return await getAdminEmailsFromFile()
+    const rows = await db.select().from(adminEmails);
+    
+    // Seed database if empty
+    if (rows.length === 0) {
+      console.log('Admin emails table is empty, seeding defaults...');
+      const now = new Date();
+      const insertValues = defaultAdminEmails.emails.map(email => ({
+        email,
+        modifiedBy: 'system',
+        createdAt: now,
+        updatedAt: now,
+      }));
+      await db.insert(adminEmails).values(insertValues);
+      
+      return {
+        ...defaultAdminEmails,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+        lastModified: now.toISOString(),
+      };
     }
 
-    // Production: use blob storage
-    try {
-      const { blobs } = await list({ prefix: BLOB_FILENAME })
-      const match = blobs.find(blob => blob.pathname === BLOB_FILENAME)
-      if (match) {
-        const response = await fetch(match.url)
-        if (response.ok) {
-          const data = await response.json()
-          return data
-        }
+    // Determine metadata from the list
+    let earliestCreatedAt = rows[0].createdAt;
+    let latestUpdatedAt = rows[0].updatedAt;
+    let modifiedBy = rows[0].modifiedBy;
+
+    for (const row of rows) {
+      if (row.createdAt < earliestCreatedAt) {
+        earliestCreatedAt = row.createdAt;
       }
-    } catch (error) {
-      console.warn('Failed to fetch admin emails from blob storage:', error)
+      if (row.updatedAt > latestUpdatedAt) {
+        latestUpdatedAt = row.updatedAt;
+        modifiedBy = row.modifiedBy;
+      }
     }
 
-    // If blob doesn't exist or fetch fails, return defaults
-    console.warn('Using default admin emails as fallback')
-    return defaultAdminEmails
+    return {
+      emails: rows.map(r => r.email),
+      lastModified: latestUpdatedAt.toISOString(),
+      modifiedBy,
+      createdAt: earliestCreatedAt.toISOString(),
+      updatedAt: latestUpdatedAt.toISOString()
+    };
   } catch (error) {
-    console.error('Error getting admin emails:', error)
-    return defaultAdminEmails
+    console.error('Error getting admin emails from database:', error);
+    return defaultAdminEmails;
   }
 }
 
-// Save admin emails to blob storage or file system
+// Save admin emails to Neon database (used for synchronization / bulk updates)
 export async function saveAdminEmails(adminEmailsData: AdminEmailsData): Promise<void> {
   try {
-    if (isDevelopment) {
-      await saveAdminEmailsToFile(adminEmailsData)
-      return
+    const emailsList = adminEmailsData.emails;
+    const modifiedBy = adminEmailsData.modifiedBy || 'system';
+    
+    if (!emailsList || emailsList.length === 0) {
+      throw new Error('At least one admin email is required');
     }
 
-    // Production: use blob storage
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      throw new Error('BLOB_READ_WRITE_TOKEN not configured')
-    }
+    // Run within a transaction to maintain atomicity and consistency
+    await db.transaction(async (tx) => {
+      const currentRows = await tx.select().from(adminEmails);
+      const currentEmails = currentRows.map(r => r.email);
+      
+      const toDelete = currentEmails.filter(e => !emailsList.includes(e));
+      const toAdd = emailsList.filter(e => !currentEmails.includes(e));
+      const toKeep = emailsList.filter(e => currentEmails.includes(e));
+      
+      const now = new Date();
+      
+      if (toDelete.length > 0) {
+        // Prevent deleting all admins in the transaction (safety check)
+        const remainingCount = currentEmails.length - toDelete.length + toAdd.length;
+        if (remainingCount === 0) {
+          throw new Error('Cannot remove the last admin email');
+        }
+        for (const email of toDelete) {
+          await tx.delete(adminEmails).where(eq(adminEmails.email, email));
+        }
+      }
+      
+      if (toAdd.length > 0) {
+        await tx.insert(adminEmails).values(toAdd.map(email => ({
+          email,
+          modifiedBy,
+          createdAt: now,
+          updatedAt: now,
+        })));
+      }
+      
+      // Update metadata for kept/updated rows to reflect the latest modifier
+      if (toKeep.length > 0) {
+        for (const email of toKeep) {
+          await tx.update(adminEmails)
+            .set({
+              modifiedBy,
+              updatedAt: now,
+            })
+            .where(eq(adminEmails.email, email));
+        }
+      }
+    });
 
-    const blob = await put(BLOB_FILENAME, JSON.stringify(adminEmailsData, null, 2), {
-      access: 'public',
-      contentType: 'application/json'
-    })
-
-    console.log('Admin emails saved to blob storage:', blob.url)
+    console.log('Admin emails saved to database successfully');
   } catch (error) {
-    console.error('Error saving admin emails:', error)
-    throw new Error('Failed to save admin emails')
+    console.error('Error saving admin emails to database:', error);
+    throw error;
   }
 }
 
 // Add admin email
 export async function addAdminEmail(email: string, modifiedBy: string = 'system'): Promise<AdminEmailsData> {
   try {
-    const adminEmailsData = await getAdminEmails()
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    const trimmedEmail = email.trim();
     
-    if (adminEmailsData.emails.includes(email)) {
-      throw new Error('Email already exists in admin list')
+    // Check if email already exists
+    const [existing] = await db.select().from(adminEmails).where(eq(adminEmails.email, trimmedEmail)).limit(1);
+    if (existing) {
+      throw new Error('Email already exists in admin list');
     }
 
-    const updatedData: AdminEmailsData = {
-      ...adminEmailsData,
-      emails: [...adminEmailsData.emails, email],
-      lastModified: new Date().toISOString(),
+    const now = new Date();
+    await db.insert(adminEmails).values({
+      email: trimmedEmail,
       modifiedBy,
-      updatedAt: new Date().toISOString()
-    }
+      createdAt: now,
+      updatedAt: now,
+    });
 
-    await saveAdminEmails(updatedData)
-    return updatedData
+    return await getAdminEmails();
   } catch (error) {
-    console.error('Error adding admin email:', error)
-    throw error
+    console.error('Error adding admin email:', error);
+    throw error;
   }
 }
 
 // Remove admin email
 export async function removeAdminEmail(email: string, modifiedBy: string = 'system'): Promise<AdminEmailsData> {
   try {
-    const adminEmailsData = await getAdminEmails()
+    const trimmedEmail = email.trim();
     
-    // Prevent removing the last admin email
-    if (adminEmailsData.emails.length <= 1) {
-      throw new Error('Cannot remove the last admin email')
+    // Check if email exists
+    const [existing] = await db.select().from(adminEmails).where(eq(adminEmails.email, trimmedEmail)).limit(1);
+    if (!existing) {
+      throw new Error('Email not found in admin list');
     }
 
-    const updatedEmails = adminEmailsData.emails.filter(e => e !== email)
+    // Get all admin emails to count them
+    const allEmails = await db.select().from(adminEmails);
     
-    if (updatedEmails.length === adminEmailsData.emails.length) {
-      throw new Error('Email not found in admin list')
+    // Prevent removing the last admin email (Ensure at least one admin email always exists)
+    if (allEmails.length <= 1) {
+      throw new Error('Cannot remove the last admin email');
     }
 
-    const updatedData: AdminEmailsData = {
-      ...adminEmailsData,
-      emails: updatedEmails,
-      lastModified: new Date().toISOString(),
-      modifiedBy,
-      updatedAt: new Date().toISOString()
-    }
-
-    await saveAdminEmails(updatedData)
-    return updatedData
+    await db.delete(adminEmails).where(eq(adminEmails.email, trimmedEmail));
+    
+    return await getAdminEmails();
   } catch (error) {
-    console.error('Error removing admin email:', error)
-    throw error
+    console.error('Error removing admin email:', error);
+    throw error;
   }
 }
 
-// Update all admin emails
+// Update all admin emails (bulk update)
 export async function updateAdminEmails(emails: string[], modifiedBy: string = 'system'): Promise<AdminEmailsData> {
   try {
     if (!emails || emails.length === 0) {
-      throw new Error('At least one admin email is required')
+      throw new Error('At least one admin email is required');
     }
 
     // Remove duplicates and filter out empty strings
-    const uniqueEmails = [...new Set(emails.filter(email => email.trim()))]
+    const uniqueEmails = [...new Set(emails.map(email => email.trim()).filter(email => email.length > 0))];
     
     if (uniqueEmails.length === 0) {
-      throw new Error('At least one valid admin email is required')
+      throw new Error('At least one valid admin email is required');
     }
 
-    const adminEmailsData = await getAdminEmails()
+    const currentEmails = await getAdminEmails();
     const updatedData: AdminEmailsData = {
-      ...adminEmailsData,
+      ...currentEmails,
       emails: uniqueEmails,
       lastModified: new Date().toISOString(),
       modifiedBy,
       updatedAt: new Date().toISOString()
-    }
+    };
 
-    await saveAdminEmails(updatedData)
-    return updatedData
+    await saveAdminEmails(updatedData);
+    return await getAdminEmails();
   } catch (error) {
-    console.error('Error updating admin emails:', error)
-    throw error
+    console.error('Error updating admin emails:', error);
+    throw error;
   }
 }
 
 // Check if email is admin
 export async function isAdminEmail(email: string): Promise<boolean> {
   try {
-    const adminEmailsData = await getAdminEmails()
-    return adminEmailsData.emails.includes(email)
+    const trimmedEmail = email.trim();
+    const [row] = await db.select().from(adminEmails).where(eq(adminEmails.email, trimmedEmail)).limit(1);
+    if (row) {
+      return true;
+    }
+    
+    // Check if the database has any admin emails registered at all
+    const allEmails = await db.select().from(adminEmails).limit(1);
+    if (allEmails.length === 0) {
+      // If table is unseeded, fallback to the hardcoded defaults
+      return defaultAdminEmails.emails.includes(trimmedEmail);
+    }
+    
+    return false;
   } catch (error) {
-    console.error('Error checking admin email:', error)
-    return false
+    console.error('Error checking admin email:', error);
+    // Fallback to checking default admin emails in case of connection error
+    return defaultAdminEmails.emails.includes(email);
   }
 }
