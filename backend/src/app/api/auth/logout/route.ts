@@ -12,5 +12,13 @@ export async function GET(request: NextRequest) {
     expires: new Date(0),
   });
 
+  response.cookies.set("student_session", "", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+    path: "/",
+    expires: new Date(0),
+  });
+
   return response;
 }

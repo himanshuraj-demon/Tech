@@ -13,9 +13,9 @@ export async function getServerSession(options?: any): Promise<any> {
     // Next.js 15+ cookies() returns a Promise, handle both sync and async
     if (cookieStore instanceof Promise) {
       const resolvedStore = await cookieStore;
-      token = resolvedStore.get("admin_session")?.value;
+      token = resolvedStore.get("admin_session")?.value || resolvedStore.get("student_session")?.value;
     } else {
-      token = (cookieStore as any).get("admin_session")?.value;
+      token = (cookieStore as any).get("admin_session")?.value || (cookieStore as any).get("student_session")?.value;
     }
 
     if (!token) {

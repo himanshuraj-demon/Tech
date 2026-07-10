@@ -39,6 +39,12 @@ export interface Hackathon {
   
   createdAt: string;
   updatedAt: string;
+  draft?: boolean;
+  teamRequired?: boolean;
+  points1st?: number;
+  points2nd?: number;
+  points3rd?: number;
+  pointsParticipation?: number;
 }
 
 // Basic hackathon interface for simple storage (matches current Blob structure)

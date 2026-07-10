@@ -6,7 +6,9 @@ const JWT_SECRET = new TextEncoder().encode(
 );
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("admin_session")?.value;
+  const adminToken = request.cookies.get("admin_session")?.value;
+  const studentToken = request.cookies.get("student_session")?.value;
+  const token = adminToken || studentToken;
 
   if (!token) {
     return NextResponse.json({ user: null });
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
         email: payload.email,
         name: payload.name,
         image: payload.picture,
-        isAdmin: payload.isAdmin,
+        isAdmin: payload.isAdmin || false,
       },
     });
   } catch (error) {

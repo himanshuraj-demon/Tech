@@ -21,7 +21,8 @@ const updateEventSchema = z.object({
     url: z.string(),
     alt: z.string(),
     caption: z.string().optional()
-  })).optional()
+  })).optional(),
+  draft: z.boolean().optional(),
 });
 
 // Check if user is admin

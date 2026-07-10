@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { getAdminEmails } from "@/lib/admin-emails-blob-storage";
+import { db, users } from "@/lib/db";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || "tech-web-iitgn-dev-fallback-secret-key-12345"
@@ -74,14 +75,35 @@ export async function GET(request: NextRequest) {
     const userData = await userResponse.json();
     const email = userData.email;
 
-    // Verify admin access
+    // Determine admin access
     const authorizedEmails = await getAuthorizedEmails();
-    const isAllowed = authorizedEmails.includes(email ?? "") || (email && (email === "technical.secretary@iitgn.ac.in") || email==="naveen.pal@iitgn.ac.in" ||email==="himanshu.raj@iitgn.ac.in" ||email==="vishal.boliwal@iitgn.ac.in");
+    const isAdmin = authorizedEmails.includes(email ?? "") || 
+                    (email && (email === "technical.secretary@iitgn.ac.in" || email === "naveen.pal@iitgn.ac.in" || email === "himanshu.raj@iitgn.ac.in" || email === "vishal.boliwal@iitgn.ac.in"));
     
-
-    if (!isAllowed) {
-      console.warn(`Unauthorized login attempt by email: ${email}`);
-      return NextResponse.redirect(`${FRONTEND_URL}/admin/login?error=Unauthorized`);
+    // Save or update the user details in our DB
+    if (email && userData.sub) {
+      try {
+        await db
+          .insert(users)
+          .values({
+            id: userData.sub,
+            name: userData.name || "Student User",
+            email: email,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: users.id,
+            set: {
+              name: userData.name || "Student User",
+              email: email,
+              updatedAt: new Date(),
+            },
+          });
+        console.log(`👤 User profile saved/updated: ${email}`);
+      } catch (dbErr) {
+        console.error("Failed to save/update user in DB:", dbErr);
+      }
     }
 
     // Sign session JWT
@@ -90,7 +112,7 @@ export async function GET(request: NextRequest) {
       email,
       name: userData.name,
       picture: userData.picture,
-      isAdmin: true,
+      isAdmin: isAdmin,
     };
 
     const token = await new SignJWT(payload)
@@ -102,7 +124,9 @@ export async function GET(request: NextRequest) {
     const isProd = process.env.NODE_ENV === "production";
     const response = NextResponse.redirect(redirectPath);
 
-    response.cookies.set("admin_session", token, {
+    const cookieName = isAdmin ? "admin_session" : "student_session";
+
+    response.cookies.set(cookieName, token, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",

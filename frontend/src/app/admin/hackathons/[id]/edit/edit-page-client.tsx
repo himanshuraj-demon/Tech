@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon } from "@/lib/hackathons-data";
@@ -43,6 +44,12 @@ interface BasicHackathon {
   submissionGuidelines?: string;
   createdAt: string;
   updatedAt: string;
+  draft: boolean;
+  teamRequired: boolean;
+  points1st: number;
+  points2nd: number;
+  points3rd: number;
+  pointsParticipation: number;
 }
 
 export default function EditHackathonPage({ params }: { params: Promise<{ id: string }> }) {
@@ -88,6 +95,14 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     themes: "",
     judingCriteria: "",
     submissionGuidelines: "",
+
+    // Custom configurations
+    draft: false,
+    teamRequired: false,
+    points1st: 100,
+    points2nd: 75,
+    points3rd: 50,
+    pointsParticipation: 10,
   });
 
   // Resolve params Promise
@@ -146,6 +161,14 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
         themes: expandedHackathon.themes || "",
         judingCriteria: expandedHackathon.judingCriteria || "",
         submissionGuidelines: expandedHackathon.submissionGuidelines || "",
+
+        // Custom config mapping
+        draft: expandedHackathon.draft || false,
+        teamRequired: expandedHackathon.teamRequired || false,
+        points1st: expandedHackathon.points1st !== undefined ? expandedHackathon.points1st : 100,
+        points2nd: expandedHackathon.points2nd !== undefined ? expandedHackathon.points2nd : 75,
+        points3rd: expandedHackathon.points3rd !== undefined ? expandedHackathon.points3rd : 50,
+        pointsParticipation: expandedHackathon.pointsParticipation !== undefined ? expandedHackathon.pointsParticipation : 10,
       });
 
     } catch (error) {
@@ -156,6 +179,10 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
       setIsLoading(false);
     }
   }, [router]);
+
+  const handleInputChange = (field: string, value: string | boolean | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   useEffect(() => {
     if (id) {
@@ -197,12 +224,7 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+
 
   if (isLoading) {
     return (
@@ -288,9 +310,9 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                   <Label htmlFor="date">Date *</Label>
                   <Input
                     id="date"
+                    type="date"
                     value={formData.date}
                     onChange={(e) => handleInputChange("date", e.target.value)}
-                    placeholder="e.g., October 26-27, 2024"
                     required
                   />
                 </div>
@@ -301,18 +323,18 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                   <Label htmlFor="startTime">Start Time</Label>
                   <Input
                     id="startTime"
+                    type="time"
                     value={formData.startTime}
                     onChange={(e) => handleInputChange("startTime", e.target.value)}
-                    placeholder="e.g., 9:00 AM"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="endTime">End Time</Label>
                   <Input
                     id="endTime"
+                    type="time"
                     value={formData.endTime}
                     onChange={(e) => handleInputChange("endTime", e.target.value)}
-                    placeholder="e.g., 6:00 PM"
                   />
                 </div>
               </div>
@@ -603,6 +625,82 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                   placeholder="Any special instructions, rules, or important information for participants"
                   rows={4}
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Leaderboard Points and Registration Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Leaderboard & Registration Settings</CardTitle>
+              <CardDescription>Configure points allocation and team requirements</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between border-b pb-4 border-gray-100 dark:border-gray-800">
+                <div>
+                  <Label htmlFor="draft" className="text-base font-semibold">Save as Draft</Label>
+                  <p className="text-xs text-muted-foreground">Keep this hackathon private until ready to publish</p>
+                </div>
+                <Switch 
+                  id="draft" 
+                  checked={formData.draft} 
+                  onCheckedChange={checked => handleInputChange("draft", checked)} 
+                />
+              </div>
+
+              <div className="flex items-center justify-between border-b pb-4 border-gray-100 dark:border-gray-800">
+                <div>
+                  <Label htmlFor="teamRequired" className="text-base font-semibold">Team Registration Required</Label>
+                  <p className="text-xs text-muted-foreground">Require students to supply team members list during registration</p>
+                </div>
+                <Switch 
+                  id="teamRequired" 
+                  checked={formData.teamRequired} 
+                  onCheckedChange={checked => handleInputChange("teamRequired", checked)} 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div>
+                  <Label htmlFor="points1st">1st Place Points</Label>
+                  <Input 
+                    id="points1st" 
+                    type="number" 
+                    value={formData.points1st} 
+                    onChange={e => handleInputChange("points1st", Number(e.target.value))} 
+                    min={0}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="points2nd">2nd Place Points</Label>
+                  <Input 
+                    id="points2nd" 
+                    type="number" 
+                    value={formData.points2nd} 
+                    onChange={e => handleInputChange("points2nd", Number(e.target.value))} 
+                    min={0}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="points3rd">3rd Place Points</Label>
+                  <Input 
+                    id="points3rd" 
+                    type="number" 
+                    value={formData.points3rd} 
+                    onChange={e => handleInputChange("points3rd", Number(e.target.value))} 
+                    min={0}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pointsParticipation">Participation Points</Label>
+                  <Input 
+                    id="pointsParticipation" 
+                    type="number" 
+                    value={formData.pointsParticipation} 
+                    onChange={e => handleInputChange("pointsParticipation", Number(e.target.value))} 
+                    min={0}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

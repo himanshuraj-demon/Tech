@@ -22,6 +22,20 @@
       "when": 1751433702841,
       "tag": "0002_secret_captain_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783608328219,
+      "tag": "0003_broken_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783611747712,
+      "tag": "0004_shiny_maelstrom",
+      "breakpoints": true
     }
   ]
 }

@@ -1,12 +1,11 @@
-import EditHackathonPage from "./edit-page-client";
+import ParticipantsClient from "./participants-client";
+import { defaultHackathonsData } from "@/lib/hackathons-data";
 
 interface PageProps {
   params: Promise<{
     id: string;
   }>;
 }
-
-import { defaultHackathonsData } from "@/lib/hackathons-data";
 
 export async function generateStaticParams() {
   try {
@@ -16,7 +15,7 @@ export async function generateStaticParams() {
       const data = await res.json();
       const hackathons = data.hackathons || [];
       if (Array.isArray(hackathons) && hackathons.length > 0) {
-        return hackathons.map((hackathon: any) => ({ id: String(hackathon.id) }));
+        return hackathons.map((h: any) => ({ id: String(h.id) }));
       }
     }
   } catch (error) {
@@ -28,6 +27,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function Page({ params }: PageProps) {
-  return <EditHackathonPage params={params} />;
+export default async function Page({ params }: PageProps) {
+  const resolvedParams = await params;
+  return <ParticipantsClient hackathonId={resolvedParams.id} />;
 }

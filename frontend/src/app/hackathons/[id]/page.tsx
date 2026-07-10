@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { HackathonDetailClient } from "@/components/hackathon-detail-client";
+import { defaultHackathonsData } from "@/lib/hackathons-data";
 
 export const metadata: Metadata = {
   title: "Hackathon Details - Technical Council IITGN",
@@ -12,16 +13,20 @@ interface HackathonPageProps {
   }>;
 }
 
-import { defaultHackathonsData } from "@/lib/hackathons-data";
-
 export async function generateStaticParams() {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-    const res = await fetch(`${API_URL}/api/hackathons`);
+    const res = await fetch(`${API_URL}/api/events`); // Using standard API fetch or fallback
     if (res.ok) {
-      const hackathons = await res.json();
-      if (Array.isArray(hackathons) && hackathons.length > 0) {
-        return hackathons.map((hackathon: any) => ({ id: String(hackathon.id) }));
+      const data = await res.json();
+      // If we fetch all hackathons
+      const hackathonsRes = await fetch(`${API_URL}/api/hackathons`);
+      if (hackathonsRes.ok) {
+        const hData = await hackathonsRes.json();
+        const hackathons = hData.hackathons || [];
+        if (Array.isArray(hackathons) && hackathons.length > 0) {
+          return hackathons.map((h: any) => ({ id: String(h.id) }));
+        }
       }
     }
   } catch (error) {

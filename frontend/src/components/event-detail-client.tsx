@@ -23,7 +23,7 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
       try {
         setLoading(true);
         setError(false);
-        const res = await  api.fetch(`/api/events/${id}`);
+        const res = await api.fetch(`/api/events/${id}`);
         if (res.status === 404) {
           setError(true);
           return;
@@ -73,7 +73,7 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
 
       {/* Hero Section */}
       <section className="relative py-16 lg:py-24">
-        <div className="absolute inset-0 gradient-bg opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 opacity-40 dark:opacity-10" />
         <div className="container relative z-10 px-4 md:px-6">
           <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="space-y-6">

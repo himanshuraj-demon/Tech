@@ -236,6 +236,15 @@ export default function AdminHackathonsPage() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => router.push(`/admin/hackathons/${hackathon.id}/participants`)}
+                        title="Manage participants & winners"
+                        className="text-primary hover:bg-primary/5 border-primary/20 hover:border-primary/45"
+                      >
+                        <Users className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => router.push(`/admin/hackathons/${hackathon.id}/edit`)}
                       >
                         <Edit className="h-4 w-4" />

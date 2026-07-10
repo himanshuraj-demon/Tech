@@ -53,6 +53,12 @@ export interface BasicHackathon {
   
   createdAt: string;
   updatedAt: string;
+  draft: boolean;
+  teamRequired: boolean;
+  points1st: number;
+  points2nd: number;
+  points3rd: number;
+  pointsParticipation: number;
 }
 
 function mapDBToData(h: Hackathon): BasicHackathon {
@@ -86,6 +92,12 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     submissionGuidelines: h.submissionGuidelines || undefined,
     createdAt: h.createdAt.toISOString(),
     updatedAt: h.updatedAt.toISOString(),
+    draft: h.draft,
+    teamRequired: h.teamRequired,
+    points1st: h.points1st,
+    points2nd: h.points2nd,
+    points3rd: h.points3rd,
+    pointsParticipation: h.pointsParticipation,
   };
 }
 
@@ -132,6 +144,12 @@ export async function createHackathon(hackathonInput: Record<string, any>): Prom
     themes: hackathonInput.themes ? String(hackathonInput.themes) : null,
     judingCriteria: hackathonInput.judingCriteria ? String(hackathonInput.judingCriteria) : null,
     submissionGuidelines: hackathonInput.submissionGuidelines ? String(hackathonInput.submissionGuidelines) : null,
+    draft: Boolean(hackathonInput.draft),
+    teamRequired: Boolean(hackathonInput.teamRequired),
+    points1st: Number(hackathonInput.points1st !== undefined ? hackathonInput.points1st : 100),
+    points2nd: Number(hackathonInput.points2nd !== undefined ? hackathonInput.points2nd : 75),
+    points3rd: Number(hackathonInput.points3rd !== undefined ? hackathonInput.points3rd : 50),
+    pointsParticipation: Number(hackathonInput.pointsParticipation !== undefined ? hackathonInput.pointsParticipation : 10),
   };
 
   const newH = await dbCreateHackathon(input);
@@ -167,6 +185,12 @@ export async function updateHackathon(id: string, updates: Record<string, any>):
   if (updates.themes !== undefined) cleanUpdates.themes = updates.themes ? String(updates.themes) : null;
   if (updates.judingCriteria !== undefined) cleanUpdates.judingCriteria = updates.judingCriteria ? String(updates.judingCriteria) : null;
   if (updates.submissionGuidelines !== undefined) cleanUpdates.submissionGuidelines = updates.submissionGuidelines ? String(updates.submissionGuidelines) : null;
+  if (updates.draft !== undefined) cleanUpdates.draft = Boolean(updates.draft);
+  if (updates.teamRequired !== undefined) cleanUpdates.teamRequired = Boolean(updates.teamRequired);
+  if (updates.points1st !== undefined) cleanUpdates.points1st = Number(updates.points1st);
+  if (updates.points2nd !== undefined) cleanUpdates.points2nd = Number(updates.points2nd);
+  if (updates.points3rd !== undefined) cleanUpdates.points3rd = Number(updates.points3rd);
+  if (updates.pointsParticipation !== undefined) cleanUpdates.pointsParticipation = Number(updates.pointsParticipation);
 
   const updated = await dbUpdateHackathon(id, cleanUpdates);
   return mapDBToData(updated);

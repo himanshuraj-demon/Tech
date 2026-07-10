@@ -21,7 +21,7 @@ const createEventSchema = z.object({
     alt: z.string(),
     caption: z.string().optional()
   })).optional().default([]),
-  draft: z.boolean().optional().default(false)
+  draft: z.boolean().optional().default(false),
 });
 
 // Check if user is admin
@@ -86,7 +86,8 @@ export async function POST(request: NextRequest) {
       organizer: validatedData.organizer && validatedData.organizer.trim() ? validatedData.organizer : "Technical Council",
       category: validatedData.category,
       highlights: validatedData.highlights || [],
-      gallery: validatedData.gallery || []
+      gallery: validatedData.gallery || [],
+      draft: validatedData.draft,
     };
 
     // Create event

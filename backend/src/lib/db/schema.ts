@@ -183,9 +183,46 @@ export const hackathons = pgTable('hackathons', {
   themes: text('themes'),
   judingCriteria: text('juding_criteria'),
   submissionGuidelines: text('submission_guidelines'),
+  draft: boolean('draft').default(false).notNull(),
+  teamRequired: boolean('team_required').default(false).notNull(),
+  points1st: integer('points_1st').default(100).notNull(),
+  points2nd: integer('points_2nd').default(75).notNull(),
+  points3rd: integer('points_3rd').default(50).notNull(),
+  pointsParticipation: integer('points_participation').default(10).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export type Hackathon = typeof hackathons.$inferSelect;
 export type NewHackathon = typeof hackathons.$inferInsert;
+
+// Users Table (Stores user name and email only, populated upon Google OAuth login)
+export const users = pgTable('users', {
+  id: text('id').primaryKey(), // Google OAuth sub
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type UserDB = typeof users.$inferSelect;
+export type NewUserDB = typeof users.$inferInsert;
+
+// Event Registrations / Participation Table
+export const eventRegistrations = pgTable('event_registrations', {
+  id: text('id').primaryKey(),
+  eventId: text('event_id').notNull(),
+  userId: text('user_id').notNull(),
+  userName: text('user_name').notNull(),
+  userEmail: text('user_email').notNull(),
+  degreeType: text('degree_type').notNull(), // 'btech' | 'mtech' | 'phd' | 'other'
+  yearOfJoining: text('year_of_joining').notNull(), // '2025' | '2026' | 'other'
+  branchName: text('branch_name').notNull(),
+  teamMembers: jsonb('team_members').$type<string[]>(), // optional names/emails if teamRequired
+  winnerPlace: integer('winner_place'), // 1 = 1st, 2 = 2nd, 3 = 3rd, 0/null = participation only
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type EventRegistration = typeof eventRegistrations.$inferSelect;
+export type NewEventRegistration = typeof eventRegistrations.$inferInsert;

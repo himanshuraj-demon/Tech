@@ -57,7 +57,7 @@ export function Footer() {
               href={contactInfo?.socialMedia.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200 touch-target"
+              className="p-2.5 rounded-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200 touch-target"
               aria-label="Instagram"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@ export function Footer() {
               href={contactInfo?.socialMedia.youtube || "https://www.youtube.com/@tech_iitgn"}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-full bg-red-600 text-white hover:scale-110 transition-transform duration-200 touch-target"
+              className="p-2.5 rounded-full bg-red-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200 touch-target"
               aria-label="YouTube"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ export function Footer() {
               href={contactInfo?.socialMedia.linkedin || "https://www.linkedin.com/school/tech-council-iitgn/"}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-full bg-blue-600 text-white hover:scale-110 transition-transform duration-200 touch-target"
+              className="p-2.5 rounded-full bg-blue-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200 touch-target"
               aria-label="LinkedIn"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@ export function Footer() {
               href={contactInfo?.socialMedia.facebook || "https://www.facebook.com/tech.iitgn"}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-full bg-blue-500 text-white hover:scale-110 transition-transform duration-200 touch-target"
+              className="p-2.5 rounded-full bg-blue-500 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200 touch-target"
               aria-label="Facebook"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -178,6 +178,9 @@ export function Footer() {
                 </Link>
                 <Link href="/hackathons" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-2 touch-target">
                   Hackathons
+                </Link>
+                <Link href="/leaderboard" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-2 touch-target">
+                  LeaderBoard
                 </Link>
                 <Link href="/achievements" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-2 touch-target">
                   Achievements
@@ -270,6 +273,12 @@ export function Footer() {
                 Hackathons
               </Link>
               <Link
+                href="/leaderboard"
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                Leaderboard
+              </Link>
+              <Link
                 href="/achievements"
                 className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
@@ -360,12 +369,12 @@ export function Footer() {
                 <span>{contactInfo?.email || 'technical.secretary@iitgn.ac.in'}</span>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center space-x-3">
               <a
                 href={contactInfo?.socialMedia.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200"
+                className="p-1.5 rounded-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200"
                 aria-label="Instagram"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -377,7 +386,7 @@ export function Footer() {
                 href={contactInfo?.socialMedia.youtube || "https://www.youtube.com/@tech_iitgn"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-full bg-red-600 text-white hover:scale-110 transition-transform duration-200"
+                className="p-1.5 rounded-full bg-red-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200"
                 aria-label="YouTube"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -389,7 +398,7 @@ export function Footer() {
                 href={contactInfo?.socialMedia.linkedin || "https://www.linkedin.com/school/tech-council-iitgn/"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-full bg-blue-600 text-white hover:scale-110 transition-transform duration-200"
+                className="p-1.5 rounded-full bg-blue-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200"
                 aria-label="LinkedIn"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -401,7 +410,7 @@ export function Footer() {
                 href={contactInfo?.socialMedia.facebook || "https://www.facebook.com/tech.iitgn"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-full bg-blue-500 text-white hover:scale-110 transition-transform duration-200"
+                className="p-1.5 rounded-full bg-blue-500 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200"
                 aria-label="Facebook"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
