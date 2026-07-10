@@ -467,28 +467,28 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     <form onSubmit={handleRegister} className="space-y-6">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div>
-                          <Label htmlFor="studName">Full Name</Label>
+                          <Label htmlFor="studName" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Full Name</Label>
                           <Input
                             id="studName"
                             value={session?.user?.name || ""}
                             disabled
-                            className="bg-gray-100/50 dark:bg-gray-900/50 cursor-not-allowed font-medium"
+                            className="bg-gray-100/50 dark:bg-gray-900/50 cursor-not-allowed font-medium text-neutral-900 dark:text-neutral-100"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="studEmail">Email Address</Label>
+                          <Label htmlFor="studEmail" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Email Address</Label>
                           <Input
                             id="studEmail"
                             value={session?.user?.email || ""}
                             disabled
-                            className="bg-gray-100/50 dark:bg-gray-900/50 cursor-not-allowed font-medium"
+                            className="bg-gray-100/50 dark:bg-gray-900/50 cursor-not-allowed font-medium text-neutral-900 dark:text-neutral-100"
                           />
                         </div>
                       </div>
 
-                      <div className="grid gap-4 md:grid-cols-3 text-black">
+                      <div className="grid gap-4 md:grid-cols-3">
                         <div>
-                          <Label htmlFor="degree">Degree Type *</Label>
+                          <Label htmlFor="degree" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Degree Type *</Label>
                           <select
                             id="degree"
                             value={degreeType}
@@ -502,7 +502,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                           </select>
                         </div>
                         <div>
-                          <Label htmlFor="joiningYear">Year of Joining *</Label>
+                          <Label htmlFor="joiningYear" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Year of Joining *</Label>
                           <select
                             id="joiningYear"
                             value={yearOfJoining}
@@ -518,12 +518,13 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                           </select>
                         </div>
                         <div>
-                          <Label htmlFor="branch">Branch Name *</Label>
+                          <Label htmlFor="branch" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Branch Name *</Label>
                           <Input
                             id="branch"
                             placeholder="e.g., Computer Science"
                             value={branchName}
                             onChange={(e) => setBranchName(e.target.value)}
+                            className="border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
                             required
                           />
                         </div>
@@ -563,6 +564,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                               placeholder="Enter team member name/email"
                               value={newTeamMember}
                               onChange={(e) => setNewTeamMember(e.target.value)}
+                              className="border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                   e.preventDefault();
