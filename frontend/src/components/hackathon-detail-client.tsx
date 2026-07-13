@@ -180,7 +180,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
   };
 
   return (
-    <div className="flex flex-col font-sans">
+    <div className="flex flex-col font-sans w-full">
       {/* Header */}
       <section className="py-12 bg-muted/50">
         <div className="container px-4 md:px-6">

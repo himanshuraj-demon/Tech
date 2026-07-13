@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "../../../services/api";
+import { cn } from "@/lib/utils";
 
 interface LeaderboardItem {
   email: string;
@@ -73,10 +74,6 @@ export default function LeaderboardPage() {
     return `${local.substring(0, 3)}...@${domain}`;
   };
 
-  // Get podium users
-  const podium = leaderboard.slice(0, 3);
-  const listUsers = leaderboard.slice(3);
-
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 font-sans">
 
@@ -113,95 +110,67 @@ export default function LeaderboardPage() {
             </div>
           ) : (
             <div className="space-y-12">
-              {/* Podium View */}
-              {podium.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-6">
-                  {/* 2nd Place */}
-                  {podium[1] && (
-                    <Card className="relative order-2 md:order-1 border-gray-200/80 dark:border-gray-800/80 bg-white/50 dark:bg-gray-900/50 backdrop-blur shadow-md md:mt-6 hover:scale-105 transition-all duration-300">
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xl border-4 border-gray-50 dark:border-gray-950 font-bold shadow-md">🥈</div>
-                      <CardHeader className="text-center pt-8 pb-3">
-                        <CardTitle className="font-space-grotesk text-lg truncate">{podium[1].name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">{formatEmail(podium[1].email)}</p>
-                      </CardHeader>
-                      <CardContent className="text-center pb-6">
-                        <div className="text-3xl font-extrabold text-slate-600 dark:text-slate-400 mb-2">{podium[1].score} pts</div>
-                        <Badge variant="secondary" className="text-xs">{podium[1].participations} Events</Badge>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* 1st Place */}
-                  {podium[0] && (
-                    <Card className="relative order-1 md:order-2 border-primary/30 dark:border-primary/20 bg-gradient-to-b from-primary/5 to-white dark:to-gray-900 shadow-xl scale-105 z-10 hover:scale-110 transition-all duration-300">
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 flex items-center justify-center text-3xl border-4 border-gray-50 dark:border-gray-950 font-bold shadow-lg animate-bounce">🥇</div>
-                      <CardHeader className="text-center pt-10 pb-3">
-                        <CardTitle className="font-space-grotesk text-xl truncate">{podium[0].name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">{formatEmail(podium[0].email)}</p>
-                      </CardHeader>
-                      <CardContent className="text-center pb-8">
-                        <div className="text-4xl font-extrabold text-amber-500 mb-3">{podium[0].score} pts</div>
-                        <div className="flex gap-2 justify-center">
-                          <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white text-[10px]">Leader</Badge>
-                          <Badge variant="outline" className="text-xs">{podium[0].participations} Events</Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* 3rd Place */}
-                  {podium[2] && (
-                    <Card className="relative order-3 md:order-3 border-gray-200/80 dark:border-gray-800/80 bg-white/50 dark:bg-gray-900/50 backdrop-blur shadow-md md:mt-8 hover:scale-105 transition-all duration-300">
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-amber-700/10 dark:bg-amber-900/20 text-amber-700 dark:text-amber-500 flex items-center justify-center text-xl border-4 border-gray-50 dark:border-gray-950 font-bold shadow-md">🥉</div>
-                      <CardHeader className="text-center pt-8 pb-3">
-                        <CardTitle className="font-space-grotesk text-lg truncate">{podium[2].name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">{formatEmail(podium[2].email)}</p>
-                      </CardHeader>
-                      <CardContent className="text-center pb-6">
-                        <div className="text-3xl font-extrabold text-amber-700 dark:text-amber-600 mb-2">{podium[2].score} pts</div>
-                        <Badge variant="secondary" className="text-xs">{podium[2].participations} Events</Badge>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              )}
-
               {/* Table Rankings */}
-              <Card className="max-w-4xl mx-auto border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm rounded-2xl overflow-hidden">
+              <Card className="max-w-4xl mx-auto border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-md rounded-2xl overflow-hidden">
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-850/50 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          <th className="px-6 py-4 text-center w-20">Rank</th>
-                          <th className="px-6 py-4">Student</th>
-                          <th className="px-6 py-4 text-center">Events Participated</th>
-                          <th className="px-6 py-4 text-right">Total Score</th>
-                          <th className="px-6 py-4 text-center w-20">Details</th>
+                          <th className="px-3 py-4 md:px-6 text-center w-16 md:w-20">Rank</th>
+                          <th className="px-3 py-4 md:px-6">Student</th>
+                          <th className="px-6 py-4 text-center hidden md:table-cell">Events Participated</th>
+                          <th className="px-3 py-4 md:px-6 text-right">Total Score</th>
+                          <th className="px-3 py-4 md:px-6 text-center w-16 md:w-20">Details</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {leaderboard.map((student, idx) => {
                           const isExpanded = !!expandedUsers[student.email];
+                          
+                          // Style variables based on rank (1st, 2nd, 3rd vs general)
+                          let rowClass = "border-l-4 border-l-transparent hover:bg-gray-50/50 dark:hover:bg-gray-850/30";
+                          let nameClass = "font-semibold text-gray-900 dark:text-gray-100 text-sm md:text-base";
+                          let scoreClass = "text-primary text-base md:text-lg font-extrabold";
+                          
+                          if (idx === 0) {
+                            rowClass = "border-l-4 border-l-amber-500 bg-amber-500/[0.03] dark:bg-amber-500/[0.06] hover:bg-amber-500/[0.06] dark:hover:bg-amber-500/[0.10]";
+                            nameClass = "font-extrabold text-amber-900 dark:text-amber-400 text-base md:text-lg";
+                            scoreClass = "text-amber-600 dark:text-amber-400 text-lg md:text-xl font-black";
+                          } else if (idx === 1) {
+                            rowClass = "border-l-4 border-l-slate-400 dark:border-l-slate-500 bg-slate-500/[0.03] dark:bg-slate-500/[0.06] hover:bg-slate-500/[0.06] dark:hover:bg-slate-500/[0.10]";
+                            nameClass = "font-bold text-slate-800 dark:text-slate-300 text-sm md:text-base";
+                            scoreClass = "text-slate-650 dark:text-slate-400 text-base md:text-lg font-extrabold";
+                          } else if (idx === 2) {
+                            rowClass = "border-l-4 border-l-orange-400 dark:border-l-orange-500 bg-orange-500/[0.03] dark:bg-orange-500/[0.06] hover:bg-orange-500/[0.06] dark:hover:bg-orange-500/[0.10]";
+                            nameClass = "font-bold text-orange-850 dark:text-orange-400 text-sm md:text-base";
+                            scoreClass = "text-orange-600 dark:text-orange-400 text-base md:text-lg font-extrabold";
+                          }
+                          
                           return (
                             <React.Fragment key={student.email}>
-                              <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-850/30 transition-colors duration-150">
-                                <td className="px-6 py-4 text-center align-middle">
+                              <tr className={cn("transition-colors duration-150", rowClass)}>
+                                <td className="px-3 py-4 md:px-6 text-center align-middle">
                                   {getRankBadge(idx)}
                                 </td>
-                                <td className="px-6 py-4 align-middle">
+                                <td className="px-3 py-4 md:px-6 align-middle">
                                   <div>
-                                    <div className="font-bold text-gray-900 dark:text-gray-100">{student.name}</div>
-                                    <div className="text-xs text-muted-foreground">{formatEmail(student.email)}</div>
+                                    <div className={nameClass}>{student.name}</div>
+                                    <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-1.5 mt-0.5">
+                                      <span>{formatEmail(student.email)}</span>
+                                      <Badge variant="secondary" className="md:hidden text-[10px] px-1.5 py-0 bg-gray-200/50 dark:bg-gray-800/50 border-0">
+                                        {student.participations} {student.participations === 1 ? 'event' : 'events'}
+                                      </Badge>
+                                    </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 text-center align-middle font-medium">
+                                <td className="px-6 py-4 text-center align-middle font-medium hidden md:table-cell">
                                   {student.participations}
                                 </td>
-                                <td className="px-6 py-4 text-right align-middle font-extrabold text-lg text-primary">
+                                <td className={cn("px-3 py-4 md:px-6 text-right align-middle", scoreClass)}>
                                   {student.score} pts
                                 </td>
-                                <td className="px-6 py-4 text-center align-middle">
+                                <td className="px-3 py-4 md:px-6 text-center align-middle">
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -216,14 +185,14 @@ export default function LeaderboardPage() {
                               {/* Expanded View (Event Breakdown) */}
                               {isExpanded && (
                                 <tr className="bg-gray-50/40 dark:bg-gray-900/40">
-                                  <td colSpan={5} className="px-8 py-4">
+                                  <td colSpan={5} className="px-4 py-4 md:px-8">
                                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Points Breakdown</div>
                                     <div className="grid gap-2">
                                       {student.events.map((e, evIdx) => (
-                                        <div key={evIdx} className="flex items-center justify-between p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950/60 shadow-sm text-sm">
-                                          <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-gray-400" />
-                                            <span className="font-medium text-gray-700 dark:text-gray-300">{e.title}</span>
+                                        <div key={evIdx} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950/60 shadow-sm text-sm gap-2">
+                                          <div className="flex flex-wrap items-center gap-2">
+                                            <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                            <span className="font-medium text-gray-700 dark:text-gray-300 break-all">{e.title}</span>
                                             {e.place && (
                                               <Badge className={
                                                 e.place === 1 ? "bg-yellow-500 text-white hover:bg-yellow-600" :
@@ -234,7 +203,7 @@ export default function LeaderboardPage() {
                                               </Badge>
                                             )}
                                           </div>
-                                          <div className="font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
+                                          <div className="font-bold text-green-600 dark:text-green-400 flex items-center gap-1 self-end sm:self-auto">
                                             <Star className="h-3 w-3 fill-current" />
                                             +{e.points} pts
                                           </div>
