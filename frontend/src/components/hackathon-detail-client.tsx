@@ -445,38 +445,6 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                         </p>
                       </div>
 
-                      <div className="w-full max-w-md bg-white dark:bg-gray-900/80 border border-gray-100 dark:border-gray-850 p-4 rounded-xl text-left text-sm space-y-2 mt-4 shadow-sm">
-                        <div className="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-                          <span className="text-muted-foreground">Name:</span>
-                          <span className="font-semibold">{session?.user?.name}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-                          <span className="text-muted-foreground">Email:</span>
-                          <span className="font-semibold">{session?.user?.email}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-                          <span className="text-muted-foreground">Degree:</span>
-                          <span className="font-semibold uppercase">{degreeType}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-                          <span className="text-muted-foreground">Year of Joining:</span>
-                          <span className="font-semibold">{yearOfJoining}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-                          <span className="text-muted-foreground">Branch:</span>
-                          <span className="font-semibold">{branchName}</span>
-                        </div>
-                        {teamMembers.length > 0 && (
-                          <div className="pt-1">
-                            <span className="text-muted-foreground block mb-1">Team Members:</span>
-                            <ul className="list-disc pl-5 space-y-1">
-                              {teamMembers.map((m, idx) => (
-                                <li key={idx} className="font-medium">{m}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
 
                       {/* Project Submission Form for ongoing hackathons */}
                       {hackathon.status === 'ongoing' && (
