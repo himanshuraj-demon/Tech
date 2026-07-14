@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
         id: string;
         title: string;
         place: number | null;
+        placeName: string | null;
         points: number;
       }>;
     }> = {};
@@ -34,6 +35,9 @@ export async function GET(request: NextRequest) {
       const email = reg.userEmail.toLowerCase();
       const hackathon = hackathonsMap[reg.eventId]; // column eventId stores hackathonId
       if (!hackathon) return; // Skip if hackathon no longer exists
+
+      // ONLY award points if the hackathon is completed/ended!
+      if (hackathon.status !== 'completed') return;
 
       if (!leaderboardMap[email]) {
         leaderboardMap[email] = {
@@ -52,15 +56,19 @@ export async function GET(request: NextRequest) {
       student.participations += 1;
 
       let pointsEarned = 0;
-      if (reg.winnerPlace === 1) {
-        pointsEarned = hackathon.points1st;
-        student.firstPlaces += 1;
-      } else if (reg.winnerPlace === 2) {
-        pointsEarned = hackathon.points2nd;
-        student.secondPlaces += 1;
-      } else if (reg.winnerPlace === 3) {
-        pointsEarned = hackathon.points3rd;
-        student.thirdPlaces += 1;
+      let placeName: string | null = null;
+
+      if (reg.winnerPlace) {
+        const tier = (hackathon.winnerTiers as any[])?.find((t: any) => t.rank === reg.winnerPlace);
+        if (tier) {
+          pointsEarned = Number(tier.points);
+          placeName = tier.name;
+          if (reg.winnerPlace === 1) student.firstPlaces += 1;
+          else if (reg.winnerPlace === 2) student.secondPlaces += 1;
+          else if (reg.winnerPlace === 3) student.thirdPlaces += 1;
+        } else {
+          pointsEarned = hackathon.pointsParticipation;
+        }
       } else {
         pointsEarned = hackathon.pointsParticipation;
       }
@@ -70,6 +78,7 @@ export async function GET(request: NextRequest) {
         id: hackathon.id,
         title: hackathon.name,
         place: reg.winnerPlace,
+        placeName: placeName,
         points: pointsEarned,
       });
     });

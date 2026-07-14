@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "Explore details of hackathons organized by the Technical Council of IIT Gandhinagar.",
 };
 
+export const dynamicParams = true;
+
 interface HackathonPageProps {
   params: Promise<{
     id: string;

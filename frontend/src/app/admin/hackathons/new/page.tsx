@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { hackathonCategories, hackathonStatuses } from "@/lib/hackathons-data";
+import { hackathonCategories, hackathonStatuses, type WinnerTier } from "@/lib/hackathons-data";
 import { api } from "../../../../../services/api";
 
 export default function NewHackathonPage() {
@@ -22,9 +22,8 @@ export default function NewHackathonPage() {
     name: "",
     description: "",
     longDescription: "",
-    date: "",
-    startTime: "",
-    endTime: "",
+    startDate: "",
+    endDate: "",
     location: "",
     category: "",
     status: "upcoming" as const,
@@ -42,10 +41,12 @@ export default function NewHackathonPage() {
     teamSize: "",
     
     // Prize pool
-    firstPrize: "",
-    secondPrize: "",
-    thirdPrize: "",
     specialPrizes: "",
+    winnerTiers: [
+      { rank: 1, name: "1st Place", prize: "", points: 100 },
+      { rank: 2, name: "2nd Place", prize: "", points: 75 },
+      { rank: 3, name: "3rd Place", prize: "", points: 50 }
+    ] as WinnerTier[],
     
     // Timeline and important details
     timeline: "",
@@ -59,11 +60,38 @@ export default function NewHackathonPage() {
     // custom points and draft config
     draft: false,
     teamRequired: false,
-    points1st: 100,
-    points2nd: 75,
-    points3rd: 50,
     pointsParticipation: 10,
   });
+
+  const addWinnerTier = () => {
+    setFormData(prev => {
+      const nextRank = prev.winnerTiers.length > 0 
+        ? Math.max(...prev.winnerTiers.map(t => t.rank)) + 1 
+        : 1;
+      return {
+        ...prev,
+        winnerTiers: [
+          ...prev.winnerTiers,
+          { rank: nextRank, name: `Place #${nextRank}`, prize: "", points: 10 }
+        ]
+      };
+    });
+  };
+
+  const updateWinnerTier = (index: number, field: keyof WinnerTier, value: any) => {
+    setFormData(prev => {
+      const updated = [...prev.winnerTiers];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, winnerTiers: updated };
+    });
+  };
+
+  const removeWinnerTier = (index: number) => {
+    setFormData(prev => {
+      const updated = prev.winnerTiers.filter((_, idx) => idx !== index);
+      return { ...prev, winnerTiers: updated };
+    });
+  };
 
   const handleInputChange = (field: string, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -76,6 +104,18 @@ export default function NewHackathonPage() {
       // Validate required fields
       if (!formData.name.trim()) {
         alert("Hackathon name is required");
+        return;
+      }
+      if (!formData.startDate) {
+        alert("Start Date is required");
+        return;
+      }
+      if (!formData.endDate) {
+        alert("End Date is required");
+        return;
+      }
+      if (new Date(formData.endDate) < new Date(formData.startDate)) {
+        alert("End Date cannot be before Start Date");
         return;
       }
       if (!formData.description.trim()) {
@@ -149,35 +189,26 @@ export default function NewHackathonPage() {
                     placeholder="e.g. Winter Hackathon 2025" 
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="date">Date *</Label>
+                  <Label htmlFor="startDate">Start Date *</Label>
                   <Input 
-                    id="date" 
+                    id="startDate" 
                     type="date"
-                    value={formData.date} 
-                    onChange={e => handleInputChange("date", e.target.value)} 
+                    value={formData.startDate} 
+                    onChange={e => handleInputChange("startDate", e.target.value)} 
                     required 
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="startTime">Start Time</Label>
+                  <Label htmlFor="endDate">End Date *</Label>
                   <Input 
-                    id="startTime" 
-                    type="time"
-                    value={formData.startTime} 
-                    onChange={e => handleInputChange("startTime", e.target.value)} 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="endTime">End Time</Label>
-                  <Input 
-                    id="endTime" 
-                    type="time"
-                    value={formData.endTime} 
-                    onChange={e => handleInputChange("endTime", e.target.value)} 
+                    id="endDate" 
+                    type="date"
+                    value={formData.endDate} 
+                    onChange={e => handleInputChange("endDate", e.target.value)} 
+                    required 
                   />
                 </div>
               </div>
@@ -349,50 +380,78 @@ export default function NewHackathonPage() {
             </CardContent>
           </Card>
 
-          {/* Prize Pool */}
+          {/* Winner Tiers & Prize Pool */}
           <Card>
-            <CardHeader>
-              <CardTitle>Prize Pool</CardTitle>
-              <CardDescription>Awards and recognition for winners</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Winner Tiers & Prize Pool</CardTitle>
+                <CardDescription>Configure points and prizes for winners and special awards</CardDescription>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={addWinnerTier}>
+                + Add Tier
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="firstPrize">First Prize</Label>
-                  <Input 
-                    id="firstPrize" 
-                    value={formData.firstPrize} 
-                    onChange={e => handleInputChange("firstPrize", e.target.value)} 
-                    placeholder="e.g., ₹50,000 + Trophy" 
-                  />
+              {formData.winnerTiers.map((tier, index) => (
+                <div key={index} className="flex flex-col md:flex-row gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 relative">
+                  <div className="w-16">
+                     <Label>Rank *</Label>
+                     <Input 
+                       type="number" 
+                       value={tier.rank} 
+                       onChange={e => updateWinnerTier(index, "rank", Number(e.target.value))} 
+                       required
+                       min={1}
+                     />
+                  </div>
+                  <div className="flex-1">
+                     <Label>Tier Name *</Label>
+                     <Input 
+                       value={tier.name} 
+                       onChange={e => updateWinnerTier(index, "name", e.target.value)} 
+                       placeholder="e.g. 1st Place, Best Innovation" 
+                       required
+                     />
+                  </div>
+                  <div className="flex-1">
+                     <Label>Prize *</Label>
+                     <Input 
+                       value={tier.prize} 
+                       onChange={e => updateWinnerTier(index, "prize", e.target.value)} 
+                       placeholder="e.g. ₹50,000 + Certificate" 
+                       required
+                     />
+                  </div>
+                  <div className="w-24">
+                     <Label>Points *</Label>
+                     <Input 
+                       type="number" 
+                       value={tier.points} 
+                       onChange={e => updateWinnerTier(index, "points", Number(e.target.value))} 
+                       required
+                       min={0}
+                     />
+                  </div>
+                  <div className="flex items-end justify-end">
+                     <Button type="button" variant="destructive" size="icon" className="h-10 w-10 shrink-0" onClick={() => removeWinnerTier(index)}>
+                       ✕
+                     </Button>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="secondPrize">Second Prize</Label>
-                  <Input 
-                    id="secondPrize" 
-                    value={formData.secondPrize} 
-                    onChange={e => handleInputChange("secondPrize", e.target.value)} 
-                    placeholder="e.g., ₹30,000 + Certificate" 
-                  />
+              ))}
+              {formData.winnerTiers.length === 0 && (
+                <div className="text-center py-6 text-sm text-muted-foreground italic">
+                  No winner tiers configured. All participants will only receive participation points.
                 </div>
-                <div>
-                  <Label htmlFor="thirdPrize">Third Prize</Label>
-                  <Input 
-                    id="thirdPrize" 
-                    value={formData.thirdPrize} 
-                    onChange={e => handleInputChange("thirdPrize", e.target.value)} 
-                    placeholder="e.g., ₹20,000 + Certificate" 
-                  />
-                </div>
-              </div>
-
+              )}
+              
               <div>
-                <Label htmlFor="specialPrizes">Special Prizes</Label>
+                <Label htmlFor="specialPrizes">Special Prizes / Track Details</Label>
                 <Textarea 
                   id="specialPrizes" 
                   value={formData.specialPrizes} 
                   onChange={e => handleInputChange("specialPrizes", e.target.value)} 
-                  placeholder="Best UI/UX, Most Innovative Solution, People's Choice Award, etc." 
+                  placeholder="General details about sponsors' special tracks, API prizes, etc." 
                   rows={3}
                 />
               </div>
@@ -494,37 +553,7 @@ export default function NewHackathonPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                <div>
-                  <Label htmlFor="points1st">1st Place Points</Label>
-                  <Input 
-                    id="points1st" 
-                    type="number" 
-                    value={formData.points1st} 
-                    onChange={e => handleInputChange("points1st", Number(e.target.value))} 
-                    min={0}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="points2nd">2nd Place Points</Label>
-                  <Input 
-                    id="points2nd" 
-                    type="number" 
-                    value={formData.points2nd} 
-                    onChange={e => handleInputChange("points2nd", Number(e.target.value))} 
-                    min={0}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="points3rd">3rd Place Points</Label>
-                  <Input 
-                    id="points3rd" 
-                    type="number" 
-                    value={formData.points3rd} 
-                    onChange={e => handleInputChange("points3rd", Number(e.target.value))} 
-                    min={0}
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div>
                   <Label htmlFor="pointsParticipation">Participation Points</Label>
                   <Input 

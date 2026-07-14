@@ -31,6 +31,10 @@ export async function POST(
       return NextResponse.json({ error: "Hackathon not found" }, { status: 404 });
     }
 
+    if (hackathon.status === "completed") {
+      return NextResponse.json({ error: "Registrations are closed as this event has ended." }, { status: 400 });
+    }
+
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
 

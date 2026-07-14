@@ -41,10 +41,8 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
   
   const visibleRegistrations = registrations.slice(0, visibleCount);
   
-  // Winners selection
-  const [firstPlace, setFirstPlace] = useState<string>("");
-  const [secondPlace, setSecondPlace] = useState<string>("");
-  const [thirdPlace, setThirdPlace] = useState<string>("");
+  // Winners selection: maps rank to registrationId
+  const [winnerSelections, setWinnerSelections] = useState<Record<number, string>>({});
 
   useEffect(() => {
     if (status === "loading") return;
@@ -77,14 +75,14 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
       const regData = await regResponse.json();
       setRegistrations(regData);
 
-      // Set initial winners if already set
-      const first = regData.find((r: Registration) => r.winnerPlace === 1);
-      const second = regData.find((r: Registration) => r.winnerPlace === 2);
-      const third = regData.find((r: Registration) => r.winnerPlace === 3);
-
-      if (first) setFirstPlace(first.id);
-      if (second) setSecondPlace(second.id);
-      if (third) setThirdPlace(third.id);
+      // Set initial winner placements from registrations data
+      const initialSelections: Record<number, string> = {};
+      regData.forEach((r: Registration) => {
+        if (r.winnerPlace) {
+          initialSelections[r.winnerPlace] = r.id;
+        }
+      });
+      setWinnerSelections(initialSelections);
 
     } catch (error) {
       console.error("Error loading data:", error);
@@ -96,31 +94,33 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
   };
 
   const handleSaveWinners = async () => {
-    if (firstPlace && (firstPlace === secondPlace || firstPlace === thirdPlace)) {
+    const selectedIds = Object.values(winnerSelections).filter(id => id !== "");
+    const hasDuplicates = new Set(selectedIds).size !== selectedIds.length;
+    if (hasDuplicates) {
       alert("A participant cannot win multiple prizes!");
       return;
     }
-    if (secondPlace && secondPlace === thirdPlace) {
-      alert("A participant cannot win multiple prizes!");
-      return;
-    }
-
+ 
     try {
       setIsSaving(true);
+      
+      const placements = Object.entries(winnerSelections)
+        .filter(([_, regId]) => regId !== "")
+        .map(([rankStr, regId]) => ({
+          regId,
+          rank: Number(rankStr),
+        }));
+ 
       const response = await api.fetch(`/api/admin/hackathons/${hackathonId}/winners`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstPlaceRegId: firstPlace || null,
-          secondPlaceRegId: secondPlace || null,
-          thirdPlaceRegId: thirdPlace || null,
-        }),
+        body: JSON.stringify({ placements }),
       });
-
+ 
       if (!response.ok) {
         throw new Error("Failed to save winners");
       }
-
+ 
       alert("Winners updated and leaderboard points distributed successfully! 🏆");
       fetchHackathonAndParticipants(); // Refresh list
     } catch (error) {
@@ -263,53 +263,50 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold uppercase text-yellow-600 flex items-center gap-1">
-                        🥇 1st Place (+{hackathon?.points1st || 0} pts)
-                      </label>
-                      <select
-                        value={firstPlace}
-                        onChange={(e) => setFirstPlace(e.target.value)}
-                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select 1st Place Winner</option>
-                        {registrations.map(r => (
-                          <option key={r.id} value={r.id} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">{r.userName} ({r.userEmail})</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold uppercase text-slate-500 flex items-center gap-1">
-                        🥈 2nd Place (+{hackathon?.points2nd || 0} pts)
-                      </label>
-                      <select
-                        value={secondPlace}
-                        onChange={(e) => setSecondPlace(e.target.value)}
-                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select 2nd Place Winner</option>
-                        {registrations.map(r => (
-                          <option key={r.id} value={r.id} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">{r.userName} ({r.userEmail})</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold uppercase text-orange-700 flex items-center gap-1">
-                        🥉 3rd Place (+{hackathon?.points3rd || 0} pts)
-                      </label>
-                      <select
-                        value={thirdPlace}
-                        onChange={(e) => setThirdPlace(e.target.value)}
-                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select 3rd Place Winner</option>
-                        {registrations.map(r => (
-                          <option key={r.id} value={r.id} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">{r.userName} ({r.userEmail})</option>
-                        ))}
-                      </select>
-                    </div>
+                    {hackathon?.winnerTiers && hackathon.winnerTiers.length > 0 ? (
+                      hackathon.winnerTiers.map((tier: any) => {
+                        const colorClass = 
+                          tier.rank === 1 ? "text-yellow-600" :
+                          tier.rank === 2 ? "text-slate-500" :
+                          tier.rank === 3 ? "text-orange-700" :
+                          "text-primary";
+                        const rankPrefix = 
+                          tier.rank === 1 ? "🥇 " :
+                          tier.rank === 2 ? "🥈 " :
+                          tier.rank === 3 ? "🥉 " :
+                          "🏆 ";
+ 
+                        return (
+                          <div key={tier.rank} className="space-y-1.5">
+                            <label className={`text-xs font-bold uppercase ${colorClass} flex items-center gap-1`}>
+                              {rankPrefix}{tier.name} (+{tier.points} pts)
+                            </label>
+                            <select
+                              value={winnerSelections[tier.rank] || ""}
+                              onChange={(e) => setWinnerSelections(prev => ({
+                                ...prev,
+                                [tier.rank]: e.target.value
+                              }))}
+                              className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+                                Select {tier.name} Winner
+                              </option>
+                              {registrations.map(r => (
+                                <option key={r.id} value={r.id} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+                                  {r.userName} ({r.userEmail})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+                        <AlertCircle className="h-4 w-4" />
+                        No winner tiers configured for this event.
+                      </div>
+                    )}
 
                     <div className="pt-2">
                       <Button
@@ -337,24 +334,18 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                 <CardTitle className="text-sm font-bold font-space-grotesk">Points Reference</CardTitle>
               </CardHeader>
               <CardContent className="space-y-1.5 text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>1st Place:</span>
-                  <span className="font-semibold text-primary">{hackathon?.points1st} pts</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>2nd Place:</span>
-                  <span className="font-semibold text-primary">{hackathon?.points2nd} pts</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>3rd Place:</span>
-                  <span className="font-semibold text-primary">{hackathon?.points3rd} pts</span>
-                </div>
+                {hackathon?.winnerTiers?.map((tier: any) => (
+                  <div key={tier.rank} className="flex justify-between">
+                    <span>{tier.name}:</span>
+                    <span className="font-semibold text-primary">{tier.points} pts</span>
+                  </div>
+                ))}
                 <div className="flex justify-between">
                   <span>Participation:</span>
                   <span className="font-semibold text-primary">{hackathon?.pointsParticipation} pts</span>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-800 pt-1.5 mt-1.5 text-[10px]">
-                  * All other participants who did not win 1st, 2nd, or 3rd place will receive the participation points.
+                  * All other participants who do not win a configured placement tier will receive participation points.
                 </div>
               </CardContent>
             </Card>
@@ -442,13 +433,25 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                             </td>
                             <td className="px-4 py-3.5 text-center align-middle">
                               {reg.winnerPlace ? (
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                                  reg.winnerPlace === 1 ? "bg-yellow-100 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400 border-yellow-300" :
-                                  reg.winnerPlace === 2 ? "bg-slate-100 dark:bg-slate-800/40 text-slate-700 dark:text-slate-400 border-slate-300" :
-                                  "bg-orange-100 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 border-orange-300"
-                                }`}>
-                                  {reg.winnerPlace === 1 ? "🥇 1st" : reg.winnerPlace === 2 ? "🥈 2nd" : "🥉 3rd"}
-                                </span>
+                                (() => {
+                                  const tier = hackathon?.winnerTiers?.find((t: any) => t.rank === reg.winnerPlace);
+                                  const tierName = tier ? tier.name : `${reg.winnerPlace} Place`;
+                                  const badgeClass = 
+                                    reg.winnerPlace === 1 ? "bg-yellow-100 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400 border-yellow-300" :
+                                    reg.winnerPlace === 2 ? "bg-slate-100 dark:bg-slate-800/40 text-slate-700 dark:text-slate-400 border-slate-300" :
+                                    reg.winnerPlace === 3 ? "bg-orange-100 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 border-orange-300" :
+                                    "bg-emerald-100 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-300";
+                                  const prefix = 
+                                    reg.winnerPlace === 1 ? "🥇 " :
+                                    reg.winnerPlace === 2 ? "🥈 " :
+                                    reg.winnerPlace === 3 ? "🥉 " :
+                                    "🏆 ";
+                                  return (
+                                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeClass}`}>
+                                      {prefix}{tierName}
+                                    </span>
+                                  );
+                                })()
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30">
                                   <UserCheck className="w-3 h-3" />

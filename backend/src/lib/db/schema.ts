@@ -154,15 +154,21 @@ export const torqueMagazines = pgTable('torque_magazines', {
 export type TorqueMagazine = typeof torqueMagazines.$inferSelect;
 export type NewTorqueMagazine = typeof torqueMagazines.$inferInsert;
 
+export interface WinnerTier {
+  rank: number;
+  name: string;
+  prize: string;
+  points: number;
+}
+
 // Hackathons Table
 export const hackathons = pgTable('hackathons', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
   longDescription: text('long_description').notNull(),
-  date: text('date').notNull(),
-  startTime: text('start_time'),
-  endTime: text('end_time'),
+  startDate: text('start_date').default('').notNull(),
+  endDate: text('end_date').default('').notNull(),
   location: text('location').notNull(),
   category: text('category').notNull(),
   status: text('status').notNull(), // 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
@@ -174,9 +180,6 @@ export const hackathons = pgTable('hackathons', {
   requirements: text('requirements'),
   eligibility: text('eligibility'),
   teamSize: text('team_size'),
-  firstPrize: text('first_prize'),
-  secondPrize: text('second_prize'),
-  thirdPrize: text('third_prize'),
   specialPrizes: text('special_prizes'),
   timeline: text('timeline'),
   importantNotes: text('important_notes'),
@@ -185,9 +188,7 @@ export const hackathons = pgTable('hackathons', {
   submissionGuidelines: text('submission_guidelines'),
   draft: boolean('draft').default(false).notNull(),
   teamRequired: boolean('team_required').default(false).notNull(),
-  points1st: integer('points_1st').default(100).notNull(),
-  points2nd: integer('points_2nd').default(75).notNull(),
-  points3rd: integer('points_3rd').default(50).notNull(),
+  winnerTiers: jsonb('winner_tiers').$type<WinnerTier[]>().default([]).notNull(),
   pointsParticipation: integer('points_participation').default(10).notNull(),
   deleted: boolean('deleted').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

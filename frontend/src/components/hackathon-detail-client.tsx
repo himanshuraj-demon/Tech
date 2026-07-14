@@ -247,14 +247,11 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Date</p>
-                  <p className="font-medium">{hackathon.date}</p>
-                  {(hackathon.startTime || hackathon.endTime) && (
-                    <p className="text-sm text-muted-foreground">
-                      {hackathon.startTime && hackathon.endTime 
-                        ? `${hackathon.startTime} - ${hackathon.endTime}`
-                        : hackathon.startTime || hackathon.endTime}
-                    </p>
-                  )}
+                  <p className="font-medium">
+                    {hackathon.startDate && hackathon.endDate 
+                      ? `${hackathon.startDate} to ${hackathon.endDate}`
+                      : hackathon.startDate || hackathon.endDate || "TBD"}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -380,7 +377,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">
                     <span>Prizes & Points</span>
-                    {(hackathon.points1st > 0 || hackathon.pointsParticipation > 0) && (
+                    {((hackathon.winnerTiers && hackathon.winnerTiers.length > 0) || hackathon.pointsParticipation > 0) && (
                       <span className="text-xs font-semibold text-yellow-600 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30 px-2 py-1 rounded">
                         Leaderboard Points Active
                       </span>
@@ -388,26 +385,39 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                      <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">🥇</div>
-                      <h4 className="font-semibold text-yellow-700 dark:text-yellow-300">First Prize</h4>
-                      <p className="text-sm text-yellow-600 dark:text-yellow-400">{hackathon.firstPrize || "TBA"}</p>
-                      {hackathon.points1st > 0 && <div className="text-xs font-bold text-yellow-700 mt-1">+{hackathon.points1st} Leaderboard pts</div>}
+                  {hackathon.winnerTiers && hackathon.winnerTiers.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {hackathon.winnerTiers.map((tier: any) => {
+                        const rankPrefix = 
+                          tier.rank === 1 ? "🥇 " :
+                          tier.rank === 2 ? "🥈 " :
+                          tier.rank === 3 ? "🥉 " :
+                          "🏆 ";
+                        const bgClass =
+                          tier.rank === 1 ? "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-800" :
+                          tier.rank === 2 ? "from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 border-gray-200 dark:border-gray-700" :
+                          tier.rank === 3 ? "from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800" :
+                          "from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-800";
+                        const textClass =
+                          tier.rank === 1 ? "text-yellow-600 dark:text-yellow-400" :
+                          tier.rank === 2 ? "text-gray-600 dark:text-gray-400" :
+                          tier.rank === 3 ? "text-orange-600 dark:text-orange-400" :
+                          "text-emerald-600 dark:text-emerald-400";
+                        return (
+                          <div key={tier.rank} className={`text-center p-4 bg-gradient-to-br rounded-lg border ${bgClass}`}>
+                            <div className="text-2xl font-bold">{rankPrefix}</div>
+                            <h4 className="font-semibold text-gray-800 dark:text-gray-200">{tier.name}</h4>
+                            <p className={`text-sm ${textClass}`}>{tier.prize || "TBA"}</p>
+                            {tier.points > 0 && <div className="text-xs font-bold mt-1 text-primary">+{tier.points} Leaderboard pts</div>}
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">🥈</div>
-                      <h4 className="font-semibold text-gray-700 dark:text-gray-300">Second Prize</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{hackathon.secondPrize || "TBA"}</p>
-                      {hackathon.points2nd > 0 && <div className="text-xs font-bold text-gray-700 mt-1">+{hackathon.points2nd} Leaderboard pts</div>}
+                  ) : (
+                    <div className="text-center py-6 text-sm text-muted-foreground italic">
+                      No prize tiers configured.
                     </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg border border-orange-200 dark:border-orange-800">
-                      <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">🥉</div>
-                      <h4 className="font-semibold text-orange-700 dark:text-orange-300">Third Prize</h4>
-                      <p className="text-sm text-orange-600 dark:text-orange-400">{hackathon.thirdPrize || "TBA"}</p>
-                      {hackathon.points3rd > 0 && <div className="text-xs font-bold text-orange-700 mt-1">+{hackathon.points3rd} Leaderboard pts</div>}
-                    </div>
-                  </div>
+                  )}
 
                   {hackathon.pointsParticipation > 0 && (
                     <div className="text-xs text-muted-foreground bg-gray-50 dark:bg-gray-900/50 p-2.5 rounded border border-gray-100 dark:border-gray-800 text-center font-medium">
@@ -709,14 +719,11 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Date</p>
-                    <p className="font-medium">{hackathon.date}</p>
-                    {(hackathon.startTime || hackathon.endTime) && (
-                      <p className="text-sm text-muted-foreground">
-                        {hackathon.startTime && hackathon.endTime 
-                          ? `${hackathon.startTime} - ${hackathon.endTime}`
-                          : hackathon.startTime || hackathon.endTime}
-                      </p>
-                    )}
+                    <p className="font-medium">
+                      {hackathon.startDate && hackathon.endDate 
+                        ? `${hackathon.startDate} to ${hackathon.endDate}`
+                        : hackathon.startDate || hackathon.endDate || "TBD"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Location</p>

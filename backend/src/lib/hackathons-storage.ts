@@ -10,7 +10,7 @@ import {
   getHackathonsCount as dbGetHackathonsCount
 } from '@/lib/db/hackathons';
 
-import { type Hackathon } from '@/lib/db/schema';
+import { type Hackathon, type WinnerTier } from '@/lib/db/schema';
 
 // Export type
 export interface BasicHackathon {
@@ -18,9 +18,8 @@ export interface BasicHackathon {
   name: string;
   description: string;
   longDescription: string;
-  date: string;
-  startTime?: string;
-  endTime?: string;
+  startDate: string;
+  endDate: string;
   location: string;
   category: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
@@ -38,10 +37,8 @@ export interface BasicHackathon {
   teamSize?: string;
   
   // Prize pool
-  firstPrize?: string;
-  secondPrize?: string;
-  thirdPrize?: string;
   specialPrizes?: string;
+  winnerTiers: WinnerTier[];
   
   // Timeline and important details
   timeline?: string;
@@ -56,9 +53,6 @@ export interface BasicHackathon {
   updatedAt: string;
   draft: boolean;
   teamRequired: boolean;
-  points1st: number;
-  points2nd: number;
-  points3rd: number;
   pointsParticipation: number;
   deleted: boolean;
 }
@@ -69,9 +63,8 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     name: h.name,
     description: h.description,
     longDescription: h.longDescription,
-    date: h.date,
-    startTime: h.startTime || undefined,
-    endTime: h.endTime || undefined,
+    startDate: h.startDate,
+    endDate: h.endDate,
     location: h.location,
     category: h.category,
     status: h.status as any,
@@ -83,9 +76,6 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     requirements: h.requirements || undefined,
     eligibility: h.eligibility || undefined,
     teamSize: h.teamSize || undefined,
-    firstPrize: h.firstPrize || undefined,
-    secondPrize: h.secondPrize || undefined,
-    thirdPrize: h.thirdPrize || undefined,
     specialPrizes: h.specialPrizes || undefined,
     timeline: h.timeline || undefined,
     importantNotes: h.importantNotes || undefined,
@@ -97,9 +87,7 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     draft: h.draft,
     deleted: h.deleted,
     teamRequired: h.teamRequired,
-    points1st: h.points1st,
-    points2nd: h.points2nd,
-    points3rd: h.points3rd,
+    winnerTiers: h.winnerTiers,
     pointsParticipation: h.pointsParticipation,
   };
 }
@@ -124,9 +112,8 @@ export async function createHackathon(hackathonInput: Record<string, any>): Prom
     name: String(hackathonInput.name || ''),
     description: String(hackathonInput.description || ''),
     longDescription: String(hackathonInput.longDescription || ''),
-    date: String(hackathonInput.date || ''),
-    startTime: hackathonInput.startTime ? String(hackathonInput.startTime) : null,
-    endTime: hackathonInput.endTime ? String(hackathonInput.endTime) : null,
+    startDate: String(hackathonInput.startDate || ''),
+    endDate: String(hackathonInput.endDate || ''),
     location: String(hackathonInput.location || ''),
     category: String(hackathonInput.category || ''),
     status: String(hackathonInput.status || 'upcoming'),
@@ -138,9 +125,6 @@ export async function createHackathon(hackathonInput: Record<string, any>): Prom
     requirements: hackathonInput.requirements ? String(hackathonInput.requirements) : null,
     eligibility: hackathonInput.eligibility ? String(hackathonInput.eligibility) : null,
     teamSize: hackathonInput.teamSize ? String(hackathonInput.teamSize) : null,
-    firstPrize: hackathonInput.firstPrize ? String(hackathonInput.firstPrize) : null,
-    secondPrize: hackathonInput.secondPrize ? String(hackathonInput.secondPrize) : null,
-    thirdPrize: hackathonInput.thirdPrize ? String(hackathonInput.thirdPrize) : null,
     specialPrizes: hackathonInput.specialPrizes ? String(hackathonInput.specialPrizes) : null,
     timeline: hackathonInput.timeline ? String(hackathonInput.timeline) : null,
     importantNotes: hackathonInput.importantNotes ? String(hackathonInput.importantNotes) : null,
@@ -149,9 +133,7 @@ export async function createHackathon(hackathonInput: Record<string, any>): Prom
     submissionGuidelines: hackathonInput.submissionGuidelines ? String(hackathonInput.submissionGuidelines) : null,
     draft: Boolean(hackathonInput.draft),
     teamRequired: Boolean(hackathonInput.teamRequired),
-    points1st: Number(hackathonInput.points1st !== undefined ? hackathonInput.points1st : 100),
-    points2nd: Number(hackathonInput.points2nd !== undefined ? hackathonInput.points2nd : 75),
-    points3rd: Number(hackathonInput.points3rd !== undefined ? hackathonInput.points3rd : 50),
+    winnerTiers: hackathonInput.winnerTiers || [],
     pointsParticipation: Number(hackathonInput.pointsParticipation !== undefined ? hackathonInput.pointsParticipation : 10),
   };
 
@@ -165,9 +147,8 @@ export async function updateHackathon(id: string, updates: Record<string, any>):
   if (updates.name !== undefined) cleanUpdates.name = String(updates.name);
   if (updates.description !== undefined) cleanUpdates.description = String(updates.description);
   if (updates.longDescription !== undefined) cleanUpdates.longDescription = String(updates.longDescription);
-  if (updates.date !== undefined) cleanUpdates.date = String(updates.date);
-  if (updates.startTime !== undefined) cleanUpdates.startTime = updates.startTime ? String(updates.startTime) : null;
-  if (updates.endTime !== undefined) cleanUpdates.endTime = updates.endTime ? String(updates.endTime) : null;
+  if (updates.startDate !== undefined) cleanUpdates.startDate = String(updates.startDate);
+  if (updates.endDate !== undefined) cleanUpdates.endDate = String(updates.endDate);
   if (updates.location !== undefined) cleanUpdates.location = String(updates.location);
   if (updates.category !== undefined) cleanUpdates.category = String(updates.category);
   if (updates.status !== undefined) cleanUpdates.status = String(updates.status);
@@ -179,9 +160,6 @@ export async function updateHackathon(id: string, updates: Record<string, any>):
   if (updates.requirements !== undefined) cleanUpdates.requirements = updates.requirements ? String(updates.requirements) : null;
   if (updates.eligibility !== undefined) cleanUpdates.eligibility = updates.eligibility ? String(updates.eligibility) : null;
   if (updates.teamSize !== undefined) cleanUpdates.teamSize = updates.teamSize ? String(updates.teamSize) : null;
-  if (updates.firstPrize !== undefined) cleanUpdates.firstPrize = updates.firstPrize ? String(updates.firstPrize) : null;
-  if (updates.secondPrize !== undefined) cleanUpdates.secondPrize = updates.secondPrize ? String(updates.secondPrize) : null;
-  if (updates.thirdPrize !== undefined) cleanUpdates.thirdPrize = updates.thirdPrize ? String(updates.thirdPrize) : null;
   if (updates.specialPrizes !== undefined) cleanUpdates.specialPrizes = updates.specialPrizes ? String(updates.specialPrizes) : null;
   if (updates.timeline !== undefined) cleanUpdates.timeline = updates.timeline ? String(updates.timeline) : null;
   if (updates.importantNotes !== undefined) cleanUpdates.importantNotes = updates.importantNotes ? String(updates.importantNotes) : null;
@@ -190,9 +168,7 @@ export async function updateHackathon(id: string, updates: Record<string, any>):
   if (updates.submissionGuidelines !== undefined) cleanUpdates.submissionGuidelines = updates.submissionGuidelines ? String(updates.submissionGuidelines) : null;
   if (updates.draft !== undefined) cleanUpdates.draft = Boolean(updates.draft);
   if (updates.teamRequired !== undefined) cleanUpdates.teamRequired = Boolean(updates.teamRequired);
-  if (updates.points1st !== undefined) cleanUpdates.points1st = Number(updates.points1st);
-  if (updates.points2nd !== undefined) cleanUpdates.points2nd = Number(updates.points2nd);
-  if (updates.points3rd !== undefined) cleanUpdates.points3rd = Number(updates.points3rd);
+  if (updates.winnerTiers !== undefined) cleanUpdates.winnerTiers = updates.winnerTiers;
   if (updates.pointsParticipation !== undefined) cleanUpdates.pointsParticipation = Number(updates.pointsParticipation);
 
   const updated = await dbUpdateHackathon(id, cleanUpdates);

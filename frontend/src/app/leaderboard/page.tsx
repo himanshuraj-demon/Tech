@@ -20,6 +20,7 @@ interface LeaderboardItem {
     id: string;
     title: string;
     place: number | null;
+    placeName?: string | null;
     points: number;
   }>;
 }
@@ -197,14 +198,15 @@ export default function LeaderboardPage() {
                                             <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
                                             <span className="font-medium text-gray-700 dark:text-gray-300 break-all">{e.title}</span>
                                             {e.place && (
-                                              <Badge className={
-                                                e.place === 1 ? "bg-yellow-500 text-white hover:bg-yellow-600" :
-                                                e.place === 2 ? "bg-slate-400 text-white hover:bg-slate-500" :
-                                                "bg-amber-700 text-white hover:bg-amber-800"
-                                              }>
-                                                {e.place === 1 ? "1st Place" : e.place === 2 ? "2nd Place" : "3rd Place"}
-                                              </Badge>
-                                            )}
+                                               <Badge className={
+                                                 e.place === 1 ? "bg-yellow-500 text-white hover:bg-yellow-600" :
+                                                 e.place === 2 ? "bg-slate-400 text-white hover:bg-slate-500" :
+                                                 e.place === 3 ? "bg-amber-700 text-white hover:bg-amber-800" :
+                                                 "bg-emerald-600 text-white hover:bg-emerald-750"
+                                               }>
+                                                 {e.placeName || `${e.place} Place`}
+                                               </Badge>
+                                             )}
                                           </div>
                                           <div className="font-bold text-green-600 dark:text-green-400 flex items-center gap-1 self-end sm:self-auto">
                                             <Star className="h-3 w-3 fill-current" />

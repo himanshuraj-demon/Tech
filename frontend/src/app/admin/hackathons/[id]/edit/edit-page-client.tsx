@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon } from "@/lib/hackathons-data";
+import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon, type WinnerTier } from "@/lib/hackathons-data";
 import { Combobox } from "@/components/ui/combobox";
 import { api } from "../../../../../../services/api";
 interface BasicHackathon {
@@ -19,9 +19,8 @@ interface BasicHackathon {
   name: string;
   description: string;
   longDescription: string;
-  date: string;
-  startTime?: string;
-  endTime?: string;
+  startDate: string;
+  endDate: string;
   location: string;
   category: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
@@ -33,9 +32,6 @@ interface BasicHackathon {
   requirements?: string;
   eligibility?: string;
   teamSize?: string;
-  firstPrize?: string;
-  secondPrize?: string;
-  thirdPrize?: string;
   specialPrizes?: string;
   timeline?: string;
   importantNotes?: string;
@@ -46,9 +42,7 @@ interface BasicHackathon {
   updatedAt: string;
   draft: boolean;
   teamRequired: boolean;
-  points1st: number;
-  points2nd: number;
-  points3rd: number;
+  winnerTiers: WinnerTier[];
   pointsParticipation: number;
   deleted: boolean;
 }
@@ -63,9 +57,8 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     name: "",
     description: "",
     longDescription: "",
-    date: "",
-    startTime: "",
-    endTime: "",
+    startDate: "",
+    endDate: "",
     location: "",
     category: "",
     status: "upcoming" as "upcoming" | "ongoing" | "completed" | "cancelled",
@@ -83,10 +76,8 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     teamSize: "",
     
     // Prize pool
-    firstPrize: "",
-    secondPrize: "",
-    thirdPrize: "",
     specialPrizes: "",
+    winnerTiers: [] as WinnerTier[],
     
     // Timeline and important details
     timeline: "",
@@ -100,9 +91,6 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     // Custom configurations
     draft: false,
     teamRequired: false,
-    points1st: 100,
-    points2nd: 75,
-    points3rd: 50,
     pointsParticipation: 10,
   });
 
@@ -129,9 +117,8 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
         name: expandedHackathon.name || "",
         description: expandedHackathon.description || "",
         longDescription: expandedHackathon.longDescription || "",
-        date: expandedHackathon.date || "",
-        startTime: expandedHackathon.startTime || "",
-        endTime: expandedHackathon.endTime || "",
+        startDate: expandedHackathon.startDate || "",
+        endDate: expandedHackathon.endDate || "",
         location: expandedHackathon.location || "",
         category: expandedHackathon.category || "",
         status: expandedHackathon.status || "upcoming",
@@ -149,10 +136,8 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
         teamSize: expandedHackathon.teamSize || "",
         
         // Prize pool
-        firstPrize: expandedHackathon.firstPrize || "",
-        secondPrize: expandedHackathon.secondPrize || "",
-        thirdPrize: expandedHackathon.thirdPrize || "",
         specialPrizes: expandedHackathon.specialPrizes || "",
+        winnerTiers: expandedHackathon.winnerTiers || [],
         
         // Timeline and important details
         timeline: expandedHackathon.timeline || "",
@@ -162,13 +147,10 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
         themes: expandedHackathon.themes || "",
         judingCriteria: expandedHackathon.judingCriteria || "",
         submissionGuidelines: expandedHackathon.submissionGuidelines || "",
-
+ 
         // Custom config mapping
         draft: expandedHackathon.draft || false,
         teamRequired: expandedHackathon.teamRequired || false,
-        points1st: expandedHackathon.points1st !== undefined ? expandedHackathon.points1st : 100,
-        points2nd: expandedHackathon.points2nd !== undefined ? expandedHackathon.points2nd : 75,
-        points3rd: expandedHackathon.points3rd !== undefined ? expandedHackathon.points3rd : 50,
         pointsParticipation: expandedHackathon.pointsParticipation !== undefined ? expandedHackathon.pointsParticipation : 10,
       });
 
@@ -180,6 +162,36 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
       setIsLoading(false);
     }
   }, [router]);
+
+  const addWinnerTier = () => {
+    setFormData(prev => {
+      const nextRank = prev.winnerTiers.length > 0 
+        ? Math.max(...prev.winnerTiers.map(t => t.rank)) + 1 
+        : 1;
+      return {
+        ...prev,
+        winnerTiers: [
+          ...prev.winnerTiers,
+          { rank: nextRank, name: `Place #${nextRank}`, prize: "", points: 10 }
+        ]
+      };
+    });
+  };
+
+  const updateWinnerTier = (index: number, field: keyof WinnerTier, value: any) => {
+    setFormData(prev => {
+      const updated = [...prev.winnerTiers];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, winnerTiers: updated };
+    });
+  };
+
+  const removeWinnerTier = (index: number) => {
+    setFormData(prev => {
+      const updated = prev.winnerTiers.filter((_, idx) => idx !== index);
+      return { ...prev, winnerTiers: updated };
+    });
+  };
 
   const handleInputChange = (field: string, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -194,8 +206,13 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!id || !formData.name.trim() || !formData.description.trim() || !formData.longDescription.trim()) {
+    if (!id || !formData.name.trim() || !formData.description.trim() || !formData.longDescription.trim() || !formData.startDate || !formData.endDate) {
       alert("Please fill in all required fields");
+      return;
+    }
+
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      alert("End Date cannot be before Start Date");
       return;
     }
 
@@ -307,35 +324,27 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date">Date *</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    required
-                  />
-                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="startTime">Start Time</Label>
+                  <Label htmlFor="startDate">Start Date *</Label>
                   <Input
-                    id="startTime"
-                    type="time"
-                    value={formData.startTime}
-                    onChange={(e) => handleInputChange("startTime", e.target.value)}
+                    id="startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => handleInputChange("startDate", e.target.value)}
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="endTime">End Time</Label>
+                  <Label htmlFor="endDate">End Date *</Label>
                   <Input
-                    id="endTime"
-                    type="time"
-                    value={formData.endTime}
-                    onChange={(e) => handleInputChange("endTime", e.target.value)}
+                    id="endDate"
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => handleInputChange("endDate", e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -512,52 +521,78 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
             </CardContent>
           </Card>
 
-          {/* Prize Pool */}
+          {/* Winner Tiers & Prize Pool */}
           <Card>
-            <CardHeader>
-              <CardTitle>Prize Pool</CardTitle>
-              <CardDescription>
-                Awards and recognition for winners
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Winner Tiers & Prize Pool</CardTitle>
+                <CardDescription>Configure points and prizes for winners and special awards</CardDescription>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={addWinnerTier}>
+                + Add Tier
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstPrize">First Prize</Label>
-                  <Input
-                    id="firstPrize"
-                    value={formData.firstPrize}
-                    onChange={(e) => handleInputChange("firstPrize", e.target.value)}
-                    placeholder="e.g., ₹50,000 + Trophy"
-                  />
+              {formData.winnerTiers.map((tier, index) => (
+                <div key={index} className="flex flex-col md:flex-row gap-4 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 relative">
+                  <div className="w-16">
+                     <Label>Rank *</Label>
+                     <Input 
+                       type="number" 
+                       value={tier.rank} 
+                       onChange={e => updateWinnerTier(index, "rank", Number(e.target.value))} 
+                       required
+                       min={1}
+                     />
+                  </div>
+                  <div className="flex-1">
+                     <Label>Tier Name *</Label>
+                     <Input 
+                       value={tier.name} 
+                       onChange={e => updateWinnerTier(index, "name", e.target.value)} 
+                       placeholder="e.g. 1st Place, Best Innovation" 
+                       required
+                     />
+                  </div>
+                  <div className="flex-1">
+                     <Label>Prize *</Label>
+                     <Input 
+                       value={tier.prize} 
+                       onChange={e => updateWinnerTier(index, "prize", e.target.value)} 
+                       placeholder="e.g. ₹50,000 + Certificate" 
+                       required
+                     />
+                  </div>
+                  <div className="w-24">
+                     <Label>Points *</Label>
+                     <Input 
+                       type="number" 
+                       value={tier.points} 
+                       onChange={e => updateWinnerTier(index, "points", Number(e.target.value))} 
+                       required
+                       min={0}
+                     />
+                  </div>
+                  <div className="flex items-end justify-end">
+                     <Button type="button" variant="destructive" size="icon" className="h-10 w-10 shrink-0" onClick={() => removeWinnerTier(index)}>
+                       ✕
+                     </Button>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="secondPrize">Second Prize</Label>
-                  <Input
-                    id="secondPrize"
-                    value={formData.secondPrize}
-                    onChange={(e) => handleInputChange("secondPrize", e.target.value)}
-                    placeholder="e.g., ₹30,000 + Certificate"
-                  />
+              ))}
+              {formData.winnerTiers.length === 0 && (
+                <div className="text-center py-6 text-sm text-muted-foreground italic">
+                  No winner tiers configured. All participants will only receive participation points.
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="thirdPrize">Third Prize</Label>
-                  <Input
-                    id="thirdPrize"
-                    value={formData.thirdPrize}
-                    onChange={(e) => handleInputChange("thirdPrize", e.target.value)}
-                    placeholder="e.g., ₹20,000 + Certificate"
-                  />
-                </div>
-              </div>
-
+              )}
+              
               <div className="space-y-2">
-                <Label htmlFor="specialPrizes">Special Prizes</Label>
+                <Label htmlFor="specialPrizes">Special Prizes / Track Details</Label>
                 <Textarea
                   id="specialPrizes"
                   value={formData.specialPrizes}
                   onChange={(e) => handleInputChange("specialPrizes", e.target.value)}
-                  placeholder="Best UI/UX, Most Innovative Solution, People's Choice Award, etc."
+                  placeholder="General details about sponsors' special tracks, API prizes, etc."
                   rows={3}
                 />
               </div>
@@ -661,37 +696,7 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                <div>
-                  <Label htmlFor="points1st">1st Place Points</Label>
-                  <Input 
-                    id="points1st" 
-                    type="number" 
-                    value={formData.points1st} 
-                    onChange={e => handleInputChange("points1st", Number(e.target.value))} 
-                    min={0}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="points2nd">2nd Place Points</Label>
-                  <Input 
-                    id="points2nd" 
-                    type="number" 
-                    value={formData.points2nd} 
-                    onChange={e => handleInputChange("points2nd", Number(e.target.value))} 
-                    min={0}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="points3rd">3rd Place Points</Label>
-                  <Input 
-                    id="points3rd" 
-                    type="number" 
-                    value={formData.points3rd} 
-                    onChange={e => handleInputChange("points3rd", Number(e.target.value))} 
-                    min={0}
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div>
                   <Label htmlFor="pointsParticipation">Participation Points</Label>
                   <Input 

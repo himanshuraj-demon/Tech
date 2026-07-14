@@ -1,11 +1,12 @@
+import { WinnerTier } from "./db/schema";
+
 export interface Hackathon {
   id: string;
   name: string;
   description: string;
   longDescription: string;
-  date: string;
-  startTime?: string;
-  endTime?: string;
+  startDate: string;
+  endDate: string;
   location: string;
   category: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
@@ -23,10 +24,9 @@ export interface Hackathon {
   teamSize?: string;
   
   // Prize pool
-  firstPrize?: string;
-  secondPrize?: string;
-  thirdPrize?: string;
   specialPrizes?: string;
+  winnerTiers: WinnerTier[];
+  pointsParticipation?: number;
   
   // Timeline and important details
   timeline?: string;
@@ -39,6 +39,7 @@ export interface Hackathon {
   
   createdAt: string;
   updatedAt: string;
+  draft?: boolean;
 }
 
 // Basic hackathon interface for simple storage (matches current Blob structure)
@@ -83,7 +84,9 @@ export const defaultHackathonsData: Record<string, Hackathon> = {
     name: "IITGNHacks 2024",
     description: "48-hour hackathon bringing together brilliant minds to solve real-world problems using cutting-edge technology.",
     longDescription: "IITGNHacks 2024 is our flagship hackathon event that challenges participants to develop innovative solutions to real-world problems. Teams work around the clock to create applications, websites, and software solutions that could make a meaningful impact. The event fosters creativity, collaboration, and technical excellence among participants from various backgrounds.",
-    date: "2024-03-15",
+    startDate: "2024-03-15",
+    endDate: "2024-03-17",
+    winnerTiers: [],
     location: "Computer Center, IIT Gandhinagar",
     category: "Open Innovation",
     status: "upcoming",
@@ -96,7 +99,9 @@ export const defaultHackathonsData: Record<string, Hackathon> = {
     name: "Smart India Hackathon 2023",
     description: "National level hackathon organized by Government of India to solve pressing problems faced by our country.",
     longDescription: "Smart India Hackathon is a nationwide initiative to provide students with a platform to solve some of the pressing problems we face in our daily lives, and thus inculcate a culture of product innovation and a mindset of problem-solving.",
-    date: "2023-12-01",
+    startDate: "2023-12-01",
+    endDate: "2023-12-03",
+    winnerTiers: [],
     location: "IIT Gandhinagar (Nodal Center)",
     category: "Social Impact",
     status: "completed",

@@ -119,14 +119,16 @@ export function HackathonsClient() {
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
               <Calendar className="h-4 w-4 text-blue-500 flex-shrink-0" />
               <div className="flex flex-col">
-                <span className="truncate">{hackathon.date}</span>
-                {(hackathon.startTime || hackathon.endTime) && (
-                  <span className="text-xs text-muted-foreground">
-                    {hackathon.startTime && hackathon.endTime 
-                      ? `${hackathon.startTime} - ${hackathon.endTime}`
-                      : hackathon.startTime || hackathon.endTime}
-                  </span>
-                )}
+                <span className="truncate">
+                  {hackathon.startDate 
+                    ? `${hackathon.startDate} to`
+                    : hackathon.startDate || "TBD"}
+                </span>
+                <span className="truncate">
+                  { hackathon.endDate 
+                    ? `${hackathon.endDate}`
+                    : hackathon.endDate || "TBD"}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
@@ -150,10 +152,12 @@ export function HackathonsClient() {
             <div className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-purple-600 dark:text-purple-400 border border-purple-600/20 w-fit">
               {hackathon.category}
             </div>
-            {(hackathon.firstPrize || hackathon.secondPrize || hackathon.thirdPrize) && (
+            {((hackathon.winnerTiers && hackathon.winnerTiers.length > 0) || hackathon.specialPrizes) && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Trophy className="h-4 w-4 text-yellow-500" />
-                <span>Prizes Available</span>
+                <span>
+                  Prizes Available
+                </span>
               </div>
             )}
           </div>

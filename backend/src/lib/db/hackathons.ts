@@ -125,7 +125,7 @@ export async function getHackathonsForDisplay(limit?: number, offset?: number): 
       .select()
       .from(hackathons)
       .where(eq(hackathons.deleted, false))
-      .orderBy(desc(hackathons.date));
+      .orderBy(desc(hackathons.startDate));
       
     if (limit !== undefined && offset !== undefined) {
       return await query.limit(limit).offset(offset);
@@ -163,7 +163,7 @@ export async function getHackathonsByStatus(status: string): Promise<Hackathon[]
       .select()
       .from(hackathons)
       .where(and(eq(hackathons.status, status), eq(hackathons.deleted, false)))
-      .orderBy(desc(hackathons.date));
+      .orderBy(desc(hackathons.startDate));
     return list;
   } catch (error) {
     console.error(`Error fetching hackathons by status (${status}):`, error);
