@@ -19,7 +19,8 @@ import {
   Palette,
   Upload,
   Trash2,
-  MapPin
+  MapPin,
+  Trophy
 } from "lucide-react";
 import { api } from "../../../../services/api";
 
@@ -338,6 +339,32 @@ export default function SettingsPage() {
     }
   };
 
+  const handleResetLeaderboard = async () => {
+    const firstConfirm = confirm("WARNING: This will permanently delete all student registrations, project submissions, and reset all leaderboard points. Are you sure you want to proceed?");
+    if (!firstConfirm) return;
+    
+    const secondConfirm = confirm("FINAL WARNING: This action CANNOT be undone. Click OK to completely wipe out the leaderboard points.");
+    if (!secondConfirm) return;
+    
+    try {
+      setIsLoading(true);
+      const response = await api.fetch("/api/admin/settings/reset-leaderboard", {
+        method: "POST"
+      });
+      if (response.ok) {
+        alert("Leaderboard points and registrations have been successfully reset! 🏆");
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to reset leaderboard");
+      }
+    } catch (error) {
+      console.error("Error resetting leaderboard:", error);
+      alert(error instanceof Error ? error.message : "Failed to reset leaderboard");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -596,6 +623,29 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Leaderboard Settings */}
+          <Card className="glass border-red-500/20 dark:border-red-950/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <Trophy className="h-5 w-5" />
+                Leaderboard Administration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Resetting the leaderboard will permanently delete all student registrations, project submission links, and winner placements. Everyone's score will go back to 0.
+              </p>
+              <Button
+                variant="destructive"
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleResetLeaderboard}
+                disabled={isLoading}
+              >
+                Reset Leaderboard Points
+              </Button>
             </CardContent>
           </Card>
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { Loader2, Trophy, ArrowLeft, Save, Users, AlertCircle, Calendar, UserCheck } from "lucide-react";
+import { Loader2, Trophy, ArrowLeft, Save, Users, AlertCircle, Calendar, UserCheck, ExternalLink, Github, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "../../../../../../services/api";
@@ -20,6 +20,8 @@ interface Registration {
   branchName: string;
   teamMembers: string[] | null;
   winnerPlace: number | null;
+  githubLink: string | null;
+  docsLink: string | null;
   createdAt: string;
 }
 
@@ -35,6 +37,9 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
   const [isSaving, setIsSaving] = useState(false);
   const [hackathon, setHackathon] = useState<any>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [visibleCount, setVisibleCount] = useState(20);
+  
+  const visibleRegistrations = registrations.slice(0, visibleCount);
   
   // Winners selection
   const [firstPlace, setFirstPlace] = useState<string>("");
@@ -126,6 +131,73 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
     }
   };
 
+  const handleExportToCSV = () => {
+    // 1. Define CSV headers
+    const headers = [
+      "Student Name",
+      "Student Email",
+      "Degree Type",
+      "Branch Name",
+      "Year of Joining",
+      "Team Members",
+      "Winner Place",
+      "GitHub Repo Link",
+      "Submission Docs Link",
+      "Registration Date"
+    ];
+
+    // 2. Map registrations to CSV rows
+    const rows = registrations.map(reg => {
+      const teamMembersStr = reg.teamMembers && reg.teamMembers.length > 0 
+        ? reg.teamMembers.join("; ") 
+        : "Individual";
+      
+      let winnerStatus = "Participant";
+      if (reg.winnerPlace === 1) winnerStatus = "1st Place (Gold)";
+      else if (reg.winnerPlace === 2) winnerStatus = "2nd Place (Silver)";
+      else if (reg.winnerPlace === 3) winnerStatus = "3rd Place (Bronze)";
+
+      return [
+        reg.userName,
+        reg.userEmail,
+        reg.degreeType.toUpperCase(),
+        reg.branchName,
+        reg.yearOfJoining,
+        teamMembersStr,
+        winnerStatus,
+        reg.githubLink || "Not Submitted",
+        reg.docsLink || "Not Submitted",
+        new Date(reg.createdAt).toLocaleDateString()
+      ];
+    });
+
+    // 3. Helper to escape fields containing quotes or commas
+    const escapeCSV = (field: any) => {
+      const cleanField = (field ?? "").toString().replace(/"/g, '""');
+      if (cleanField.includes(",") || cleanField.includes("\n") || cleanField.includes('"')) {
+        return `"${cleanField}"`;
+      }
+      return cleanField;
+    };
+
+    // 4. Construct CSV string
+    const csvContent = [
+      headers.map(escapeCSV).join(","),
+      ...rows.map(row => row.map(escapeCSV).join(","))
+    ].join("\n");
+
+    // 5. Trigger download in browser
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${(hackathon?.name || "Hackathon").replace(/\s+/g, "_")}_Participants.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (status === "loading" || isLoading) {
     return (
       <AdminLayout>
@@ -141,7 +213,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -160,6 +232,16 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
               </p>
             </div>
           </div>
+          {registrations.length > 0 && (
+            <Button 
+              onClick={handleExportToCSV} 
+              variant="outline" 
+              className="flex items-center gap-2 border-emerald-600/30 hover:bg-emerald-600/10 hover:border-emerald-600/50 transition-all duration-300 text-emerald-600 dark:text-emerald-400"
+            >
+              <Download className="h-4 w-4" />
+              Export to Excel (CSV)
+            </Button>
+          )}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -301,11 +383,12 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                           <th className="px-4 py-3">Student Details</th>
                           <th className="px-4 py-3">Academic info</th>
                           <th className="px-4 py-3">Team details</th>
+                          <th className="px-4 py-3">Submissions</th>
                           <th className="px-4 py-3 text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                        {registrations.map((reg) => (
+                        {visibleRegistrations.map((reg) => (
                           <tr key={reg.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-850/20">
                             <td className="px-4 py-3.5">
                               <div className="font-semibold text-gray-900 dark:text-gray-100">{reg.userName}</div>
@@ -326,6 +409,36 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                               ) : (
                                 <span className="text-xs text-muted-foreground italic">Individual</span>
                               )}
+                            </td>
+                            <td className="px-4 py-3.5 max-w-xs">
+                              <div className="flex flex-col gap-1">
+                                {reg.githubLink ? (
+                                  <a 
+                                    href={reg.githubLink.startsWith('http') ? reg.githubLink : `https://${reg.githubLink}`} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
+                                  >
+                                    <Github className="h-3.5 w-3.5 flex-shrink-0" />
+                                    GitHub Repo
+                                  </a>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground italic">No Repo link</span>
+                                )}
+                                {reg.docsLink ? (
+                                  <a 
+                                    href={reg.docsLink.startsWith('http') ? reg.docsLink : `https://${reg.docsLink}`} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
+                                  >
+                                    <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+                                    Docs Link
+                                  </a>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground italic">No Docs link</span>
+                                )}
+                              </div>
                             </td>
                             <td className="px-4 py-3.5 text-center align-middle">
                               {reg.winnerPlace ? (
@@ -351,6 +464,17 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                 )}
               </CardContent>
             </Card>
+            {visibleCount < registrations.length && (
+              <div className="flex justify-center mt-4">
+                <Button 
+                  onClick={() => setVisibleCount(prev => prev + 20)}
+                  variant="outline"
+                  className="glass border-primary/30 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300"
+                >
+                  Load More Participants
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

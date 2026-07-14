@@ -29,6 +29,9 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedUsers, setExpandedUsers] = useState<Record<string, boolean>>({});
+  const [visibleCount, setVisibleCount] = useState(20);
+
+  const visibleLeaderboard = leaderboard.slice(0, visibleCount);
 
   useEffect(() => {
     async function fetchLeaderboard() {
@@ -125,7 +128,7 @@ export default function LeaderboardPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                        {leaderboard.map((student, idx) => {
+                        {visibleLeaderboard.map((student, idx) => {
                           const isExpanded = !!expandedUsers[student.email];
                           
                           // Style variables based on rank (1st, 2nd, 3rd vs general)
@@ -221,6 +224,18 @@ export default function LeaderboardPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {visibleCount < leaderboard.length && (
+                <div className="flex justify-center mt-6">
+                  <Button 
+                    onClick={() => setVisibleCount(prev => prev + 20)}
+                    variant="outline"
+                    className="glass border-primary/30 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300"
+                  >
+                    Load More Rankings
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -45,6 +45,7 @@ export interface Hackathon {
   points2nd?: number;
   points3rd?: number;
   pointsParticipation?: number;
+  deleted?: boolean;
 }
 
 // Basic hackathon interface for simple storage (matches current Blob structure)

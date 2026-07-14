@@ -6,7 +6,8 @@ import {
   deleteHackathon as dbDeleteHackathon,
   getHackathonsForDisplay as dbGetHackathonsForDisplay,
   getHackathonsByStatus as dbGetHackathonsByStatus,
-  getBasicHackathonStats as dbGetBasicHackathonStats
+  getBasicHackathonStats as dbGetBasicHackathonStats,
+  getHackathonsCount as dbGetHackathonsCount
 } from '@/lib/db/hackathons';
 
 import { type Hackathon } from '@/lib/db/schema';
@@ -59,6 +60,7 @@ export interface BasicHackathon {
   points2nd: number;
   points3rd: number;
   pointsParticipation: number;
+  deleted: boolean;
 }
 
 function mapDBToData(h: Hackathon): BasicHackathon {
@@ -93,6 +95,7 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     createdAt: h.createdAt.toISOString(),
     updatedAt: h.updatedAt.toISOString(),
     draft: h.draft,
+    deleted: h.deleted,
     teamRequired: h.teamRequired,
     points1st: h.points1st,
     points2nd: h.points2nd,
@@ -200,9 +203,13 @@ export async function deleteHackathon(id: string): Promise<void> {
   await dbDeleteHackathon(id);
 }
 
-export async function getHackathonsForDisplay(): Promise<BasicHackathon[]> {
-  const list = await dbGetHackathonsForDisplay();
+export async function getHackathonsForDisplay(limit?: number, offset?: number): Promise<BasicHackathon[]> {
+  const list = await dbGetHackathonsForDisplay(limit, offset);
   return list.map(mapDBToData);
+}
+
+export async function getHackathonsCount(): Promise<number> {
+  return await dbGetHackathonsCount();
 }
 
 export async function getHackathonsByStatus(status: BasicHackathon['status']): Promise<BasicHackathon[]> {

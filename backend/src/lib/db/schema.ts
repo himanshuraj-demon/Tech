@@ -189,6 +189,7 @@ export const hackathons = pgTable('hackathons', {
   points2nd: integer('points_2nd').default(75).notNull(),
   points3rd: integer('points_3rd').default(50).notNull(),
   pointsParticipation: integer('points_participation').default(10).notNull(),
+  deleted: boolean('deleted').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -220,6 +221,8 @@ export const eventRegistrations = pgTable('event_registrations', {
   branchName: text('branch_name').notNull(),
   teamMembers: jsonb('team_members').$type<string[]>(), // optional names/emails if teamRequired
   winnerPlace: integer('winner_place'), // 1 = 1st, 2 = 2nd, 3 = 3rd, 0/null = participation only
+  githubLink: text('github_link'),
+  docsLink: text('docs_link'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

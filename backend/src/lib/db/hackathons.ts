@@ -1,5 +1,5 @@
 import { db, hackathons, type Hackathon, type NewHackathon } from '@/lib/db';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, count } from 'drizzle-orm';
 
 // Helper function to generate an ID from name
 function generateHackathonId(name: string): string {
@@ -12,7 +12,7 @@ function generateHackathonId(name: string): string {
 // Get all hackathons
 export async function getAllHackathons(): Promise<Record<string, Hackathon>> {
   try {
-    const list = await db.select().from(hackathons);
+    const list = await db.select().from(hackathons).where(eq(hackathons.deleted, false));
     const result: Record<string, Hackathon> = {};
     list.forEach((h) => {
       result[h.id] = h;
@@ -59,6 +59,7 @@ export async function createHackathon(
       .insert(hackathons)
       .values({
         ...hackathonInput,
+        draft: hackathonInput.draft ?? false,
         id: uniqueId,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -82,6 +83,7 @@ export async function updateHackathon(
       .update(hackathons)
       .set({
         ...updates,
+        ...(updates.draft !== undefined ? { draft: updates.draft ?? false } : {}),
         updatedAt: new Date(),
       })
       .where(eq(hackathons.id, id))
@@ -102,7 +104,8 @@ export async function updateHackathon(
 export async function deleteHackathon(id: string): Promise<void> {
   try {
     const result = await db
-      .delete(hackathons)
+      .update(hackathons)
+      .set({ deleted: true, updatedAt: new Date() })
       .where(eq(hackathons.id, id))
       .returning();
       
@@ -116,16 +119,40 @@ export async function deleteHackathon(id: string): Promise<void> {
 }
 
 // Get hackathons for public display (sorted by date desc)
-export async function getHackathonsForDisplay(): Promise<Hackathon[]> {
+export async function getHackathonsForDisplay(limit?: number, offset?: number): Promise<Hackathon[]> {
   try {
-    const list = await db
+    const query = db
       .select()
       .from(hackathons)
+      .where(eq(hackathons.deleted, false))
       .orderBy(desc(hackathons.date));
-    return list;
+      
+    if (limit !== undefined && offset !== undefined) {
+      return await query.limit(limit).offset(offset);
+    } else if (limit !== undefined) {
+      return await query.limit(limit);
+    } else if (offset !== undefined) {
+      return await query.offset(offset);
+    }
+    
+    return await query;
   } catch (error) {
     console.error('Error fetching hackathons for display:', error);
     return [];
+  }
+}
+
+// Get total count of active (non-deleted) hackathons
+export async function getHackathonsCount(): Promise<number> {
+  try {
+    const [result] = await db
+      .select({ value: count() })
+      .from(hackathons)
+      .where(eq(hackathons.deleted, false));
+    return result?.value || 0;
+  } catch (error) {
+    console.error('Error counting hackathons:', error);
+    return 0;
   }
 }
 
@@ -135,7 +162,7 @@ export async function getHackathonsByStatus(status: string): Promise<Hackathon[]
     const list = await db
       .select()
       .from(hackathons)
-      .where(eq(hackathons.status, status))
+      .where(and(eq(hackathons.status, status), eq(hackathons.deleted, false)))
       .orderBy(desc(hackathons.date));
     return list;
   } catch (error) {

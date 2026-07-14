@@ -9,15 +9,23 @@ import { api } from "../../services/api";
 
 export function HackathonsClient() {
   const [hackathons, setHackathons] = useState<any[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    total: 0,
+    upcoming: 0,
+    totalParticipants: 0,
+    totalPrizePool: 0
+  });
 
   useEffect(() => {
     async function fetchHackathons() {
       try {
         setLoading(true);
         setError(null);
-        const res = await await api.fetch("/api/hackathons");
+        const res = await api.fetch("/api/hackathons?limit=6&offset=0");
         if (res.status === 404) {
           setError("Hackathons section is currently disabled");
           return;
@@ -27,6 +35,10 @@ export function HackathonsClient() {
         }
         const data = await res.json();
         setHackathons(data.hackathons || []);
+        setTotal(data.total || 0);
+        if (data.stats) {
+          setStats(data.stats);
+        }
       } catch (err) {
         console.error("Error fetching hackathons:", err);
         setError("Failed to load hackathons");
@@ -37,20 +49,22 @@ export function HackathonsClient() {
     fetchHackathons();
   }, []);
 
-  // Calculate statistics client-side using the same logic as the backend
-  const stats = {
-    total: hackathons.length,
-    upcoming: hackathons.filter(h => h && h.status === 'upcoming').length,
-    totalParticipants: hackathons.reduce((sum, h) => {
-      if (!h || !h.status) return sum + 40;
-      switch (h.status) {
-        case 'completed': return sum + 75;
-        case 'ongoing': return sum + 50;
-        case 'upcoming': return sum + 30;
-        default: return sum + 40;
+  const handleLoadMore = async () => {
+    if (loadingMore) return;
+    try {
+      setLoadingMore(true);
+      const offset = hackathons.length;
+      const res = await api.fetch(`/api/hackathons?limit=6&offset=${offset}`);
+      if (res.ok) {
+        const data = await res.json();
+        setHackathons(prev => [...prev, ...(data.hackathons || [])]);
+        setTotal(data.total || 0);
       }
-    }, 0),
-    totalPrizePool: hackathons.length * 25000
+    } catch (err) {
+      console.error("Error loading more hackathons:", err);
+    } finally {
+      setLoadingMore(false);
+    }
   };
 
   // Categorize hackathons by status
@@ -155,7 +169,7 @@ export function HackathonsClient() {
             {hackathon.registrationLink && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
               <Button asChild variant="outline" className="flex-1 sm:flex-none glass border-blue-600/30 hover:bg-blue-600/10 hover:border-blue-600/50 transition-all duration-300">
                 <Link href={hackathon.registrationLink} target="_blank" rel="noopener noreferrer">
-                  {hackathon.status === 'upcoming' ? 'Register' : 'Join Now'}
+                  Event Info
                   <ExternalLink className="h-4 w-4 ml-2" />
                 </Link>
               </Button>
@@ -359,6 +373,19 @@ export function HackathonsClient() {
         </section>
       )}
 
+      {/* Load More Button */}
+      {hackathons.length > 0 && hackathons.length < total && (
+        <div className="flex justify-center pb-16">
+          <Button 
+            onClick={handleLoadMore} 
+            disabled={loadingMore}
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md rounded-full px-8"
+          >
+            {loadingMore ? "Loading..." : "Load More Events"}
+          </Button>
+        </div>
+      )}
       {/* Empty State */}
       {hackathons.length === 0 && (
         <section className="py-16 md:py-20 lg:py-24">

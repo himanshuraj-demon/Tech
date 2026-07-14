@@ -57,7 +57,7 @@ export default function NewHackathonPage() {
     submissionGuidelines: "",
 
     // custom points and draft config
-    draft: true,
+    draft: false,
     teamRequired: false,
     points1st: 100,
     points2nd: 75,
@@ -245,12 +245,12 @@ export default function NewHackathonPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="registrationLink">Registration Link</Label>
+                  <Label htmlFor="registrationLink">Event Info Link (PDF URL)</Label>
                   <Input 
                     id="registrationLink" 
                     value={formData.registrationLink} 
                     onChange={e => handleInputChange("registrationLink", e.target.value)} 
-                    placeholder="https://forms.gle/example" 
+                    placeholder="e.g. https://domain.com/event-rules.pdf" 
                   />
                 </div>
               </div>
@@ -494,7 +494,7 @@ export default function NewHackathonPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
                 <div>
                   <Label htmlFor="points1st">1st Place Points</Label>
                   <Input 

@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { getHackathonsForDisplay } from '@/lib/hackathons-storage';
+import { NextRequest, NextResponse } from 'next/server';
+import { getHackathonsForDisplay, getHackathonsCount, getBasicHackathonStats } from '@/lib/hackathons-storage';
 import { getHackathonsVisibility } from '@/lib/site-settings';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Check if hackathons section is visible
     const isVisible = await getHackathonsVisibility();
@@ -14,9 +14,18 @@ export async function GET() {
       );
     }
 
-    const hackathons = await getHackathonsForDisplay();
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined;
+
+    const hackathons = await getHackathonsForDisplay(limit, offset);
+    const total = await getHackathonsCount();
+    const stats = await getBasicHackathonStats();
+
     return NextResponse.json({
       hackathons,
+      total,
+      stats,
       visible: isVisible
     });
   } catch (error) {

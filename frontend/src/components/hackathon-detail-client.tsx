@@ -46,6 +46,13 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
   const [newTeamMember, setNewTeamMember] = useState("");
 
+  // Project submission states
+  const [githubLink, setGithubLink] = useState("");
+  const [docsLink, setDocsLink] = useState("");
+  const [submittingProject, setSubmittingProject] = useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
+
   useEffect(() => {
     async function fetchHackathon() {
       try {
@@ -89,6 +96,8 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
               setYearOfJoining(data.registration.yearOfJoining);
               setBranchName(data.registration.branchName);
               setTeamMembers(data.registration.teamMembers || []);
+              setGithubLink(data.registration.githubLink || "");
+              setDocsLink(data.registration.docsLink || "");
             }
           }
         } catch (err) {
@@ -112,6 +121,32 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
 
   const removeTeamMember = (idx: number) => {
     setTeamMembers(teamMembers.filter((_, i) => i !== idx));
+  };
+
+  const handleProjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmittingProject(true);
+    setSubmissionSuccess(false);
+    setSubmissionError("");
+    try {
+      const res = await api.fetch(`/api/hackathons/${id}/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ githubLink, docsLink }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit project");
+      }
+      setSubmissionSuccess(true);
+    } catch (err) {
+      console.error("Error submitting project:", err);
+      setSubmissionError(err instanceof Error ? err.message : "Failed to submit project");
+    } finally {
+      setSubmittingProject(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -442,6 +477,63 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                           </div>
                         )}
                       </div>
+
+                      {/* Project Submission Form for ongoing hackathons */}
+                      {hackathon.status === 'ongoing' && (
+                        <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 p-6 rounded-2xl mt-6 shadow-md text-left space-y-4">
+                          <h4 className="text-lg font-bold font-space-grotesk text-neutral-900 dark:text-neutral-100 flex items-center gap-2 border-b pb-2 dark:border-neutral-850">
+                            <Award className="h-5 w-5 text-primary" />
+                            Project Submission
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            Submit or update your repository and documentation links here. This form is only active during ongoing events.
+                          </p>
+                          
+                          <form onSubmit={handleProjectSubmit} className="space-y-4">
+                            <div>
+                              <Label htmlFor="githubLink" className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">GitHub Repository URL</Label>
+                              <Input
+                                id="githubLink"
+                                value={githubLink}
+                                onChange={(e) => setGithubLink(e.target.value)}
+                                placeholder="e.g. https://github.com/myusername/myproject"
+                                className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor="docsLink" className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">Submission Docs Link</Label>
+                              <Input
+                                id="docsLink"
+                                value={docsLink}
+                                onChange={(e) => setDocsLink(e.target.value)}
+                                placeholder="e.g. Google Drive PDF, Notion Doc, or Loom Video"
+                                className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
+                              />
+                            </div>
+
+                            {submissionSuccess && (
+                              <p className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
+                                <CheckCircle className="h-3.5 w-3.5" /> Project submission links saved successfully!
+                              </p>
+                            )}
+
+                            {submissionError && (
+                              <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                                {submissionError}
+                              </p>
+                            )}
+
+                            <Button 
+                              type="submit" 
+                              disabled={submittingProject}
+                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                            >
+                              {submittingProject ? "Saving Submission..." : "Save Submission Links"}
+                            </Button>
+                          </form>
+                        </div>
+                      )}
                     </div>
                   ) : authStatus !== "authenticated" ? (
                     // Needs login
@@ -666,6 +758,16 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     <p className="text-sm text-muted-foreground">Team Size</p>
                     <p className="font-medium">{hackathon.teamSize || "Individual or Team (TBA)"}</p>
                   </div>
+                  {hackathon.registrationLink && (
+                    <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+                      <Button asChild variant="outline" className="w-full flex items-center gap-2 justify-center">
+                        <Link href={hackathon.registrationLink} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4" />
+                          Download Event Info (PDF)
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
