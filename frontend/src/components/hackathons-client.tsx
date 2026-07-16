@@ -2,43 +2,79 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Calendar, MapPin, Users, Trophy, Clock, ExternalLink, ArrowRight } from "lucide-react";
+import { Calendar, MapPin, Users, Trophy, Clock, ExternalLink, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { api } from "../../services/api";
 
 export function HackathonsClient() {
-  const [hackathons, setHackathons] = useState<any[]>([]);
-  const [total, setTotal] = useState(0);
+  const [upcomingList, setUpcomingList] = useState<any[]>([]);
+  const [ongoingList, setOngoingList] = useState<any[]>([]);
+  const [completedList, setCompletedList] = useState<any[]>([]);
+  
+  const [upcomingTotal, setUpcomingTotal] = useState(0);
+  const [ongoingTotal, setOngoingTotal] = useState(0);
+  const [completedTotal, setCompletedTotal] = useState(0);
+
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [loadingMoreUpcoming, setLoadingMoreUpcoming] = useState(false);
+  const [loadingMoreOngoing, setLoadingMoreOngoing] = useState(false);
+  const [loadingMoreCompleted, setLoadingMoreCompleted] = useState(false);
+
   const [stats, setStats] = useState({
-    total: 0,
-    upcoming: 0,
-    totalParticipants: 0,
+    totalCount: 0,
+    upcomingCount: 0,
+    ongoingCount: 0,
+    completedCount: 0,
     totalPrizePool: 0
   });
 
   useEffect(() => {
-    async function fetchHackathons() {
+    async function fetchInitialData() {
       try {
         setLoading(true);
         setError(null);
-        const res = await api.fetch("/api/hackathons?limit=6&offset=0");
-        if (res.status === 404) {
+
+        // Fetch stats first
+        const statsRes = await api.fetch("/api/hackathons?statsOnly=true");
+        if (statsRes.status === 404) {
           setError("Hackathons section is currently disabled");
           return;
         }
-        if (!res.ok) {
-          throw new Error("Failed to fetch hackathons");
+        if (!statsRes.ok) {
+          throw new Error("Failed to fetch hackathons data");
         }
-        const data = await res.json();
-        setHackathons(data.hackathons || []);
-        setTotal(data.total || 0);
-        if (data.stats) {
-          setStats(data.stats);
+        const statsData = await statsRes.json();
+        if (statsData.stats) {
+          setStats(statsData.stats);
         }
+
+        // Fetch upcoming (initial 6)
+        const upcomingRes = await api.fetch("/api/hackathons?status=upcoming&limit=6&offset=0");
+        if (upcomingRes.ok) {
+          const uData = await upcomingRes.json();
+          setUpcomingList(uData.hackathons || []);
+          setUpcomingTotal(uData.total || 0);
+        }
+
+        // Fetch ongoing (initial 6)
+        const ongoingRes = await api.fetch("/api/hackathons?status=ongoing&limit=6&offset=0");
+        if (ongoingRes.ok) {
+          const oData = await ongoingRes.json();
+          setOngoingList(oData.hackathons || []);
+          setOngoingTotal(oData.total || 0);
+        }
+
+        // Fetch completed (initial 6)
+        const completedRes = await api.fetch("/api/hackathons?status=completed&limit=6&offset=0");
+        if (completedRes.ok) {
+          const cData = await completedRes.json();
+          setCompletedList(cData.hackathons || []);
+          setCompletedTotal(cData.total || 0);
+        }
+
       } catch (err) {
         console.error("Error fetching hackathons:", err);
         setError("Failed to load hackathons");
@@ -46,31 +82,67 @@ export function HackathonsClient() {
         setLoading(false);
       }
     }
-    fetchHackathons();
+    fetchInitialData();
   }, []);
 
-  const handleLoadMore = async () => {
-    if (loadingMore) return;
+  const handleLoadMoreUpcoming = async () => {
+    if (loadingMoreUpcoming) return;
     try {
-      setLoadingMore(true);
-      const offset = hackathons.length;
-      const res = await api.fetch(`/api/hackathons?limit=6&offset=${offset}`);
+      setLoadingMoreUpcoming(true);
+      const offset = upcomingList.length;
+      const res = await api.fetch(`/api/hackathons?status=upcoming&limit=6&offset=${offset}`);
       if (res.ok) {
         const data = await res.json();
-        setHackathons(prev => [...prev, ...(data.hackathons || [])]);
-        setTotal(data.total || 0);
+        setUpcomingList(prev => [...prev, ...((data.hackathons || []).filter((h: any) => h !== null))]);
+        setUpcomingTotal(data.total || 0);
       }
     } catch (err) {
-      console.error("Error loading more hackathons:", err);
+      console.error("Error loading more upcoming events:", err);
     } finally {
-      setLoadingMore(false);
+      setLoadingMoreUpcoming(false);
+    }
+  };
+
+  const handleLoadMoreOngoing = async () => {
+    if (loadingMoreOngoing) return;
+    try {
+      setLoadingMoreOngoing(true);
+      const offset = ongoingList.length;
+      const res = await api.fetch(`/api/hackathons?status=ongoing&limit=6&offset=${offset}`);
+      if (res.ok) {
+        const data = await res.json();
+        setOngoingList(prev => [...prev, ...((data.hackathons || []).filter((h: any) => h !== null))]);
+        setOngoingTotal(data.total || 0);
+      }
+    } catch (err) {
+      console.error("Error loading more ongoing events:", err);
+    } finally {
+      setLoadingMoreOngoing(false);
+    }
+  };
+
+  const handleLoadMoreCompleted = async () => {
+    if (loadingMoreCompleted) return;
+    try {
+      setLoadingMoreCompleted(true);
+      const offset = completedList.length;
+      const res = await api.fetch(`/api/hackathons?status=completed&limit=6&offset=${offset}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCompletedList(prev => [...prev, ...((data.hackathons || []).filter((h: any) => h !== null))]);
+        setCompletedTotal(data.total || 0);
+      }
+    } catch (err) {
+      console.error("Error loading more completed events:", err);
+    } finally {
+      setLoadingMoreCompleted(false);
     }
   };
 
   // Categorize hackathons by status
-  const upcomingHackathons = hackathons.filter(h => h && h.status === 'upcoming');
-  const ongoingHackathons = hackathons.filter(h => h && h.status === 'ongoing');
-  const previousHackathons = hackathons.filter(h => h && h.status === 'completed');
+  const upcomingHackathons = upcomingList;
+  const ongoingHackathons = ongoingList;
+  const previousHackathons = completedList;
 
   const HackathonCard = ({ hackathon }: { hackathon: any }) => {
     const getStatusGradient = (status: string) => {
@@ -119,16 +191,17 @@ export function HackathonsClient() {
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
               <Calendar className="h-4 w-4 text-blue-500 flex-shrink-0" />
               <div className="flex flex-col">
-                <span className="truncate">
-                  {hackathon.startDate 
-                    ? `${hackathon.startDate} to`
-                    : hackathon.startDate || "TBD"}
-                </span>
-                <span className="truncate">
-                  { hackathon.endDate 
-                    ? `${hackathon.endDate}`
-                    : hackathon.endDate || "TBD"}
-                </span>
+                {hackathon.status === 'upcoming' ? (
+                  <>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Registration Ends</span>
+                    <span className="truncate font-semibold">{hackathon.startDate || "TBD"}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Submission Ends</span>
+                    <span className="truncate font-semibold">{hackathon.endDate || "TBD"}</span>
+                  </>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
@@ -139,27 +212,17 @@ export function HackathonsClient() {
               <Clock className="h-4 w-4 text-purple-500 flex-shrink-0" />
               <span className="truncate">{hackathon.category}</span>
             </div>
-            {hackathon.teamSize && (
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
-                <Users className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                <span className="truncate">{hackathon.teamSize}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
+              <Users className="h-4 w-4 text-orange-500 flex-shrink-0" />
+              <span className="truncate">Individual Only</span>
+            </div>
           </div>
 
-          {/* Category and Prizes */}
+          {/* Category */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-purple-600 dark:text-purple-400 border border-purple-600/20 w-fit">
               {hackathon.category}
             </div>
-            {((hackathon.winnerTiers && hackathon.winnerTiers.length > 0) || hackathon.specialPrizes) && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Trophy className="h-4 w-4 text-yellow-500" />
-                <span>
-                  Prizes Available
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Action Buttons */}
@@ -241,7 +304,7 @@ export function HackathonsClient() {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                {stats.total}
+                {stats.totalCount}
               </div>
               <p className="text-sm font-medium text-muted-foreground">Total Events</p>
             </div>
@@ -255,7 +318,7 @@ export function HackathonsClient() {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600/10 to-cyan-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
               <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-                {stats.upcoming}
+                {stats.upcomingCount}
               </div>
               <p className="text-sm font-medium text-muted-foreground">Upcoming</p>
             </div>
@@ -269,30 +332,30 @@ export function HackathonsClient() {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-600/10 to-emerald-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
               <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-                {stats.totalParticipants}
+                {stats.ongoingCount}
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Total Participants</p>
+              <p className="text-sm font-medium text-muted-foreground">Ongoing</p>
             </div>
 
-            {/* Total Prize Pool */}
+            {/* Completed Events */}
             <div className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl group">
               <div className="relative mb-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-yellow-600/20 to-orange-600/20 flex items-center justify-center mb-3 group-hover:from-yellow-600/30 group-hover:to-orange-600/30 transition-all duration-300">
-                  <Trophy className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
+                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-gray-600/20 to-slate-600/20 flex items-center justify-center mb-3 group-hover:from-gray-600/30 group-hover:to-slate-600/30 transition-all duration-300">
+                  <CheckCircle className="h-8 w-8 text-gray-600 dark:text-gray-400" />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-600/10 to-orange-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-600/10 to-slate-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-2">
-                ₹{(stats.totalPrizePool / 100000).toFixed(1)}L
+              <div className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent mb-2">
+                {stats.completedCount}
               </div>
-              <p className="text-sm font-medium text-muted-foreground">Total Prize Pool</p>
+              <p className="text-sm font-medium text-muted-foreground">Completed</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Upcoming Hackathons */}
-      {upcomingHackathons.length > 0 && (
+      {upcomingList.length > 0 && (
         <section className="py-16 md:py-20 lg:py-24">
           <div className="container px-4 md:px-6">
             <div className="space-y-12">
@@ -312,13 +375,25 @@ export function HackathonsClient() {
                   <HackathonCard key={hackathon.id} hackathon={hackathon} />
                 ))}
               </div>
+              {upcomingList.length < upcomingTotal && (
+                <div className="text-center pt-6">
+                  <Button 
+                    onClick={handleLoadMoreUpcoming} 
+                    disabled={loadingMoreUpcoming}
+                    variant="outline"
+                    className="glass border-blue-600/30 hover:bg-blue-600/10 hover:border-blue-600/50"
+                  >
+                    {loadingMoreUpcoming ? "Loading..." : "Load More Upcoming Events"}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
 
       {/* Ongoing Hackathons */}
-      {ongoingHackathons.length > 0 && (
+      {ongoingList.length > 0 && (
         <section className="py-16 md:py-20 lg:py-24 bg-muted/20">
           <div className="container px-4 md:px-6">
             <div className="space-y-12">
@@ -338,13 +413,25 @@ export function HackathonsClient() {
                   <HackathonCard key={hackathon.id} hackathon={hackathon} />
                 ))}
               </div>
+              {ongoingList.length < ongoingTotal && (
+                <div className="text-center pt-6">
+                  <Button 
+                    onClick={handleLoadMoreOngoing} 
+                    disabled={loadingMoreOngoing}
+                    variant="outline"
+                    className="glass border-green-600/30 hover:bg-green-600/10 hover:border-green-600/50"
+                  >
+                    {loadingMoreOngoing ? "Loading..." : "Load More Ongoing Events"}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
 
       {/* Previous Hackathons */}
-      {previousHackathons.length > 0 && (
+      {completedList.length > 0 && (
         <section className="py-16 md:py-20 lg:py-24">
           <div className="container px-4 md:px-6">
             <div className="space-y-12">
@@ -360,15 +447,19 @@ export function HackathonsClient() {
                 </p>
               </div>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {previousHackathons.slice(0, 6).map((hackathon) => (
+                {previousHackathons.map((hackathon) => (
                   <HackathonCard key={hackathon.id} hackathon={hackathon} />
                 ))}
               </div>
-              {previousHackathons.length > 6 && (
-                <div className="text-center">
-                  <Button variant="outline" size="lg" className="glass border-purple-600/30 hover:bg-purple-600/10 hover:border-purple-600/50 transition-all duration-300 group">
-                    View All Previous Events
-                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+              {completedList.length < completedTotal && (
+                <div className="text-center pt-6">
+                  <Button 
+                    onClick={handleLoadMoreCompleted} 
+                    disabled={loadingMoreCompleted}
+                    variant="outline"
+                    className="glass border-purple-600/30 hover:bg-purple-600/10 hover:border-purple-600/50"
+                  >
+                    {loadingMoreCompleted ? "Loading..." : "Load More Previous Events"}
                   </Button>
                 </div>
               )}
@@ -377,36 +468,19 @@ export function HackathonsClient() {
         </section>
       )}
 
-      {/* Load More Button */}
-      {hackathons.length > 0 && hackathons.length < total && (
-        <div className="flex justify-center pb-16">
-          <Button 
-            onClick={handleLoadMore} 
-            disabled={loadingMore}
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md rounded-full px-8"
-          >
-            {loadingMore ? "Loading..." : "Load More Events"}
-          </Button>
-        </div>
-      )}
       {/* Empty State */}
-      {hackathons.length === 0 && (
+      {upcomingList.length === 0 && ongoingList.length === 0 && completedList.length === 0 && (
         <section className="py-16 md:py-20 lg:py-24">
           <div className="container px-4 md:px-6">
             <div className="text-center space-y-6 max-w-2xl mx-auto">
               <div className="glass rounded-2xl p-12">
                 <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 flex items-center justify-center mb-6">
-                  <Trophy className="h-12 w-12 text-purple-600 dark:text-purple-400" />
+                  <Trophy className="h-12 w-12 text-primary" />
                 </div>
-                <h2 className="text-3xl font-bold mb-4 font-space-grotesk">No Hackathons Available</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                  We're working on organizing exciting hackathons and competitions. Stay tuned for updates!
+                <h3 className="text-2xl font-bold font-space-grotesk">No Hackathons Found</h3>
+                <p className="text-muted-foreground">
+                  We are currently planning next semester's hackathons. Keep an eye on this space for updates!
                 </p>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Get Notified
-                </Button>
               </div>
             </div>
           </div>

@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db, eventRegistrations, hackathons } from "@/lib/db";
+import { db, eventRegistrations } from "@/lib/db";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
+import { getHackathonById } from "@/lib/hackathons-storage";
 
 const registerSchema = z.object({
-  degreeType: z.enum(["btech", "mtech", "phd", "other"]),
-  yearOfJoining: z.string().min(1),
-  branchName: z.string().min(1),
-  teamMembers: z.array(z.string()).optional().default([]),
+  degreeType: z.enum(["btech", "mtech", "phd", "other"]).optional().default("other"),
+  yearOfJoining: z.string().optional().default("N/A"),
+  branchName: z.string().optional().default("N/A"),
 });
 
 export async function POST(
@@ -26,22 +26,17 @@ export async function POST(
     const { id: hackathonId } = await params;
     
     // Check if the hackathon exists
-    const [hackathon] = await db.select().from(hackathons).where(eq(hackathons.id, hackathonId)).limit(1);
+    const hackathon = await getHackathonById(hackathonId);
     if (!hackathon) {
       return NextResponse.json({ error: "Hackathon not found" }, { status: 404 });
     }
 
-    if (hackathon.status === "completed") {
-      return NextResponse.json({ error: "Registrations are closed as this event has ended." }, { status: 400 });
+    if (hackathon.status !== "upcoming") {
+      return NextResponse.json({ error: "Registrations are closed as this event is no longer upcoming." }, { status: 400 });
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const validatedData = registerSchema.parse(body);
-
-    // If team members required, check if they are provided
-    if (hackathon.teamRequired && validatedData.teamMembers.length === 0) {
-      return NextResponse.json({ error: "Team members are required for this hackathon" }, { status: 400 });
-    }
 
     // Check if user already registered
     const [existingReg] = await db
@@ -68,7 +63,7 @@ export async function POST(
       degreeType: validatedData.degreeType,
       yearOfJoining: validatedData.yearOfJoining,
       branchName: validatedData.branchName,
-      teamMembers: validatedData.teamMembers,
+      teamMembers: null, // individual registration only
       winnerPlace: null,
       createdAt: new Date(),
       updatedAt: new Date(),

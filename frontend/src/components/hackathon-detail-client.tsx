@@ -14,7 +14,9 @@ import {
   LogIn,
   Plus,
   Trash2,
-  Award
+  Award,
+  Trophy,
+  Github
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,26 +153,13 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!branchName.trim() || !yearOfJoining.trim()) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-    if (hackathon.teamRequired && teamMembers.length === 0) {
-      alert("Please add at least one team member.");
-      return;
-    }
 
     try {
       setSubmittingReg(true);
       const res = await api.fetch(`/api/hackathons/${id}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          degreeType,
-          yearOfJoining,
-          branchName: branchName.trim(),
-          teamMembers,
-        }),
+        body: JSON.stringify({}),
       });
 
       if (res.ok) {
@@ -242,15 +231,22 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
             </div>
 
             {/* Quick Info */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Date</p>
+                  <p className="text-sm text-muted-foreground">Registration Ends</p>
                   <p className="font-medium">
-                    {hackathon.startDate && hackathon.endDate 
-                      ? `${hackathon.startDate} to ${hackathon.endDate}`
-                      : hackathon.startDate || hackathon.endDate || "TBD"}
+                    {hackathon.startDate || "TBD"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Submission Ends</p>
+                  <p className="font-medium">
+                    {hackathon.endDate || "TBD"}
                   </p>
                 </div>
               </div>
@@ -262,7 +258,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-muted-foreground" />
+                <Award className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Category</p>
                   <p className="font-medium">{hackathon.category}</p>
@@ -272,7 +268,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Team Size</p>
-                  <p className="font-medium">{hackathon.teamSize || "Open"}</p>
+                  <p className="font-medium">Individual Only</p>
                 </div>
               </div>
             </div>
@@ -372,60 +368,51 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 </Card>
               )}
 
-              {/* Prize Pool & Leaderboard points */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                    <span>Prizes & Points</span>
-                    {((hackathon.winnerTiers && hackathon.winnerTiers.length > 0) || hackathon.pointsParticipation > 0) && (
-                      <span className="text-xs font-semibold text-yellow-600 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30 px-2 py-1 rounded">
-                        Leaderboard Points Active
-                      </span>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {hackathon.winnerTiers && hackathon.winnerTiers.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {hackathon.winnerTiers.map((tier: any) => {
+              {/* Event Winners Section (Only visible when completed & winners declared) */}
+              {hackathon.status === 'completed' && hackathon.winners && hackathon.winners.length > 0 && (
+                <Card className="border-yellow-200/50 dark:border-yellow-900/30 bg-gradient-to-b from-yellow-50/10 to-transparent dark:from-yellow-950/5">
+                  <CardHeader className="text-center">
+                    <CardTitle className="flex justify-center items-center gap-2 text-2xl font-bold font-space-grotesk text-yellow-600 dark:text-yellow-400">
+                      <Trophy className="h-6 w-6" />
+                      Event Winners 🏆
+                    </CardTitle>
+                    <CardDescription>Congratulations to the winners of {hackathon.name}!</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {hackathon.winners.map((winner: any) => {
                         const rankPrefix = 
-                          tier.rank === 1 ? "🥇 " :
-                          tier.rank === 2 ? "🥈 " :
-                          tier.rank === 3 ? "🥉 " :
-                          "🏆 ";
-                        const bgClass =
-                          tier.rank === 1 ? "from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-800" :
-                          tier.rank === 2 ? "from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 border-gray-200 dark:border-gray-700" :
-                          tier.rank === 3 ? "from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800" :
-                          "from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-800";
-                        const textClass =
-                          tier.rank === 1 ? "text-yellow-600 dark:text-yellow-400" :
-                          tier.rank === 2 ? "text-gray-600 dark:text-gray-400" :
-                          tier.rank === 3 ? "text-orange-600 dark:text-orange-400" :
-                          "text-emerald-600 dark:text-emerald-400";
+                          winner.winnerPlace === 1 ? "🥇 1st Place" :
+                          winner.winnerPlace === 2 ? "🥈 2nd Place" :
+                          winner.winnerPlace === 3 ? "🥉 3rd Place" :
+                          `🏆 Winner`;
+                        
+                        const tier = hackathon.winnerTiers?.find((t: any) => t.rank === winner.winnerPlace);
+                        const tierName = tier ? tier.name : rankPrefix;
+                        const pointsAwarded = tier ? tier.points : 0;
+
                         return (
-                          <div key={tier.rank} className={`text-center p-4 bg-gradient-to-br rounded-lg border ${bgClass}`}>
-                            <div className="text-2xl font-bold">{rankPrefix}</div>
-                            <h4 className="font-semibold text-gray-800 dark:text-gray-200">{tier.name}</h4>
-                            <p className={`text-sm ${textClass}`}>{tier.prize || "TBA"}</p>
-                            {tier.points > 0 && <div className="text-xs font-bold mt-1 text-primary">+{tier.points} Leaderboard pts</div>}
-                          </div>
+                          <Card key={winner.id} className="relative overflow-hidden border-yellow-150 dark:border-yellow-900/20 bg-white/50 dark:bg-neutral-900/40 shadow-sm hover:shadow-md transition-all duration-300">
+                            <div className="absolute top-0 right-0 left-0 h-1 bg-yellow-500" />
+                            <CardHeader className="pb-3 text-center">
+                              <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">{tierName}</span>
+                              <CardTitle className="text-lg font-bold font-space-grotesk mt-1">{winner.userName}</CardTitle>
+                              <CardDescription className="text-xs text-muted-foreground">{winner.userEmail}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3 pt-0 text-center flex flex-col items-center">
+                              {pointsAwarded > 0 && (
+                                <Badge variant="secondary" className="bg-yellow-50 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-400 border border-yellow-250/50">
+                                  +{pointsAwarded} Leaderboard Points
+                                </Badge>
+                              )}
+                            </CardContent>
+                          </Card>
                         );
                       })}
                     </div>
-                  ) : (
-                    <div className="text-center py-6 text-sm text-muted-foreground italic">
-                      No prize tiers configured.
-                    </div>
-                  )}
-
-                  {hackathon.pointsParticipation > 0 && (
-                    <div className="text-xs text-muted-foreground bg-gray-50 dark:bg-gray-900/50 p-2.5 rounded border border-gray-100 dark:border-gray-800 text-center font-medium">
-                      * All other active participants will receive <span className="font-bold text-primary">+{hackathon.pointsParticipation} points</span> on the technical council leaderboard.
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Dynamic Registration Section */}
               {!hackathon.draft && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
@@ -533,122 +520,13 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                       </Button>
                     </div>
                   ) : (
-                    // Registration Form
-                    <form onSubmit={handleRegister} className="space-y-6">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                          <Label htmlFor="studName" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Full Name</Label>
-                          <Input
-                            id="studName"
-                            value={session?.user?.name || ""}
-                            disabled
-                            className="bg-gray-100/50 dark:bg-gray-900/50 cursor-not-allowed font-medium text-neutral-900 dark:text-neutral-100"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="studEmail" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Email Address</Label>
-                          <Input
-                            id="studEmail"
-                            value={session?.user?.email || ""}
-                            disabled
-                            className="bg-gray-100/50 dark:bg-gray-900/50 cursor-not-allowed font-medium text-neutral-900 dark:text-neutral-100"
-                          />
-                        </div>
+                    // Registration Form (Simple direct button)
+                    <form onSubmit={handleRegister} className="space-y-6 max-w-md mx-auto">
+                      <div className="text-center p-4 bg-blue-50/50 dark:bg-blue-950/10 rounded-xl border border-blue-150/20">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          You will be registered as <span className="font-semibold text-gray-800 dark:text-gray-200">{session?.user?.name}</span> ({session?.user?.email}).
+                        </p>
                       </div>
-
-                      <div className="grid gap-4 md:grid-cols-3">
-                        <div>
-                          <Label htmlFor="degree" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Degree Type *</Label>
-                          <select
-                            id="degree"
-                            value={degreeType}
-                            onChange={(e) => setDegreeType(e.target.value)}
-                            className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                          >
-                            <option value="btech" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">B.Tech</option>
-                            <option value="mtech" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">M.Tech</option>
-                            <option value="phd" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">PhD</option>
-                            <option value="other" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Other</option>
-                          </select>
-                        </div>
-                        <div>
-                          <Label htmlFor="joiningYear" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Year of Joining *</Label>
-                          <select
-                            id="joiningYear"
-                            value={yearOfJoining}
-                            onChange={(e) => setYearOfJoining(e.target.value)}
-                            className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                          >
-                            <option value="2022" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">2022</option>
-                            <option value="2023" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">2023</option>
-                            <option value="2024" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">2024</option>
-                            <option value="2025" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">2025</option>
-                            <option value="2026" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">2026</option>
-                            <option value="other" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Other</option>
-                          </select>
-                        </div>
-                        <div>
-                          <Label htmlFor="branch" className="text-neutral-900 dark:text-neutral-200 mb-1.5 block">Branch Name *</Label>
-                          <Input
-                            id="branch"
-                            placeholder="e.g., Computer Science"
-                            value={branchName}
-                            onChange={(e) => setBranchName(e.target.value)}
-                            className="border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      {/* Team Members */}
-                      {hackathon.teamRequired && (
-                        <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/65 space-y-4">
-                          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-                            <Label className="text-base font-semibold">Team Members List</Label>
-                            <span className="text-xs text-muted-foreground font-medium">Add all team participants</span>
-                          </div>
-
-                          {teamMembers.length > 0 && (
-                            <div className="space-y-2">
-                              {teamMembers.map((member, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 text-sm">
-                                  <span className="font-semibold text-gray-700 dark:text-gray-300">
-                                    {idx + 1}. {member}
-                                  </span>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeTeamMember(idx)}
-                                    className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="flex gap-2">
-                            <Input
-                              placeholder="Enter team member name/email"
-                              value={newTeamMember}
-                              onChange={(e) => setNewTeamMember(e.target.value)}
-                              className="border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  e.preventDefault();
-                                  addTeamMember();
-                                }
-                              }}
-                            />
-                            <Button type="button" onClick={addTeamMember} variant="outline" className="flex-shrink-0">
-                              <Plus className="h-4 w-4 mr-1" />
-                              Add
-                            </Button>
-                          </div>
-                        </div>
-                      )}
 
                       <Button
                         type="submit"
@@ -656,12 +534,12 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2.5 rounded-xl shadow-md border-0"
                       >
                         {submittingReg ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center gap-2">
                             <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
                             <span>Registering...</span>
                           </div>
                         ) : (
-                          <span>Confirm Registration</span>
+                          <span>Confirm & Register</span>
                         )}
                       </Button>
                     </form>

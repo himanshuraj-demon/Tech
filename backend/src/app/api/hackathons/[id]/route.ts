@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHackathonById } from '@/lib/hackathons-storage';
+import { db, eventRegistrations } from "@/lib/db";
+import { eq, and, isNotNull, asc } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +16,24 @@ export async function GET(
         { error: 'Hackathon not found' },
         { status: 404 }
       );
+    }
+    
+    if (hackathon.status === 'completed') {
+      const winners = await db
+        .select()
+        .from(eventRegistrations)
+        .where(
+          and(
+            eq(eventRegistrations.eventId, id),
+            isNotNull(eventRegistrations.winnerPlace)
+          )
+        )
+        .orderBy(asc(eventRegistrations.winnerPlace));
+      
+      return NextResponse.json({
+        ...hackathon,
+        winners
+      });
     }
     
     return NextResponse.json(hackathon);

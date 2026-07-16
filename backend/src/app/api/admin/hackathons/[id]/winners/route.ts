@@ -10,6 +10,13 @@ const winnersSchema = z.object({
     regId: z.string(),
     rank: z.number(),
   })),
+  winnerTiers: z.array(z.object({
+    rank: z.number(),
+    name: z.string(),
+    points: z.number(),
+    prize: z.string().optional().default("TBD"),
+  })),
+  pointsParticipation: z.number().optional().default(10),
 });
 
 export async function POST(
@@ -42,13 +49,18 @@ export async function POST(
       }
     }
 
-    // Automatically transition status to completed
+    // Save winnerTiers and pointsParticipation dynamically and update status to completed
     await db
       .update(hackathons)
-      .set({ status: 'completed', updatedAt: new Date() })
+      .set({ 
+        winnerTiers: validatedData.winnerTiers,
+        pointsParticipation: validatedData.pointsParticipation,
+        status: 'completed', 
+        updatedAt: new Date() 
+      })
       .where(eq(hackathons.id, hackathonId));
 
-    return NextResponse.json({ success: true, message: "Winners updated successfully" });
+    return NextResponse.json({ success: true, message: "Winners and points configuration updated successfully" });
   } catch (error) {
     console.error("Error setting hackathon winners:", error);
     if (error instanceof z.ZodError) {

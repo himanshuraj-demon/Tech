@@ -58,6 +58,8 @@ export async function GET(request: NextRequest) {
       let pointsEarned = 0;
       let placeName: string | null = null;
 
+      const hasSubmission = !!(reg.githubLink?.trim() || reg.docsLink?.trim());
+
       if (reg.winnerPlace) {
         const tier = (hackathon.winnerTiers as any[])?.find((t: any) => t.rank === reg.winnerPlace);
         if (tier) {
@@ -67,10 +69,10 @@ export async function GET(request: NextRequest) {
           else if (reg.winnerPlace === 2) student.secondPlaces += 1;
           else if (reg.winnerPlace === 3) student.thirdPlaces += 1;
         } else {
-          pointsEarned = hackathon.pointsParticipation;
+          pointsEarned = hasSubmission ? hackathon.pointsParticipation : 0;
         }
       } else {
-        pointsEarned = hackathon.pointsParticipation;
+        pointsEarned = hasSubmission ? hackathon.pointsParticipation : 0;
       }
 
       student.score += pointsEarned;

@@ -57,7 +57,37 @@ export interface BasicHackathon {
   deleted: boolean;
 }
 
+function getAutomaticStatus(startDateStr: string, endDateStr: string, fallbackStatus: string): "upcoming" | "ongoing" | "completed" | "cancelled" {
+  if (fallbackStatus === "cancelled" || fallbackStatus === "completed") return fallbackStatus as any;
+  if (!startDateStr || !endDateStr) return fallbackStatus as any;
+  
+  try {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    const startParts = startDateStr.split('-');
+    const endParts = endDateStr.split('-');
+    
+    if (startParts.length !== 3 || endParts.length !== 3) return fallbackStatus as any;
+    
+    const startVal = new Date(Number(startParts[0]), Number(startParts[1]) - 1, Number(startParts[2])).getTime();
+    const endVal = new Date(Number(endParts[0]), Number(endParts[1]) - 1, Number(endParts[2])).getTime();
+    
+    if (today < startVal) {
+      return "upcoming";
+    } else if (today < endVal) {
+      return "ongoing";
+    } else {
+      return "completed";
+    }
+  } catch (e) {
+    return fallbackStatus as any;
+  }
+}
+
 function mapDBToData(h: Hackathon): BasicHackathon {
+  const computedStatus = getAutomaticStatus(h.startDate, h.endDate, h.status);
+  
   return {
     id: h.id,
     name: h.name,
@@ -67,7 +97,7 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     endDate: h.endDate,
     location: h.location,
     category: h.category,
-    status: h.status as any,
+    status: computedStatus,
     registrationLink: h.registrationLink || undefined,
     organizerName: h.organizerName || undefined,
     organizerEmail: h.organizerEmail || undefined,
@@ -189,8 +219,10 @@ export async function getHackathonsCount(): Promise<number> {
 }
 
 export async function getHackathonsByStatus(status: BasicHackathon['status']): Promise<BasicHackathon[]> {
-  const list = await dbGetHackathonsByStatus(status);
-  return list.map(mapDBToData);
+  const allMap = await getAllHackathons();
+  const allList = Object.values(allMap);
+  const filtered = allList.filter(h => h.status === status);
+  return filtered.sort((a, b) => b.startDate.localeCompare(a.startDate));
 }
 
 export async function getUpcomingHackathons(): Promise<BasicHackathon[]> {

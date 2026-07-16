@@ -171,33 +171,70 @@ export async function getHackathonsByStatus(status: string): Promise<Hackathon[]
   }
 }
 
-// Get hackathon statistics
 export async function getBasicHackathonStats() {
   try {
-    const list = await getHackathonsForDisplay();
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Select only status and date fields for active hackathons
+    const list = await db
+      .select({
+        status: hackathons.status,
+        startDate: hackathons.startDate,
+        endDate: hackathons.endDate,
+      })
+      .from(hackathons)
+      .where(
+        and(
+          eq(hackathons.draft, false),
+          eq(hackathons.deleted, false)
+        )
+      );
+
     const total = list.length;
-    const upcoming = list.filter(h => h.status === 'upcoming').length;
-    
-    // Estimates as in original
-    const totalParticipants = list.reduce((sum, h) => {
-      switch (h.status) {
-        case 'completed': return sum + 75;
-        case 'ongoing': return sum + 50;
-        case 'upcoming': return sum + 30;
-        default: return sum + 40;
+    let upcoming = 0;
+    let ongoing = 0;
+    let completed = 0;
+
+    list.forEach(h => {
+      let computedStatus = h.status;
+      if (h.status !== 'cancelled' && h.status !== 'completed') {
+        if (h.startDate && today < h.startDate) {
+          computedStatus = 'upcoming';
+        } else if (h.startDate && h.endDate && today >= h.startDate && today < h.endDate) {
+          computedStatus = 'ongoing';
+        } else if (h.endDate && today >= h.endDate) {
+          computedStatus = 'completed';
+        }
       }
-    }, 0);
-    
-    const totalPrizePool = list.length * 25000;
-    
+      
+      if (computedStatus === 'upcoming') upcoming++;
+      else if (computedStatus === 'ongoing') ongoing++;
+      else if (computedStatus === 'completed') completed++;
+    });
+
     return {
       total,
       upcoming,
-      totalParticipants,
-      totalPrizePool
+      ongoing,
+      completed,
+      totalCount: total,
+      upcomingCount: upcoming,
+      ongoingCount: ongoing,
+      completedCount: completed,
+      totalPrizePool: 0
     };
   } catch (error) {
     console.error('Error getting hackathon stats:', error);
-    return { total: 0, upcoming: 0, totalParticipants: 0, totalPrizePool: 0 };
+    return {
+      total: 0,
+      upcoming: 0,
+      ongoing: 0,
+      completed: 0,
+      totalCount: 0,
+      upcomingCount: 0,
+      ongoingCount: 0,
+      completedCount: 0,
+      totalPrizePool: 0
+    };
   }
 }
