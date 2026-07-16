@@ -41,9 +41,9 @@ export async function POST(
       return NextResponse.json({ error: "Hackathon has been deleted" }, { status: 404 });
     }
 
-    if (hackathon.status !== "ongoing") {
+    if (hackathon.status !== "ongoing" && hackathon.status !== "upcoming") {
       return NextResponse.json(
-        { error: "Submissions are only allowed for ongoing hackathons" },
+        { error: "Submissions are only allowed for upcoming or ongoing hackathons" },
         { status: 400 }
       );
     }

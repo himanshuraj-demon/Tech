@@ -444,7 +444,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
 
 
                       {/* Project Submission Form for ongoing hackathons */}
-                      {hackathon.status === 'ongoing' && (
+                      {(hackathon.status === 'ongoing' || hackathon.status === 'upcoming') && (
                         <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 p-6 rounded-2xl mt-6 shadow-md text-left space-y-4">
                           <h4 className="text-lg font-bold font-space-grotesk text-neutral-900 dark:text-neutral-100 flex items-center gap-2 border-b pb-2 dark:border-neutral-850">
                             <Award className="h-5 w-5 text-primary" />

@@ -39,6 +39,12 @@ export async function GET(request: NextRequest) {
       // ONLY award points if the hackathon is completed/ended!
       if (hackathon.status !== 'completed') return;
 
+      const hasSubmission = !!(reg.githubLink?.trim() || reg.docsLink?.trim());
+
+      // Skip registrations that never submitted a project and aren't a declared winner.
+      // These users should not appear on the leaderboard at all.
+      if (!hasSubmission && !reg.winnerPlace) return;
+
       if (!leaderboardMap[email]) {
         leaderboardMap[email] = {
           email: reg.userEmail,
@@ -57,8 +63,6 @@ export async function GET(request: NextRequest) {
 
       let pointsEarned = 0;
       let placeName: string | null = null;
-
-      const hasSubmission = !!(reg.githubLink?.trim() || reg.docsLink?.trim());
 
       if (reg.winnerPlace) {
         const tier = (hackathon.winnerTiers as any[])?.find((t: any) => t.rank === reg.winnerPlace);
