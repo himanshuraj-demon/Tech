@@ -59,7 +59,7 @@ export default function ClubsAdminPage() {
       const cleanClubId = clubId.split(':')[0];
       console.log('Delete club - clubId:', clubId, 'cleanClubId:', cleanClubId);
       
-      const response = await fetch(`/api/admin/clubs/${cleanClubId}`, {
+      const response = await api.fetch(`/api/admin/clubs/${cleanClubId}`, {
         method: "DELETE",
       });
 

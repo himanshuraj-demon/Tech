@@ -515,7 +515,7 @@ export default function NewEvent() {
                                     formData.append("file", file);
                                     formData.append("folder", "events");
 
-                                    const response = await fetch("/api/admin/upload", {
+                                    const response = await api.fetch("/api/admin/upload", {
                                       method: "POST",
                                       body: formData,
                                     });

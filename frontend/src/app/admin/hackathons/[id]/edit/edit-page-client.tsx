@@ -241,7 +241,7 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-col">
             <Button
               variant="outline"
               onClick={() => router.push("/admin/hackathons")}
@@ -573,26 +573,6 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
             </CardContent>
           </Card>
 
-          {/* Publication Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Publication Settings</CardTitle>
-              <CardDescription>Configure hackathon draft status</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="draft" className="text-base font-semibold">Save as Draft</Label>
-                  <p className="text-xs text-muted-foreground">Keep this hackathon private until ready to publish</p>
-                </div>
-                <Switch 
-                  id="draft" 
-                  checked={formData.draft} 
-                  onCheckedChange={checked => handleInputChange("draft", checked)} 
-                />
-              </div>
-            </CardContent>
-          </Card>
 
           <div className="flex justify-end gap-3">
             <Button

@@ -1,3 +1,4 @@
+import { api } from "../../../../../../services/api";
 import ParticipantsClient from "./participants-client";
 import { defaultEventsData } from "@/lib/events-data";
 
@@ -9,8 +10,7 @@ interface PageProps {
 
 export async function generateStaticParams() {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-    const res = await fetch(`${API_URL}/api/events`);
+    const res = await api.fetch(`/api/events`);
     if (res.ok) {
       const events = await res.json();
       if (Array.isArray(events) && events.length > 0) {

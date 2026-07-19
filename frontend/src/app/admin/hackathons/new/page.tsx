@@ -426,27 +426,6 @@ export default function NewHackathonPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Publication Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Publication Settings</CardTitle>
-              <CardDescription>Configure hackathon draft status</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="draft" className="text-base font-semibold">Save as Draft</Label>
-                  <p className="text-xs text-muted-foreground">Keep this hackathon private until ready to publish</p>
-                </div>
-                <Switch 
-                  id="draft" 
-                  checked={formData.draft} 
-                  onCheckedChange={checked => handleInputChange("draft", checked)} 
-                />
-              </div>
-            </CardContent>
-          </Card>
           
           <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? "Creating..." : "Create Hackathon"}
