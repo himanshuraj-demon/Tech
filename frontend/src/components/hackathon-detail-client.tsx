@@ -368,6 +368,61 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 </Card>
               )}
 
+              {/* Submission Guidelines */}
+              {hackathon.submissionGuidelines && (
+                <Card className="border-gray-200 dark:border-white">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ExternalLink className="h-5 w-5 text-blue-500" />
+                      Submission Guidelines
+                    </CardTitle>
+                    <CardDescription>Follow these guidelines when submitting your project</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {hackathon.submissionGuidelines}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Judging Criteria */}
+              {hackathon.judingCriteria && (
+                <Card className="border-purple-200/50 dark:border-purple-900/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Award className="h-5 w-5 text-purple-500" />
+                      Judging Criteria
+                    </CardTitle>
+                    <CardDescription>How your project will be evaluated</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {hackathon.judingCriteria}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Important Notes */}
+              {hackathon.importantNotes && (
+                <Card className="border-orange-200/50 dark:border-orange-900/30 bg-orange-50/30 dark:bg-orange-950/10">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      Important Notes
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-orange-800 dark:text-orange-300 leading-relaxed whitespace-pre-line">
+                      {hackathon.importantNotes}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Event Winners Section (Only visible when completed & winners declared) */}
               {hackathon.status === 'completed' && hackathon.winners && hackathon.winners.length > 0 && (
                 <Card className="border-yellow-200/50 dark:border-yellow-900/30 bg-gradient-to-b from-yellow-50/10 to-transparent dark:from-yellow-950/5">
