@@ -2,9 +2,9 @@
 
 import { Mail, MapPin, ChevronDown, ChevronUp, Phone } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ThemeAwareLogo } from "@/components/ui/theme-aware-logo"
-import { api } from "../../../services/api";
+import { useContactInfo } from "@/lib/queries";
 
 interface ContactInfo {
   address: {
@@ -25,28 +25,13 @@ interface ContactInfo {
 }
 
 export function Footer() {
-  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const { data: contactInfo } = useContactInfo();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  useEffect(() => {
-    const fetchContactInfo = async () => {
-      try {
-        const response = await  api.fetch('/api/contact-info');
-        if (response.ok) {
-          const data = await response.json();
-          setContactInfo(data);
-        }
-      } catch (error) {
-        console.error('Error fetching contact info:', error);
-      }
-    };
-
-    fetchContactInfo();
-  }, []);
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
       <div className="container mobile-padding">

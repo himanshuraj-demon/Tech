@@ -1,47 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar, Users, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageSlider } from "@/components/ui/image-slider";
-import { api } from "../../services/api";
+import { useEventDetail } from "@/lib/queries";
 
 interface EventDetailClientProps {
   id: string;
 }
 
 export function EventDetailClient({ id }: EventDetailClientProps) {
-  const [event, setEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data: event, isLoading: loading, error } = useEventDetail(id);
 
-  useEffect(() => {
-    async function fetchEvent() {
-      try {
-        setLoading(true);
-        setError(false);
-        const res = await api.fetch(`/api/events/${id}`);
-        if (res.status === 404) {
-          setError(true);
-          return;
-        }
-        if (!res.ok) {
-          throw new Error("Failed to fetch event");
-        }
-        const data = await res.json();
-        setEvent(data);
-      } catch (err) {
-        console.error("Error fetching event details:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEvent();
-  }, [id]);
+  // 404 handling
+  if (!loading && error?.message === "NOT_FOUND") {
+    notFound();
+  }
 
   if (loading) {
     return (
@@ -55,7 +32,7 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
   }
 
   if (error || !event) {
-    notFound();
+    if (!loading) notFound();
     return null;
   }
 

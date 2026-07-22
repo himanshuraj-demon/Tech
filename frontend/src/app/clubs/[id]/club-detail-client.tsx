@@ -1,13 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, Mail, Users, Award, Loader2, AlertCircle, RefreshCw, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { api } from "../../../../services/api"
+import { useClubDetail } from "@/lib/queries"
 
 interface Club {
   id: string;
@@ -62,41 +61,13 @@ export default function ClubDetailPage() {
   const params = useParams();
   const clubId = params.id as string;
 
-  const [club, setClub] = useState<Club | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: club, isLoading, error, refetch } = useClubDetail(clubId);
 
-  const fetchClub = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // Handle 404
+  if (!isLoading && error?.message === "NOT_FOUND") {
+    notFound();
+  }
 
-      const response = await  api.fetch(`/api/clubs/${clubId}`);
-
-      if (response.status === 404) {
-        notFound();
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch club: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setClub(data);
-    } catch (error) {
-      console.error("Error fetching club:", error);
-      setError(error instanceof Error ? error.message : "Failed to load club details. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (clubId) {
-      fetchClub();
-    }
-  }, [clubId]);
 
   if (isLoading) {
     return (
@@ -107,12 +78,12 @@ export default function ClubDetailPage() {
     );
   }
 
-  if (error) {
+  if (error && error.message !== "NOT_FOUND") {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
-        <p className="text-red-600 mb-4 text-center max-w-md">{error}</p>
-        <Button onClick={fetchClub} variant="outline" className="flex items-center gap-2">
+        <p className="text-red-600 mb-4 text-center max-w-md">Failed to load club details. Please try again.</p>
+        <Button onClick={() => refetch()} variant="outline" className="flex items-center gap-2">
           <RefreshCw className="h-4 w-4" />
           Try Again
         </Button>
@@ -245,7 +216,7 @@ export default function ClubDetailPage() {
           <div className="container px-4 md:px-6">
             <h3 className="text-2xl font-bold mb-8">Team Members</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {club.team.map((member, index: number) => (
+              {club.team.map((member: any, index: number) => (
                 <div key={index} className="glass rounded-lg p-6 text-center">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-4 flex items-center justify-center text-white font-bold text-lg">
                     {member.name.split(' ').map((n: string) => n[0]).join('')}

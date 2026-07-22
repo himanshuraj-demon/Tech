@@ -12,8 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Event } from "@/lib/events-data";
-import { useEffect, useState } from "react";
-import { api } from "../../../services/api";
+import { useInterIITAchievements, useEvents } from "@/lib/queries";
 
 // Client-side rendering for dynamic data
 
@@ -56,108 +55,42 @@ interface UIAchievement {
   medal: string;
 }
 
-// This will fetch fresh data from the API for dynamic updates
-async function getInterIITAchievements() {
-  try {
-    // Use relative API calls to work with any domain
-    const response = await api.fetch("/api/inter-iit-achievements");
+function transformAchievements(achievements: Achievement[]): UIAchievement[] {
+  return achievements.map((achievement) => {
+    let medal = "bronze";
+    let position = `${achievement.ranking || "N/A"}`;
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    if (achievement.achievementType === "gold-medal") {
+      medal = "gold";
+      position = "1st Place";
+    } else if (achievement.achievementType === "silver-medal") {
+      medal = "silver";
+      position = "2nd Place";
+    } else if (achievement.achievementType === "bronze-medal") {
+      medal = "bronze";
+      position = "3rd Place";
+    } else if (achievement.ranking) {
+      position = `${achievement.ranking}${achievement.ranking === 1 ? "st" : achievement.ranking === 2 ? "nd" : achievement.ranking === 3 ? "rd" : "th"} Place`;
     }
 
-    const achievements: Achievement[] = await response.json();
-    console.log("Fetched achievements count:", achievements.length);
-
-    if (achievements.length === 0) {
-      console.warn("No achievements found");
-      return [];
-    }
-
-    // Transform the data to match the expected format for the UI
-    return achievements.map((achievement: Achievement) => {
-      let medal = "bronze";
-      let position = `${achievement.ranking || "N/A"}`;
-
-      if (achievement.achievementType === "gold-medal") {
-        medal = "gold";
-        position = "1st Place";
-      } else if (achievement.achievementType === "silver-medal") {
-        medal = "silver";
-        position = "2nd Place";
-      } else if (achievement.achievementType === "bronze-medal") {
-        medal = "bronze";
-        position = "3rd Place";
-      } else if (achievement.ranking) {
-        position = `${achievement.ranking}${achievement.ranking === 1 ? "st" : achievement.ranking === 2 ? "nd" : achievement.ranking === 3 ? "rd" : "th"} Place`;
-      }
-
-      return {
-        year: achievement.year,
-        position,
-        event: achievement.competitionName,
-        description: achievement.achievementDescription,
-        team: achievement.teamMembers
-          .map((member: TeamMember) => member.name)
-          .join(", "),
-        medal,
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching Inter-IIT achievements:", error);
-    // Return empty array instead of error object to avoid showing errors in UI
-    return [];
-  }
-}
-
-// This will fetch fresh data from the events API for dynamic updates
-async function getEventGallery(): Promise<Event[]> {
-  try {
-    // Use relative API calls to work with any domain
-    const apiUrl = "/api/events";
-
-    console.log("Fetching events from:", apiUrl);
-    const response = await  api.fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const events = await response.json();
-    console.log("Fetched events count:", events.length);
-
-    return events || [];
-  } catch (error) {
-    console.error("Error fetching events:", error);
-    // Return empty array instead of error object to avoid showing errors in UI
-    return [];
-  }
+    return {
+      year: achievement.year,
+      position,
+      event: achievement.competitionName,
+      description: achievement.achievementDescription,
+      team: achievement.teamMembers.map((m) => m.name).join(", "),
+      medal,
+    };
+  });
 }
 
 export default function AchievementsPage() {
-  const [eventGallery, setEventGallery] = useState<Event[]>([]);
-  const [interIITAchievements, setInterIITAchievements] = useState<
-    UIAchievement[]
-  >([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawAchievements = [], isLoading: achLoading } = useInterIITAchievements();
+  const { data: eventGallery = [], isLoading: eventsLoading } = useEvents();
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [eventsData, achievementsData] = await Promise.all([
-          getEventGallery(),
-          getInterIITAchievements(),
-        ]);
-        setEventGallery(eventsData);
-        setInterIITAchievements(achievementsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+  const loading = achLoading || eventsLoading;
+  const interIITAchievements: UIAchievement[] = transformAchievements(rawAchievements as Achievement[]);
+
 
   if (loading) {
     return (

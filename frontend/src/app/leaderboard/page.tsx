@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Trophy, Award, Calendar, ChevronDown, ChevronUp, Star, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { api } from "../../../services/api";
 import { cn } from "@/lib/utils";
+import { useLeaderboard } from "@/lib/queries";
 
 interface LeaderboardItem {
   email: string;
@@ -26,31 +26,11 @@ interface LeaderboardItem {
 }
 
 export default function LeaderboardPage() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: leaderboard = [], isLoading: loading, error } = useLeaderboard();
   const [expandedUsers, setExpandedUsers] = useState<Record<string, boolean>>({});
   const [visibleCount, setVisibleCount] = useState(20);
 
-  const visibleLeaderboard = leaderboard.slice(0, visibleCount);
-
-  useEffect(() => {
-    async function fetchLeaderboard() {
-      try {
-        setLoading(true);
-        setError(null);
-        // Fetch from API
-        const data = await api.get<LeaderboardItem[]>("/api/leaderboard");
-        setLeaderboard(data);
-      } catch (err) {
-        console.error("Error fetching leaderboard:", err);
-        setError("Failed to load leaderboard data. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchLeaderboard();
-  }, []);
+  const visibleLeaderboard = (leaderboard as LeaderboardItem[]).slice(0, visibleCount);
 
   const toggleUserExpand = (email: string) => {
     setExpandedUsers(prev => ({
@@ -102,7 +82,7 @@ export default function LeaderboardPage() {
             </div>
           ) : error ? (
             <div className="text-center p-8 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-2xl max-w-md mx-auto">
-              <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
+              <p className="text-red-600 dark:text-red-400 font-medium">Failed to load leaderboard data. Please try again later.</p>
             </div>
           ) : leaderboard.length === 0 ? (
             <div className="text-center py-20 max-w-md mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-12 shadow-sm">

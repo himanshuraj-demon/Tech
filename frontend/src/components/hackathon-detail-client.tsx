@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { api } from "../../services/api";
+import { useHackathonDetail, useHackathonRegistrationStatus } from "@/lib/queries";
 import { useSession, signIn } from "next-auth/react";
 
 interface HackathonDetailClientProps {
@@ -31,17 +32,29 @@ interface HackathonDetailClientProps {
 }
 
 export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
-  const [hackathon, setHackathon] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  // Auth & registration states
   const { data: session, status: authStatus } = useSession();
+
+  // ── TanStack Query: hackathon detail ─────────────────────────────────────
+  const {
+    data: hackathon,
+    isLoading: loading,
+    error: hackathonError,
+  } = useHackathonDetail(id);
+
+  // ── TanStack Query: registration status (only when authenticated & hackathon loaded) ─
+  const {
+    data: regStatus,
+    isLoading: checkingStatus,
+  } = useHackathonRegistrationStatus(
+    id,
+    authStatus === "authenticated" && !!hackathon
+  );
+
+  // Registration state derived from query + local overrides for optimistic updates
   const [isRegistered, setIsRegistered] = useState(false);
-  const [checkingStatus, setCheckingStatus] = useState(true);
   const [submittingReg, setSubmittingReg] = useState(false);
-  
-  // Form fields
+
+  // Form fields (pre-filled from registration status query)
   const [degreeType, setDegreeType] = useState("btech");
   const [yearOfJoining, setYearOfJoining] = useState("2025");
   const [branchName, setBranchName] = useState("");
@@ -55,64 +68,24 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
 
+  // Sync registration status from query into local state for form pre-filling
   useEffect(() => {
-    async function fetchHackathon() {
-      try {
-        setLoading(true);
-        setError(false);
-        const res = await api.fetch(`/api/hackathons/${id}`);
-        if (res.status === 404) {
-          setError(true);
-          return;
-        }
-        if (!res.ok) {
-          throw new Error("Failed to fetch hackathon");
-        }
-        const data = await res.json();
-        setHackathon(data);
-      } catch (err) {
-        console.error("Error fetching hackathon details:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+    if (regStatus?.registered) {
+      setIsRegistered(true);
+      setDegreeType(regStatus.registration?.degreeType || "btech");
+      setYearOfJoining(regStatus.registration?.yearOfJoining || "2025");
+      setBranchName(regStatus.registration?.branchName || "");
+      setTeamMembers(regStatus.registration?.teamMembers || []);
+      setGithubLink(regStatus.registration?.githubLink || "");
+      setDocsLink(regStatus.registration?.docsLink || "");
     }
-    fetchEventAndRegistration();
+  }, [regStatus]);
 
-    async function fetchEventAndRegistration() {
-      await fetchHackathon();
-    }
-  }, [id]);
+  // 404 handling
+  if (!loading && hackathonError?.message === "NOT_FOUND") {
+    notFound();
+  }
 
-  useEffect(() => {
-    async function checkRegistration() {
-      if (authStatus === "authenticated" && hackathon) {
-        try {
-          setCheckingStatus(true);
-          const res = await api.fetch(`/api/hackathons/${id}/registration-status`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.registered) {
-              setIsRegistered(true);
-              setDegreeType(data.registration.degreeType);
-              setYearOfJoining(data.registration.yearOfJoining);
-              setBranchName(data.registration.branchName);
-              setTeamMembers(data.registration.teamMembers || []);
-              setGithubLink(data.registration.githubLink || "");
-              setDocsLink(data.registration.docsLink || "");
-            }
-          }
-        } catch (err) {
-          console.error("Error checking registration status:", err);
-        } finally {
-          setCheckingStatus(false);
-        }
-      } else {
-        setCheckingStatus(false);
-      }
-    }
-    checkRegistration();
-  }, [id, authStatus, hackathon]);
 
   const addTeamMember = () => {
     if (newTeamMember.trim()) {
@@ -188,7 +161,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
     );
   }
 
-  if (error || !hackathon) {
+  if (hackathonError || !hackathon) {
     notFound();
     return null;
   }

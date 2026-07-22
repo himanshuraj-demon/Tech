@@ -1,41 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { TeamMember } from "@/lib/team-data";
 import { TeamMemberImage } from "@/components/ui/team-member-image";
-import { api } from "../../../../services/api";
+import { useTeam } from "@/lib/queries";
 
 export default function CouncilMembersPage() {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: rawTeam = [], isLoading } = useTeam();
 
-  useEffect(() => {
-    const fetchTeamMembers = async () => {
-  try {
-    const response = await api.fetch("/api/team");
+  const teamMembers = (rawTeam as TeamMember[]).filter(
+    (member: TeamMember) =>
+      member.category === "general" ||
+      member.category === "design" ||
+      member.category === "social"
+  );
 
-    if (response.ok) {
-      const members = await response.json();
-
-      const councilMembers = members.filter(
-        (member: TeamMember) =>
-          member.category === "general" ||
-          member.category === "design" ||
-          member.category === "social"
-      );
-
-      setTeamMembers(councilMembers);
-    }
-  } catch (error) {
-    console.error("Error fetching team members:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-    fetchTeamMembers();
-  }, []);
 
   const categories = [
     { id: "general", name: "General Council Members", color: "blue" },

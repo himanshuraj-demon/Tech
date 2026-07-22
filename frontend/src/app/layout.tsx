@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -59,7 +60,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange={false}
           >
-            <ConditionalLayout>{children}</ConditionalLayout>
+            <QueryProvider>
+              <ConditionalLayout>{children}</ConditionalLayout>
+            </QueryProvider>
           </ThemeProvider>
         </SessionProvider>
       </body>

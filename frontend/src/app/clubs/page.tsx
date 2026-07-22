@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClubCard } from "@/components/clubs/club-card";
-import { api } from "../../../services/api";
+import { useClubs } from "@/lib/queries";
 
 interface Club {
   id: string;
@@ -17,40 +15,9 @@ interface Club {
 }
 
 export default function ClubsPage() {
-  const [clubs, setClubs] = useState<Club[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error, refetch } = useClubs();
+  const clubs: Club[] = Array.isArray(data) ? data : (data?.clubs ?? []);
 
-  const fetchClubs = async () => {
-  try {
-    setIsLoading(true);
-    setError(null);
-
-    const response = await api.fetch("/api/clubs");
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch clubs: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const data = await response.json();
-    setClubs(data);
-  } catch (error) {
-    console.error("Error fetching clubs:", error);
-    setError(
-      error instanceof Error
-        ? error.message
-        : "Failed to load clubs. Please try again."
-    );
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-  useEffect(() => {
-    fetchClubs();
-  }, []);
 
   // Separate clubs, hobby groups, and technical council groups
   const technicalClubs = clubs.filter((item) => item.type === "club");
@@ -74,9 +41,9 @@ export default function ClubsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
-        <p className="text-red-600 mb-4 text-center max-w-md">{error}</p>
+        <p className="text-red-600 mb-4 text-center max-w-md">Failed to load clubs. Please try again.</p>
         <Button
-          onClick={fetchClubs}
+          onClick={() => refetch()}
           variant="outline"
           className="flex items-center gap-2">
           <RefreshCw className="h-4 w-4" />
@@ -238,7 +205,7 @@ export default function ClubsPage() {
                   We're working on adding exciting clubs and groups. Check back
                   soon for updates!
                 </p>
-                <Button onClick={fetchClubs} variant="outline">
+                <Button onClick={() => refetch()} variant="outline">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </Button>

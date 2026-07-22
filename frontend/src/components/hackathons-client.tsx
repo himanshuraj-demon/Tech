@@ -1,142 +1,74 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Calendar, MapPin, Users, Trophy, Clock, ExternalLink, ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { api } from "../../services/api";
+import { useHackathonStats, useHackathonsList } from "@/lib/queries";
 
 export function HackathonsClient() {
-  const [upcomingList, setUpcomingList] = useState<any[]>([]);
-  const [ongoingList, setOngoingList] = useState<any[]>([]);
-  const [completedList, setCompletedList] = useState<any[]>([]);
-  
-  const [upcomingTotal, setUpcomingTotal] = useState(0);
-  const [ongoingTotal, setOngoingTotal] = useState(0);
-  const [completedTotal, setCompletedTotal] = useState(0);
+  const [upcomingLimit, setUpcomingLimit] = useState(6);
+  const [ongoingLimit, setOngoingLimit] = useState(6);
+  const [completedLimit, setCompletedLimit] = useState(6);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  const [loadingMoreUpcoming, setLoadingMoreUpcoming] = useState(false);
-  const [loadingMoreOngoing, setLoadingMoreOngoing] = useState(false);
-  const [loadingMoreCompleted, setLoadingMoreCompleted] = useState(false);
+  // Queries
+  const {
+    data: stats = {
+      totalCount: 0,
+      upcomingCount: 0,
+      ongoingCount: 0,
+      completedCount: 0,
+      totalPrizePool: 0,
+    },
+    isLoading: statsLoading,
+    error: statsError,
+  } = useHackathonStats();
 
-  const [stats, setStats] = useState({
-    totalCount: 0,
-    upcomingCount: 0,
-    ongoingCount: 0,
-    completedCount: 0,
-    totalPrizePool: 0
-  });
+  const {
+    data: upcomingData,
+    isLoading: upcomingLoading,
+    isFetching: fetchingMoreUpcoming,
+  } = useHackathonsList("upcoming", 0, upcomingLimit);
 
-  useEffect(() => {
-    async function fetchInitialData() {
-      try {
-        setLoading(true);
-        setError(null);
+  const {
+    data: ongoingData,
+    isLoading: ongoingLoading,
+    isFetching: fetchingMoreOngoing,
+  } = useHackathonsList("ongoing", 0, ongoingLimit);
 
-        // Fetch stats first
-        const statsRes = await api.fetch("/api/hackathons?statsOnly=true");
-        if (statsRes.status === 404) {
-          setError("Hackathons section is currently disabled");
-          return;
-        }
-        if (!statsRes.ok) {
-          throw new Error("Failed to fetch hackathons data");
-        }
-        const statsData = await statsRes.json();
-        if (statsData.stats) {
-          setStats(statsData.stats);
-        }
+  const {
+    data: completedData,
+    isLoading: completedLoading,
+    isFetching: fetchingMoreCompleted,
+  } = useHackathonsList("completed", 0, completedLimit);
 
-        // Fetch upcoming (initial 6)
-        const upcomingRes = await api.fetch("/api/hackathons?status=upcoming&limit=6&offset=0");
-        if (upcomingRes.ok) {
-          const uData = await upcomingRes.json();
-          setUpcomingList(uData.hackathons || []);
-          setUpcomingTotal(uData.total || 0);
-        }
+  const loading = statsLoading || upcomingLoading || ongoingLoading || completedLoading;
+  const error = statsError ? "Failed to load hackathons" : null;
 
-        // Fetch ongoing (initial 6)
-        const ongoingRes = await api.fetch("/api/hackathons?status=ongoing&limit=6&offset=0");
-        if (ongoingRes.ok) {
-          const oData = await ongoingRes.json();
-          setOngoingList(oData.hackathons || []);
-          setOngoingTotal(oData.total || 0);
-        }
+  const upcomingList = upcomingData?.hackathons || [];
+  const upcomingTotal = upcomingData?.total || 0;
 
-        // Fetch completed (initial 6)
-        const completedRes = await api.fetch("/api/hackathons?status=completed&limit=6&offset=0");
-        if (completedRes.ok) {
-          const cData = await completedRes.json();
-          setCompletedList(cData.hackathons || []);
-          setCompletedTotal(cData.total || 0);
-        }
+  const ongoingList = ongoingData?.hackathons || [];
+  const ongoingTotal = ongoingData?.total || 0;
 
-      } catch (err) {
-        console.error("Error fetching hackathons:", err);
-        setError("Failed to load hackathons");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchInitialData();
-  }, []);
+  const completedList = completedData?.hackathons || [];
+  const completedTotal = completedData?.total || 0;
 
-  const handleLoadMoreUpcoming = async () => {
-    if (loadingMoreUpcoming) return;
-    try {
-      setLoadingMoreUpcoming(true);
-      const offset = upcomingList.length;
-      const res = await api.fetch(`/api/hackathons?status=upcoming&limit=6&offset=${offset}`);
-      if (res.ok) {
-        const data = await res.json();
-        setUpcomingList(prev => [...prev, ...((data.hackathons || []).filter((h: any) => h !== null))]);
-        setUpcomingTotal(data.total || 0);
-      }
-    } catch (err) {
-      console.error("Error loading more upcoming events:", err);
-    } finally {
-      setLoadingMoreUpcoming(false);
-    }
+  const loadingMoreUpcoming = fetchingMoreUpcoming && upcomingLimit > 6;
+  const loadingMoreOngoing = fetchingMoreOngoing && ongoingLimit > 6;
+  const loadingMoreCompleted = fetchingMoreCompleted && completedLimit > 6;
+
+  const handleLoadMoreUpcoming = () => {
+    setUpcomingLimit((prev) => prev + 6);
   };
 
-  const handleLoadMoreOngoing = async () => {
-    if (loadingMoreOngoing) return;
-    try {
-      setLoadingMoreOngoing(true);
-      const offset = ongoingList.length;
-      const res = await api.fetch(`/api/hackathons?status=ongoing&limit=6&offset=${offset}`);
-      if (res.ok) {
-        const data = await res.json();
-        setOngoingList(prev => [...prev, ...((data.hackathons || []).filter((h: any) => h !== null))]);
-        setOngoingTotal(data.total || 0);
-      }
-    } catch (err) {
-      console.error("Error loading more ongoing events:", err);
-    } finally {
-      setLoadingMoreOngoing(false);
-    }
+  const handleLoadMoreOngoing = () => {
+    setOngoingLimit((prev) => prev + 6);
   };
 
-  const handleLoadMoreCompleted = async () => {
-    if (loadingMoreCompleted) return;
-    try {
-      setLoadingMoreCompleted(true);
-      const offset = completedList.length;
-      const res = await api.fetch(`/api/hackathons?status=completed&limit=6&offset=${offset}`);
-      if (res.ok) {
-        const data = await res.json();
-        setCompletedList(prev => [...prev, ...((data.hackathons || []).filter((h: any) => h !== null))]);
-        setCompletedTotal(data.total || 0);
-      }
-    } catch (err) {
-      console.error("Error loading more completed events:", err);
-    } finally {
-      setLoadingMoreCompleted(false);
-    }
+  const handleLoadMoreCompleted = () => {
+    setCompletedLimit((prev) => prev + 6);
   };
 
   // Categorize hackathons by status

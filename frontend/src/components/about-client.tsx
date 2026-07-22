@@ -1,39 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Target, Eye, MapPin, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TeamMember, defaultTeamData } from "@/lib/team-data";
 import { TechCube3D } from "@/components/ui/tech-cube-3d";
 import { TeamMemberImage } from "@/components/ui/team-member-image";
-import { api } from "../../services/api";
+import { useTeam } from "@/lib/queries";
+
+const defaultTeamList: TeamMember[] = Object.values(defaultTeamData).map(member => ({
+  ...member,
+  createdAt: member.createdAt || new Date().toISOString(),
+  updatedAt: member.updatedAt || new Date().toISOString()
+})) as TeamMember[];
 
 export function AboutClient() {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => 
-    Object.values(defaultTeamData).map(member => ({
-      ...member,
-      createdAt: member.createdAt || new Date().toISOString(),
-      updatedAt: member.updatedAt || new Date().toISOString()
-    })) as TeamMember[]
-  );
+  const { data: rawTeam } = useTeam();
 
-  useEffect(() => {
-    async function fetchTeam() {
-      try {
-        const response = await  api.fetch("/api/team");
-        if (response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setTeamMembers(data);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading team data from API:", error);
-      }
-    }
-    fetchTeam();
-  }, []);
+  // Use API data if available and non-empty, otherwise fall back to default team data
+  const teamMembers: TeamMember[] =
+    Array.isArray(rawTeam) && rawTeam.length > 0
+      ? (rawTeam as TeamMember[])
+      : defaultTeamList;
+
 
   // Get leadership team (secretary)
   const secretary = teamMembers.find(member => member.category === "leadership");

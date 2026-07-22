@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { BookOpen, Download, Eye, Calendar, Users, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { api } from "../../../services/api"
+import { useTorque, useTorqueLatest } from "@/lib/queries"
 
 interface TorqueMagazine {
   id: string;
@@ -47,60 +46,21 @@ const highlights = [
 ]
 
 export default function TorquePage() {
-  const [magazines, setMagazines] = useState<TorqueMagazine[]>([])
-  const [latestMagazine, setLatestMagazine] = useState<TorqueMagazine | null>(null)
-  const [stats, setStats] = useState<TorqueStats>({
-    totalYears: 0,
-    totalArticles: 0,
-    totalPages: 0,
-    totalDownloads: 5000
-  })
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data: magazines = [], isLoading: magazinesLoading, error: magazinesError } = useTorque();
+  const { data: latestMagazine, isLoading: latestLoading } = useTorqueLatest();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
+  const isLoading = magazinesLoading || latestLoading;
+  const error = magazinesError;
 
-        // Fetch all magazines
-        const magazinesResponse = await  api.fetch('/api/torque')
-        if (!magazinesResponse.ok) {
-          throw new Error('Failed to fetch magazines')
-        }
-        const magazinesData = await magazinesResponse.json()
-        setMagazines(magazinesData)
+  // Compute stats from loaded data
+  const magList = magazines as TorqueMagazine[];
+  const stats: TorqueStats = {
+    totalYears: magList.length,
+    totalArticles: magList.reduce((sum, mag) => sum + mag.articles, 0),
+    totalPages: magList.reduce((sum, mag) => sum + mag.pages, 0),
+    totalDownloads: 5000,
+  };
 
-        // Fetch latest magazine
-        const latestResponse = await  api.fetch('/api/torque/latest')
-        if (latestResponse.ok) {
-          const latestData = await latestResponse.json()
-          setLatestMagazine(latestData)
-        }
-
-        // Calculate stats
-        const totalYears = magazinesData.length
-        const totalArticles = magazinesData.reduce((sum: number, mag: TorqueMagazine) => sum + mag.articles, 0)
-        const totalPages = magazinesData.reduce((sum: number, mag: TorqueMagazine) => sum + mag.pages, 0)
-
-        setStats({
-          totalYears,
-          totalArticles,
-          totalPages,
-          totalDownloads: 5000
-        })
-
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        setError('Failed to load magazine data')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   if (isLoading) {
     return (
@@ -122,7 +82,7 @@ export default function TorquePage() {
           <div className="text-center">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Error Loading Magazines</h3>
-            <p className="text-muted-foreground mb-4">{error}</p>
+            <p className="text-muted-foreground mb-4">Failed to load magazine data</p>
             <Button onClick={() => window.location.reload()}>
               Try Again
             </Button>
