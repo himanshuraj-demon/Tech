@@ -73,9 +73,9 @@ function getAutomaticStatus(startDateStr: string, endDateStr: string, fallbackSt
     const startVal = new Date(Number(startParts[0]), Number(startParts[1]) - 1, Number(startParts[2])).getTime();
     const endVal = new Date(Number(endParts[0]), Number(endParts[1]) - 1, Number(endParts[2])).getTime();
     
-    if (today < startVal) {
+    if (today <= startVal) {
       return "upcoming";
-    } else if (today < endVal) {
+    } else if (today <= endVal) {
       return "ongoing";
     } else {
       return "completed";
