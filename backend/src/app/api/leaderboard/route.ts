@@ -42,7 +42,6 @@ export async function GET(request: NextRequest) {
       const hasSubmission = !!(reg.githubLink?.trim() || reg.docsLink?.trim());
 
       // Skip registrations that never submitted a project and aren't a declared winner.
-      // These users should not appear on the leaderboard at all.
       if (!hasSubmission && !reg.winnerPlace) return;
 
       if (!leaderboardMap[email]) {
@@ -59,7 +58,6 @@ export async function GET(request: NextRequest) {
       }
 
       const student = leaderboardMap[email];
-      student.participations += 1;
 
       let pointsEarned = 0;
       let placeName: string | null = null;
@@ -79,6 +77,7 @@ export async function GET(request: NextRequest) {
         pointsEarned = hasSubmission ? hackathon.pointsParticipation : 0;
       }
 
+      student.participations += 1;
       student.score += pointsEarned;
       student.events.push({
         id: hackathon.id,
@@ -89,8 +88,10 @@ export async function GET(request: NextRequest) {
       });
     });
 
-    // 4. Convert map to sorted list
-    const leaderboard = Object.values(leaderboardMap).sort((a, b) => b.score - a.score);
+    // 4. Convert map to array, filter out zero-score students, and sort descending
+    const leaderboard = Object.values(leaderboardMap)
+      .filter((student) => student.score > 0)
+      .sort((a, b) => b.score - a.score);
 
     return NextResponse.json(leaderboard, {
       headers: {
