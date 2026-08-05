@@ -189,7 +189,7 @@ export const hackathons = pgTable('hackathons', {
   draft: boolean('draft').default(false).notNull(),
   teamRequired: boolean('team_required').default(false).notNull(),
   winnerTiers: jsonb('winner_tiers').$type<WinnerTier[]>().default([]).notNull(),
-  pointsParticipation: integer('points_participation').default(10).notNull(),
+  pointsParticipation: integer('points_participation').default(0).notNull(),
   deleted: boolean('deleted').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -230,3 +230,27 @@ export const eventRegistrations = pgTable('event_registrations', {
 
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type NewEventRegistration = typeof eventRegistrations.$inferInsert;
+
+// Leaderboard Table
+export const leaderboard = pgTable('leaderboard', {
+  email: text('email').primaryKey(),
+  name: text('name').notNull(),
+  score: integer('score').default(0).notNull(),
+  participations: integer('participations').default(0).notNull(),
+  firstPlaces: integer('first_places').default(0).notNull(),
+  secondPlaces: integer('second_places').default(0).notNull(),
+  thirdPlaces: integer('third_places').default(0).notNull(),
+  events: jsonb('events').$type<Array<{
+    id: string;
+    title: string;
+    place: number | null;
+    placeName: string | null;
+    points: number;
+  }>>().default([]).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type LeaderboardDB = typeof leaderboard.$inferSelect;
+export type NewLeaderboardDB = typeof leaderboard.$inferInsert;
+

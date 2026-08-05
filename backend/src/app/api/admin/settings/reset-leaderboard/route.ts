@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db, eventRegistrations } from "@/lib/db";
+import { db, eventRegistrations, leaderboard } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,8 +10,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Reset leaderboard by deleting all registrations
-    await db.delete(eventRegistrations);
+    // Reset leaderboard by deleting all registrations and leaderboard pre-computations
+    await db.transaction(async (tx) => {
+      await tx.delete(eventRegistrations);
+      await tx.delete(leaderboard);
+    });
 
     return NextResponse.json({
       success: true,

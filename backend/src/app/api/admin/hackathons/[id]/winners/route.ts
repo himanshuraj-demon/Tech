@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db, eventRegistrations, hackathons } from "@/lib/db";
+import { db, eventRegistrations, hackathons, rebuildLeaderboard } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ const winnersSchema = z.object({
     points: z.number(),
     prize: z.string().optional().default("TBD"),
   })),
-  pointsParticipation: z.number().optional().default(10),
+  pointsParticipation: z.number().optional().default(0),
 });
 
 export async function POST(
@@ -33,32 +33,38 @@ export async function POST(
     const body = await request.json();
     const validatedData = winnersSchema.parse(body);
 
-    // Reset all registrations for this hackathon to null winnerPlace
-    await db
-      .update(eventRegistrations)
-      .set({ winnerPlace: null })
-      .where(eq(eventRegistrations.eventId, hackathonId));
+    // Run database updates and leaderboard rebuild inside a single transaction
+    await db.transaction(async (tx) => {
+      // Reset all registrations for this hackathon to null winnerPlace
+      await tx
+        .update(eventRegistrations)
+        .set({ winnerPlace: null })
+        .where(eq(eventRegistrations.eventId, hackathonId));
 
-    // Update winner placements
-    for (const p of validatedData.placements) {
-      if (p.regId) {
-        await db
-          .update(eventRegistrations)
-          .set({ winnerPlace: p.rank })
-          .where(eq(eventRegistrations.id, p.regId));
+      // Update winner placements
+      for (const p of validatedData.placements) {
+        if (p.regId) {
+          await tx
+            .update(eventRegistrations)
+            .set({ winnerPlace: p.rank })
+            .where(eq(eventRegistrations.id, p.regId));
+        }
       }
-    }
 
-    // Save winnerTiers and pointsParticipation dynamically and update status to completed
-    await db
-      .update(hackathons)
-      .set({ 
-        winnerTiers: validatedData.winnerTiers,
-        pointsParticipation: validatedData.pointsParticipation,
-        status: 'completed', 
-        updatedAt: new Date() 
-      })
-      .where(eq(hackathons.id, hackathonId));
+      // Save winnerTiers and pointsParticipation dynamically and update status to completed
+      await tx
+        .update(hackathons)
+        .set({ 
+          winnerTiers: validatedData.winnerTiers,
+          pointsParticipation: validatedData.pointsParticipation,
+          status: 'completed', 
+          updatedAt: new Date() 
+        })
+        .where(eq(hackathons.id, hackathonId));
+
+      // Recompile and rebuild the leaderboard table
+      await rebuildLeaderboard(tx);
+    });
 
     return NextResponse.json({ success: true, message: "Winners and points configuration updated successfully" });
   } catch (error) {

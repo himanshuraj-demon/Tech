@@ -15,3 +15,4 @@ const sql = neon(databaseUrl);
 export const db = drizzle(sql, { schema });
 
 export * from './schema';
+export * from './leaderboard';

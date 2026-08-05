@@ -51,7 +51,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
   const [winnerRows, setWinnerRows] = useState<WinnerRow[]>([
     { label: "1st Place", regId: "", points: "100" }
   ]);
-  const [participationPoints, setParticipationPoints] = useState<string>("10");
+  const [participationPoints, setParticipationPoints] = useState<string>("0");
 
   useEffect(() => {
     if (status === "loading") return;
@@ -98,7 +98,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
       } else {
         setWinnerRows([{ label: "1st Place", regId: "", points: "100" }]);
       }
-      setParticipationPoints(String(hackathonData.pointsParticipation !== undefined ? hackathonData.pointsParticipation : "10"));
+      setParticipationPoints(String(hackathonData.pointsParticipation !== undefined ? hackathonData.pointsParticipation : "0"));
 
     } catch (error) {
       console.error("Error loading data:", error);

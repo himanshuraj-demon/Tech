@@ -39,8 +39,12 @@ export default function LeaderboardPage() {
     }));
   };
 
-  const getRankBadge = (index: number) => {
-    switch (index) {
+  const getRankBadge = (studentScore: number, index: number) => {
+    const uniqueScoresAbove = Array.from(
+      new Set(leaderboard.map((item: any) => item.score))
+    ).filter((score: number) => score > studentScore);
+    const finalRank = uniqueScoresAbove.length;
+    switch (finalRank) {
       case 0:
         return <span className="text-2xl">🥇</span>;
       case 1:
@@ -48,7 +52,7 @@ export default function LeaderboardPage() {
       case 2:
         return <span className="text-2xl">🥉</span>;
       default:
-        return <span className="font-bold text-gray-500">#{index + 1}</span>;
+        return <span className="font-bold text-gray-500">#{finalRank + 1}</span>;
     }
   };
 
@@ -112,20 +116,26 @@ export default function LeaderboardPage() {
                         {visibleLeaderboard.map((student, idx) => {
                           const isExpanded = !!expandedUsers[student.email];
                           
+                          // Shared dense ranking for tied scores
+                          const uniqueScoresAbove = Array.from(
+                            new Set(leaderboard.map((item: any) => item.score))
+                          ).filter((score: number) => score > student.score);
+                          const finalRank = uniqueScoresAbove.length;
+                          
                           // Style variables based on rank (1st, 2nd, 3rd vs general)
                           let rowClass = "border-l-4 border-l-transparent hover:bg-gray-50/50 dark:hover:bg-gray-850/30";
                           let nameClass = "font-semibold text-gray-900 dark:text-gray-100 text-sm md:text-base";
                           let scoreClass = "text-primary text-base md:text-lg font-extrabold";
                           
-                          if (idx === 0) {
+                          if (finalRank === 0) {
                             rowClass = "border-l-4 border-l-amber-500 bg-amber-500/[0.03] dark:bg-amber-500/[0.06] hover:bg-amber-500/[0.06] dark:hover:bg-amber-500/[0.10]";
                             nameClass = "font-extrabold text-amber-900 dark:text-amber-400 text-base md:text-lg";
                             scoreClass = "text-amber-600 dark:text-amber-400 text-lg md:text-xl font-black";
-                          } else if (idx === 1) {
+                          } else if (finalRank === 1) {
                             rowClass = "border-l-4 border-l-slate-400 dark:border-l-slate-500 bg-slate-500/[0.03] dark:bg-slate-500/[0.06] hover:bg-slate-500/[0.06] dark:hover:bg-slate-500/[0.10]";
                             nameClass = "font-bold text-slate-800 dark:text-slate-300 text-sm md:text-base";
                             scoreClass = "text-slate-650 dark:text-slate-400 text-base md:text-lg font-extrabold";
-                          } else if (idx === 2) {
+                          } else if (finalRank === 2) {
                             rowClass = "border-l-4 border-l-orange-400 dark:border-l-orange-500 bg-orange-500/[0.03] dark:bg-orange-500/[0.06] hover:bg-orange-500/[0.06] dark:hover:bg-orange-500/[0.10]";
                             nameClass = "font-bold text-orange-850 dark:text-orange-400 text-sm md:text-base";
                             scoreClass = "text-orange-600 dark:text-orange-400 text-base md:text-lg font-extrabold";
@@ -135,7 +145,7 @@ export default function LeaderboardPage() {
                             <React.Fragment key={student.email}>
                               <tr className={cn("transition-colors duration-150", rowClass)}>
                                 <td className="px-3 py-4 md:px-6 text-center align-middle">
-                                  {getRankBadge(idx)}
+                                  {getRankBadge(student.score, idx)}
                                 </td>
                                 <td className="px-3 py-4 md:px-6 align-middle">
                                   <div>

@@ -164,7 +164,7 @@ export async function createHackathon(hackathonInput: Record<string, any>): Prom
     draft: Boolean(hackathonInput.draft),
     teamRequired: Boolean(hackathonInput.teamRequired),
     winnerTiers: hackathonInput.winnerTiers || [],
-    pointsParticipation: Number(hackathonInput.pointsParticipation !== undefined ? hackathonInput.pointsParticipation : 10),
+    pointsParticipation: Number(hackathonInput.pointsParticipation !== undefined ? hackathonInput.pointsParticipation : 0),
   };
 
   const newH = await dbCreateHackathon(input);
