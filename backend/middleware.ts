@@ -5,6 +5,36 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || "tech-web-iitgn-dev-fallback-secret-key-12345",
 );
 
+function getAllowedOrigin(req: NextRequest): string {
+  const origin = req.headers.get("origin");
+  const frontendUrl = process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app";
+
+  if (!origin) {
+    return frontendUrl;
+  }
+
+  if (origin === frontendUrl || origin === "https://tech-henna-six.vercel.app") {
+    return origin;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    if (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
+      return origin;
+    }
+  }
+
+  try {
+    const originUrl = new URL(origin);
+    if (originUrl.hostname === "council-iitgn.in" || originUrl.hostname.endsWith(".council-iitgn.in")) {
+      return origin;
+    }
+  } catch (e) {
+    // Ignore invalid URL
+  }
+
+  return frontendUrl;
+}
+
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.pathname;
 
@@ -13,8 +43,7 @@ export async function middleware(req: NextRequest) {
     return new NextResponse(null, {
       status: 200,
       headers: {
-        "Access-Control-Allow-Origin":
-          process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
+        "Access-Control-Allow-Origin": getAllowedOrigin(req),
         "Access-Control-Allow-Methods":
           "GET, POST, PUT, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers":
@@ -55,7 +84,7 @@ export async function middleware(req: NextRequest) {
 
       response.headers.set(
         "Access-Control-Allow-Origin",
-        process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
+        getAllowedOrigin(req),
       );
       response.headers.set(
         "Access-Control-Allow-Methods",
@@ -91,7 +120,7 @@ export async function middleware(req: NextRequest) {
 
         response.headers.set(
           "Access-Control-Allow-Origin",
-          process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
+          getAllowedOrigin(req),
         );
         response.headers.set(
           "Access-Control-Allow-Methods",
@@ -115,7 +144,7 @@ export async function middleware(req: NextRequest) {
 
       response.headers.set(
         "Access-Control-Allow-Origin",
-        process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
+        getAllowedOrigin(req),
       );
       response.headers.set(
         "Access-Control-Allow-Methods",
@@ -135,7 +164,7 @@ export async function middleware(req: NextRequest) {
 
   response.headers.set(
     "Access-Control-Allow-Origin",
-    process.env.FRONTEND_URL || "https://tech-henna-six.vercel.app",
+    getAllowedOrigin(req),
   );
   response.headers.set(
     "Access-Control-Allow-Methods",

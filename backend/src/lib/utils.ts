@@ -40,3 +40,49 @@ export function slugify(text: string): string {
     .replace(/-+/g, '-')
     .trim();
 }
+
+/**
+ * Determines cookie configuration based on the request host.
+ * Using SameSite=Lax and wildcard domain for IITGN subdomains ensures
+ * that session cookies are shared across front/backend and not blocked.
+ */
+export function getCookieOptions(request: Request) {
+  const hostHeader = request.headers.get("host");
+  const isProd = process.env.NODE_ENV === "production";
+  
+  if (!hostHeader) {
+    return {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? ("none" as const) : ("lax" as const),
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    };
+  }
+
+  const hostname = hostHeader.split(":")[0].toLowerCase();
+
+  // If localhost, don't set a domain
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax" as const,
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    };
+  }
+
+  // Check if we are on council-iitgn.in or iitgn.ac.in subdomains
+  const isIITGN = hostname.endsWith("council-iitgn.in") || hostname.endsWith("iitgn.ac.in");
+
+  return {
+    httpOnly: true,
+    secure: true,
+    sameSite: isIITGN ? ("lax" as const) : ("none" as const),
+    domain: isIITGN ? (hostname.endsWith("council-iitgn.in") ? ".council-iitgn.in" : ".iitgn.ac.in") : undefined,
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60,
+  };
+}
+

@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
           { key: "Access-Control-Allow-Credentials", value: "true" },
           {
             key: "Access-Control-Allow-Origin",
-            value: process.env.FRONTEND_URL || "*",
+            value: process.env.FRONTEND_URL || "https://technical.council-iitgn.in",
           },
           {
             key: "Access-Control-Allow-Methods",

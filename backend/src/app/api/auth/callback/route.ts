@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { getAdminEmails } from "@/lib/admin-emails-blob-storage";
 import { db, users } from "@/lib/db";
+import { getCookieOptions } from "@/lib/utils";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || "tech-web-iitgn-dev-fallback-secret-key-12345"
@@ -126,13 +127,7 @@ export async function GET(request: NextRequest) {
 
     const cookieName = isAdmin ? "admin_session" : "student_session";
 
-    response.cookies.set(cookieName, token, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-    });
+    response.cookies.set(cookieName, token, getCookieOptions(request));
 
     return response;
   } catch (err) {

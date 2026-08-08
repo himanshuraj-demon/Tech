@@ -551,7 +551,7 @@ export default function EditEvent({ params }: PageProps) {
                                     const uploadFormData = new FormData();
                                     uploadFormData.append("file", file);
                                     uploadFormData.append("folder", "events");
-                                    const response = await fetch("/api/admin/upload", { method: "POST", body: uploadFormData });
+                                    const response = await api.fetch("/api/admin/upload", { method: "POST", body: uploadFormData });
                                     if (!response.ok) throw new Error("Failed to upload");
                                     const result = await response.json();
                                     const newAlt = prompt("Enter alt text for the new image:", item.alt) || item.alt;

@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCookieOptions } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
-  const isProd = process.env.NODE_ENV === "production";
   const response = NextResponse.json({ success: true });
+  const cookieOptions = getCookieOptions(request);
 
   response.cookies.set("admin_session", "", {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-    path: "/",
+    ...cookieOptions,
     expires: new Date(0),
+    maxAge: 0,
   });
 
   response.cookies.set("student_session", "", {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-    path: "/",
+    ...cookieOptions,
     expires: new Date(0),
+    maxAge: 0,
   });
 
   return response;
