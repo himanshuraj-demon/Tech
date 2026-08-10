@@ -46,11 +46,11 @@ export default function LeaderboardPage() {
     const finalRank = uniqueScoresAbove.length;
     switch (finalRank) {
       case 0:
-        return <span className="text-2xl text-orange-300">I</span>;
+        return <span className="text-2xl text-orange-300">#1</span>;
       case 1:
-        return <span className="text-2xl text-gray-400">II</span>;
+        return <span className="text-2xl text-gray-400">#2</span>;
       case 2:
-        return <span className="text-2xl text-amber-800">III</span>;
+        return <span className="text-2xl text-amber-800">#3</span>;
       default:
         return <span className="font-bold text-gray-500">#{finalRank + 1}</span>;
     }
