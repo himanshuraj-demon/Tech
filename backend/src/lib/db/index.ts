@@ -1,6 +1,4 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle as drizzleNeon, NeonHttpDatabase } from 'drizzle-orm/neon-http';
-import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
 
@@ -16,25 +14,21 @@ const isLocal = databaseUrl.includes('localhost') || databaseUrl.includes('127.0
 // Global cache to prevent multiple connections in development hot reload
 const globalForDb = globalThis as unknown as {
   conn: Pool | undefined;
-  db: any | undefined;
+  db: NodePgDatabase<typeof schema> | undefined;
 };
 
-let dbInstance: any;
-
-if (isLocal) {
-  if (!globalForDb.conn) {
-    globalForDb.conn = new Pool({ connectionString: databaseUrl });
-  }
-  if (!globalForDb.db) {
-    globalForDb.db = drizzlePg(globalForDb.conn, { schema });
-  }
-  dbInstance = globalForDb.db;
-} else {
-  const sql = neon(databaseUrl);
-  dbInstance = drizzleNeon(sql, { schema });
+if (!globalForDb.conn) {
+  globalForDb.conn = new Pool({
+    connectionString: databaseUrl,
+    ssl: isLocal ? false : { rejectUnauthorized: false }
+  });
 }
 
-export const db = dbInstance as NeonHttpDatabase<typeof schema>;
+if (!globalForDb.db) {
+  globalForDb.db = drizzle(globalForDb.conn, { schema });
+}
+
+export const db = globalForDb.db;
 
 export * from './schema';
 export * from './leaderboard';

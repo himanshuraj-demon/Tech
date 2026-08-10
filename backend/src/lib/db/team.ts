@@ -126,7 +126,7 @@ export async function deleteTeamMember(id: string): Promise<void> {
       .delete(teamMembers)
       .where(eq(teamMembers.id, id));
     
-    if (result.rowCount === 0) {
+    if ((result.rowCount ?? 0) === 0) {
       throw new Error('Team member not found');
     }
   } catch (error) {

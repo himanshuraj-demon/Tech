@@ -143,7 +143,7 @@ export async function deleteMagazine(id: string): Promise<boolean> {
     const result = await db
       .delete(torqueMagazines)
       .where(eq(torqueMagazines.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   } catch (error) {
     console.error(`Error deleting magazine (${id}):`, error);
     return false;
