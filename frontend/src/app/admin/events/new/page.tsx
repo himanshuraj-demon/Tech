@@ -70,7 +70,7 @@ export default function NewEvent() {
     category: "",
     highlights: [],
     gallery: [],
-    draft: true
+    draft: false
   });
   const [newHighlight, setNewHighlight] = useState("");
 

@@ -36,6 +36,44 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
     return null;
   }
 
+  const rawGallery = event.gallery;
+  let normalizedGallery: any[] = [];
+  if (Array.isArray(rawGallery)) {
+    normalizedGallery = rawGallery;
+  } else if (typeof rawGallery === "string") {
+    try {
+      const parsed = JSON.parse(rawGallery);
+      if (Array.isArray(parsed)) normalizedGallery = parsed;
+    } catch {
+      normalizedGallery = [];
+    }
+  }
+
+  let coverImage = "/events/placeholder-1.svg";
+  let coverAlt = event.title || "Event image";
+  if (normalizedGallery.length > 0) {
+    const first = normalizedGallery[0];
+    if (typeof first === "string") {
+      coverImage = first;
+    } else if (first && typeof first === "object") {
+      if (first.url) coverImage = first.url;
+      if (first.alt) coverAlt = first.alt;
+    }
+  }
+
+  const rawHighlights = event.highlights;
+  let normalizedHighlights: string[] = [];
+  if (Array.isArray(rawHighlights)) {
+    normalizedHighlights = rawHighlights;
+  } else if (typeof rawHighlights === "string") {
+    try {
+      const parsed = JSON.parse(rawHighlights);
+      if (Array.isArray(parsed)) normalizedHighlights = parsed;
+    } catch {
+      normalizedHighlights = [];
+    }
+  }
+
   return (
     <div className="flex flex-col">
       {/* Back Navigation */}
@@ -93,8 +131,8 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
 
             <div className="aspect-square rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center overflow-hidden">
               <Image
-                src={typeof event.gallery[0] === 'string' ? event.gallery[0] : event.gallery[0]?.url || '/events/placeholder-1.svg'}
-                alt={typeof event.gallery[0] === 'string' ? event.title : event.gallery[0]?.alt || event.title}
+                src={coverImage}
+                alt={coverAlt}
                 width={500}
                 height={500}
                 className="w-full h-full object-cover"
@@ -117,23 +155,25 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Event Highlights</h3>
-              <ul className="grid gap-2 md:grid-cols-2">
-                {event.highlights?.map((highlight: string, index: number) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-blue-600" />
-                    <span className="text-sm">{highlight}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {normalizedHighlights.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold">Event Highlights</h3>
+                <ul className="grid gap-2 md:grid-cols-2">
+                  {normalizedHighlights.map((highlight: string, index: number) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-blue-600" />
+                      <span className="text-sm">{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* Photo Gallery */}
-      {event.gallery && event.gallery.length > 0 && (
+      {normalizedGallery.length > 0 && (
         <section className="py-16">
           <div className="container px-4 md:px-6">
             <div className="space-y-8">
@@ -147,7 +187,7 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
               </div>
 
               <div className="group">
-                <ImageSlider images={event.gallery} eventTitle={event.title} />
+                <ImageSlider images={normalizedGallery} eventTitle={event.title} />
               </div>
             </div>
           </div>

@@ -84,6 +84,45 @@ function transformAchievements(achievements: Achievement[]): UIAchievement[] {
   });
 }
 
+function getEventThumbnail(event: any): string {
+  if (!event || !event.gallery) return "/events/placeholder-1.svg";
+  let gallery = event.gallery;
+  if (typeof gallery === "string") {
+    try {
+      gallery = JSON.parse(gallery);
+    } catch {
+      return gallery.startsWith("/") || gallery.startsWith("http") ? gallery : "/events/placeholder-1.svg";
+    }
+  }
+
+  if (Array.isArray(gallery) && gallery.length > 0) {
+    const first = gallery[0];
+    if (typeof first === "string") return first;
+    if (first && typeof first === "object" && first.url) return first.url;
+  }
+
+  return "/events/placeholder-1.svg";
+}
+
+function getEventImageAlt(event: any): string {
+  if (!event || !event.gallery) return event?.title || "Event Image";
+  let gallery = event.gallery;
+  if (typeof gallery === "string") {
+    try {
+      gallery = JSON.parse(gallery);
+    } catch {
+      return event.title || "Event Image";
+    }
+  }
+
+  if (Array.isArray(gallery) && gallery.length > 0) {
+    const first = gallery[0];
+    if (typeof first === "object" && first?.alt) return first.alt;
+  }
+
+  return event?.title || "Event Image";
+}
+
 export default function AchievementsPage() {
   const { data: rawAchievements = [], isLoading: achLoading } = useInterIITAchievements();
   const { data: eventGallery = [], isLoading: eventsLoading } = useEvents();
@@ -267,10 +306,8 @@ export default function AchievementsPage() {
                       {/* Event Image */}
                       <div className="relative h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
                         <Image
-                          src={
-                            event.gallery[0]?.url || "/events/placeholder-1.svg"
-                          }
-                          alt={event.gallery[0]?.alt || event.title}
+                          src={getEventThumbnail(event)}
+                          alt={getEventImageAlt(event)}
                           width={400}
                           height={200}
                           className="w-full h-full object-cover"
