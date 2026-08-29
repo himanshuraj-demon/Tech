@@ -114,6 +114,41 @@ export async function PUT(
   }
 }
 
+// PATCH /api/admin/events/[id] - Partial update / Toggle draft
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const resolvedParams = await params;
+    const body = await request.json();
+
+    const updatedEvent = await updateEvent(resolvedParams.id, body);
+
+    if (!updatedEvent) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    revalidatePath('/admin/events');
+    revalidatePath(`/admin/events/${resolvedParams.id}/edit`);
+    revalidatePath('/achievements');
+    revalidatePath(`/achievements/events/${resolvedParams.id}`);
+
+    return NextResponse.json(updatedEvent);
+  } catch (error) {
+    console.error("Error patching event:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to update event" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE /api/admin/events/[id] - Delete event
 export async function DELETE(
   request: NextRequest,

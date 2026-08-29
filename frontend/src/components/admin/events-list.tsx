@@ -88,9 +88,20 @@ export function EventsList({ events, onEventUpdate }: EventsListProps) {
                     <CardTitle className="text-lg line-clamp-2 mb-2">
                       {event.title}
                     </CardTitle>
-                    <Badge variant="secondary" className="mb-2">
-                      {event.category}
-                    </Badge>
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <Badge variant="secondary">
+                        {event.category}
+                      </Badge>
+                      {event.draft ? (
+                        <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                          Draft
+                        </Badge>
+                      ) : (
+                        <Badge variant="default" className="bg-green-600 text-white">
+                          Published
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
 

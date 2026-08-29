@@ -19,7 +19,9 @@ import {
   Eye,
   Edit,
   Trash2,
-  Filter
+  Filter,
+  Globe,
+  FileText
 } from "lucide-react";
 
 export default function EventsManagement() {
@@ -27,6 +29,8 @@ export default function EventsManagement() {
   const router = useRouter();
   const [events, setEvents] = useState<Record<string, Event>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isPublishingAll, setIsPublishingAll] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -45,7 +49,7 @@ export default function EventsManagement() {
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const response = await  api.fetch("/api/admin/events");
+      const response = await api.fetch("/api/admin/events");
 
       if (!response.ok) {
         throw new Error("Failed to fetch events");
@@ -60,12 +64,64 @@ export default function EventsManagement() {
     }
   };
 
+  const handleToggleDraft = async (eventId: string, currentDraft: boolean) => {
+    try {
+      setTogglingId(eventId);
+      const newDraftState = !currentDraft;
+      const response = await api.fetch(`/api/admin/events/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ draft: newDraftState }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update event status");
+      }
+
+      // Update state locally for immediate responsiveness
+      setEvents((prev) => ({
+        ...prev,
+        [eventId]: {
+          ...prev[eventId],
+          draft: newDraftState,
+        },
+      }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to toggle draft status");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const handlePublishAll = async () => {
+    if (!confirm("Are you sure you want to publish all events to the public website?")) return;
+
+    try {
+      setIsPublishingAll(true);
+      const response = await api.fetch("/api/admin/events/publish-all", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to publish all events");
+      }
+
+      const result = await response.json();
+      alert(result.message || "All events published successfully!");
+      fetchEvents();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to publish all events");
+    } finally {
+      setIsPublishingAll(false);
+    }
+  };
+
   const handleDeleteEvent = async (eventId: string) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
 
     try {
-      console.log('Deleting event:', eventId);
-      
       const response = await api.fetch(`/api/admin/events/${eventId}`, {
         method: "DELETE",
         headers: {
@@ -73,22 +129,14 @@ export default function EventsManagement() {
         }
       });
 
-      console.log('Delete response status:', response.status);
-      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Delete failed:', errorData);
         throw new Error(errorData.error || `HTTP ${response.status}: Failed to delete event`);
       }
 
-      const result = await response.json();
-      console.log('Delete successful:', result);
-      
-      // Refresh the events list
       fetchEvents();
       alert('Event deleted successfully!');
     } catch (err) {
-      console.error('Delete error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete event';
       alert(`Failed to delete event: ${errorMessage}`);
     }
@@ -121,6 +169,8 @@ export default function EventsManagement() {
   }
 
   const eventsArray = Object.entries(events);
+  const publishedCount = eventsArray.filter(([_, event]) => !event.draft).length;
+  const draftCount = eventsArray.filter(([_, event]) => Boolean(event.draft)).length;
   const categories = ["all", ...new Set(Object.values(events).map(event => event.category))];
 
   const filteredEvents = eventsArray.filter(([id, event]) => {
@@ -134,7 +184,7 @@ export default function EventsManagement() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold font-space-grotesk">
               Events Management
@@ -143,10 +193,23 @@ export default function EventsManagement() {
               Create, edit, and manage events for your gallery
             </p>
           </div>
-          <Button onClick={() => router.push('/admin/events/new')}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Event
-          </Button>
+          <div className="flex gap-2">
+            {draftCount > 0 && (
+              <Button
+                variant="outline"
+                onClick={handlePublishAll}
+                disabled={isPublishingAll}
+                className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                {isPublishingAll ? "Publishing..." : `Publish All Drafts (${draftCount})`}
+              </Button>
+            )}
+            <Button onClick={() => router.push('/admin/events/new')}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Event
+            </Button>
+          </div>
         </div>
 
         {/* Statistics */}
@@ -166,37 +229,35 @@ export default function EventsManagement() {
           <Card className="glass">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Image className="h-4 w-4 text-green-600" />
+                <Globe className="h-4 w-4 text-green-600" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Published (Public)</p>
+                  <p className="text-2xl font-bold text-green-600">{publishedCount}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-amber-600" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Drafts (Hidden)</p>
+                  <p className="text-2xl font-bold text-amber-600">{draftCount}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <Image className="h-4 w-4 text-purple-600" />
                 <div>
                   <p className="text-sm text-muted-foreground">Total Photos</p>
                   <p className="text-2xl font-bold">
                     {Object.values(events).reduce((total, event) => total + (event.gallery?.length || 0), 0)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-purple-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Categories</p>
-                  <p className="text-2xl font-bold">{categories.length - 1}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-orange-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Published</p>
-                  <p className="text-2xl font-bold">
-                    {Object.values(events).length}
                   </p>
                 </div>
               </div>
@@ -261,9 +322,15 @@ export default function EventsManagement() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold">{event.title}</h3>
-                        <Badge variant="default">
-                          Published
-                        </Badge>
+                        {event.draft ? (
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-300">
+                            Draft (Hidden from Public)
+                          </Badge>
+                        ) : (
+                          <Badge variant="default" className="bg-green-600 text-white">
+                            Published (Public)
+                          </Badge>
+                        )}
                         <Badge variant="outline">{event.category}</Badge>
                       </div>
                       <p className="text-muted-foreground mb-3 line-clamp-2">
@@ -280,7 +347,17 @@ export default function EventsManagement() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex items-center gap-2 ml-4">
+                      <Button
+                        variant={event.draft ? "default" : "outline"}
+                        size="sm"
+                        disabled={togglingId === id}
+                        onClick={() => handleToggleDraft(id, Boolean(event.draft))}
+                        className={event.draft ? "bg-green-600 hover:bg-green-700 text-white" : "text-amber-600 hover:text-amber-700"}
+                        title={event.draft ? "Click to Publish to Public" : "Click to Unpublish / Draft"}
+                      >
+                        {event.draft ? "Publish" : "Make Draft"}
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -293,6 +370,7 @@ export default function EventsManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => router.push(`/admin/events/${id}/edit`)}
+                        title="Edit event"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -301,6 +379,7 @@ export default function EventsManagement() {
                         size="sm"
                         onClick={() => handleDeleteEvent(id)}
                         className="text-red-600 hover:text-red-700"
+                        title="Delete event"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
