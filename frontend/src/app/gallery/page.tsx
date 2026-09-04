@@ -53,7 +53,7 @@ function getEventImageAlt(event: any): string {
   return event?.title || "Event Image";
 }
 
-const page = () => {
+const Gallery = () => {
   const { data: eventGallery = [], isLoading: eventsLoading } = useEvents();
 
   const loading = eventsLoading;
@@ -159,4 +159,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Gallery;
