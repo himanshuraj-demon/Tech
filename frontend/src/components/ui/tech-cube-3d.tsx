@@ -4,9 +4,16 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { extend } from '@react-three/fiber';
 import { MathUtils, Vector3, Color } from 'three';
 import * as THREE from 'three';
-import { Environment, Lightformer } from '@react-three/drei';
+import { Environment, Lightformer, Line } from '@react-three/drei';
 
 extend({ IcosahedronGeometry: THREE.IcosahedronGeometry });
+
+/* ------------------------------------------------------------------ */
+/* Shaders — same noise-displacement approach as the original blob,   */
+/* but the fragment shader now mixes between two brand colors instead */
+/* of flashing to white, which reads as "circuitry / energy" rather   */
+/* than "liquid".                                                      */
+/* ------------------------------------------------------------------ */
 
 const vertexShader = `
 uniform float u_intensity;
@@ -15,18 +22,9 @@ uniform float u_time;
 varying vec2 vUv;
 varying float vDisplacement;
 
-// Classic Perlin 3D Noise functions
-vec4 permute(vec4 x) {
-    return mod(((x*34.0)+1.0)*x, 289.0);
-}
-
-vec4 taylorInvSqrt(vec4 r) {
-    return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec3 fade(vec3 t) {
-    return t*t*t*(t*(t*6.0-15.0)+10.0);
-}
+vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+vec3 fade(vec3 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
 
 float cnoise(vec3 P) {
     vec3 Pi0 = floor(P);
@@ -70,15 +68,9 @@ float cnoise(vec3 P) {
     vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
 
     vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-    g000 *= norm0.x;
-    g010 *= norm0.y;
-    g100 *= norm0.z;
-    g110 *= norm0.w;
+    g000 *= norm0.x; g010 *= norm0.y; g100 *= norm0.z; g110 *= norm0.w;
     vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-    g001 *= norm1.x;
-    g011 *= norm1.y;
-    g101 *= norm1.z;
-    g111 *= norm1.w;
+    g001 *= norm1.x; g011 *= norm1.y; g101 *= norm1.z; g111 *= norm1.w;
 
     float n000 = dot(g000, Pf0);
     float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
@@ -98,188 +90,223 @@ float cnoise(vec3 P) {
 
 void main() {
     vUv = uv;
-
-    vDisplacement = cnoise(position + vec3(2.0 * u_time));
-
+    vDisplacement = cnoise(position + vec3(1.4 * u_time));
     vec3 newPosition = position + normal * (u_intensity * vDisplacement);
-
     vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
     vec4 viewPosition = viewMatrix * modelPosition;
-    vec4 projectedPosition = projectionMatrix * viewPosition;
-
-    gl_Position = projectedPosition;
+    gl_Position = projectionMatrix * viewPosition;
 }
 `;
 
 const fragmentShader = `
 uniform float u_intensity;
 uniform float u_time;
-uniform vec3 u_color;
+uniform vec3 u_colorA;
+uniform vec3 u_colorB;
 
 varying vec2 vUv;
 varying float vDisplacement;
 
 void main() {
-    float distort = 2.0 * vDisplacement * u_intensity * sin(vUv.y * 10.0 + u_time);
-    vec3 color = mix(u_color, vec3(1.0, 1.0, 1.0), distort);
+    float mixAmt = clamp(0.5 + 0.5 * vDisplacement, 0.0, 1.0);
+    vec3 color = mix(u_colorA, u_colorB, mixAmt);
+    // faint scanline pulse to read as "signal" rather than "liquid"
+    float scan = 0.06 * sin(vUv.y * 40.0 - u_time * 2.0);
+    color += scan;
     gl_FragColor = vec4(color, 1.0);
 }
 `;
 
-const Blob = ({ color, scale = 1 }: { color: string; scale?: number }) => {
+/* ------------------------------------------------------------------ */
+/* Glowing core                                                        */
+/* ------------------------------------------------------------------ */
+
+const Core = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
   const mesh = useRef<THREE.Mesh>(null);
   const hover = useRef(false);
-  const isHovering = useRef(false);
+  const target = useRef(new Vector3(0, 0, 0));
+  const current = useRef(new Vector3(0, 0, 0));
+
   const uniforms = useMemo(
     () => ({
       u_time: { value: 0 },
-      u_intensity: { value: 0.3 },
-      u_color: { value: new Color(color) },
+      u_intensity: { value: 0.25 },
+      u_colorA: { value: new Color(colorA) },
+      u_colorB: { value: new Color(colorB) },
     }),
-    [color]
+    [colorA, colorB]
   );
-  const targetPosition = useRef(new Vector3(0, 0, 0));
-  const currentPosition = useRef(new Vector3(0, 0, 0));
+
   useFrame((state) => {
     const { clock, pointer } = state;
-    if (mesh.current) {
-      const material = mesh.current.material as THREE.ShaderMaterial;
-      material.uniforms.u_time.value = 0.4 * clock.getElapsedTime();
-      material.uniforms.u_intensity.value = MathUtils.lerp(
-        material.uniforms.u_intensity.value,
-        hover.current ? 0.7 : 0.5,
-        0.02
-      );
-
-      // Set target position based on hover state
-      if (isHovering.current) {
-        // Follow mouse when hovering
-        targetPosition.current.set(pointer.x * 1, pointer.y * 1, 0);
-      } else {
-        // Return to center when not hovering
-        targetPosition.current.set(0, 0, 0);
-      }
-
-      currentPosition.current.lerp(targetPosition.current, 0.1);
-      mesh.current.position.copy(currentPosition.current);
-    }
+    if (!mesh.current) return;
+    const mat = mesh.current.material as THREE.ShaderMaterial;
+    mat.uniforms.u_time.value = 0.4 * clock.getElapsedTime();
+    mat.uniforms.u_intensity.value = MathUtils.lerp(
+      mat.uniforms.u_intensity.value,
+      hover.current ? 0.55 : 0.28,
+      0.03
+    );
+    target.current.set(hover.current ? pointer.x * 0.4 : 0, hover.current ? pointer.y * 0.4 : 0, 0);
+    current.current.lerp(target.current, 0.08);
+    mesh.current.position.copy(current.current);
+    mesh.current.rotation.y += 0.0015;
   });
+
   return (
     <mesh
       ref={mesh}
-      scale={1.8 * scale} // Apply responsive scale
-      position={[0, 0, 0]}
-      onPointerOver={() => {
-        hover.current = true;
-        isHovering.current = true;
-      }}
-      onPointerOut={() => {
-        hover.current = false;
-        isHovering.current = false;
-      }}
+      scale={1.35}
+      onPointerOver={() => (hover.current = true)}
+      onPointerOut={() => (hover.current = false)}
     >
-      <icosahedronGeometry args={[2, 20]} />
-      <shaderMaterial
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={uniforms}
-      />
+      <icosahedronGeometry args={[2, 24]} />
+      <shaderMaterial vertexShader={vertexShader} fragmentShader={fragmentShader} uniforms={uniforms} />
     </mesh>
   );
 };
 
-export function TechCube3D() {
-  const [blobColor, setBlobColor] = useState('#06b6d4'); // Default cyan-teal
+/* ------------------------------------------------------------------ */
+/* Outer wireframe shell — structure / "code" reading                  */
+/* ------------------------------------------------------------------ */
+
+const WireShell = ({ color }: { color: string }) => {
+  const group = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (group.current) {
+      group.current.rotation.y += 0.0009;
+      group.current.rotation.x += 0.0003;
+    }
+  });
+  const geo = useMemo(() => new THREE.IcosahedronGeometry(3.05, 1), []);
+  const edges = useMemo(() => new THREE.EdgesGeometry(geo), [geo]);
+
+  return (
+    <group ref={group}>
+      <lineSegments geometry={edges}>
+        <lineBasicMaterial color={color} transparent opacity={0.35} />
+      </lineSegments>
+    </group>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Orbiting nodes — one per club, each on its own ring + speed,        */
+/* thin line tethering it back toward the core so the shape reads as   */
+/* "one council, many groups" rather than decorative particles.        */
+/* ------------------------------------------------------------------ */
+
+type NodeConfig = {
+  radius: number;
+  speed: number;
+  tilt: number;
+  phase: number;
+  color: string;
+  size: number;
+};
+
+const OrbitNode = ({ config }: { config: NodeConfig }) => {
+  const ref = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
+  const [pos, setPos] = useState<[number, number, number]>([config.radius, 0, 0]);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime() * config.speed + config.phase;
+    const x = Math.cos(t) * config.radius;
+    const z = Math.sin(t) * config.radius;
+    const y = Math.sin(t * 1.3 + config.phase) * config.radius * Math.sin(config.tilt);
+    if (ref.current) ref.current.position.set(x, y, z);
+    if (meshRef.current) {
+      const pulse = 1 + 0.15 * Math.sin(state.clock.getElapsedTime() * 2 + config.phase * 3);
+      meshRef.current.scale.setScalar(pulse);
+    }
+    setPos([x, y, z]);
+  });
+
+  return (
+    <>
+      <group ref={ref}>
+        <mesh ref={meshRef}>
+          <sphereGeometry args={[config.size, 16, 16]} />
+          <meshStandardMaterial
+            color={config.color}
+            emissive={config.color}
+            emissiveIntensity={1.4}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
+      <Line points={[[0, 0, 0], pos]} color={config.color} transparent opacity={0.25} lineWidth={1} />
+    </>
+  );
+};
+
+const ORBIT_NODES: NodeConfig[] = [
+  { radius: 3.6, speed: 0.22, tilt: 0.9, phase: 0.0, color: '#7dd3fc', size: 0.09 }, // web dev — sky
+  { radius: 3.9, speed: -0.17, tilt: 1.4, phase: 1.4, color: '#c084fc', size: 0.1 }, // app dev — violet
+  { radius: 3.3, speed: 0.28, tilt: 0.5, phase: 2.6, color: '#34d399', size: 0.08 }, // DSA / CP — green
+  { radius: 4.2, speed: -0.13, tilt: 1.1, phase: 3.9, color: '#fb7185', size: 0.09 }, // game dev — rose
+  { radius: 3.7, speed: 0.19, tilt: 0.3, phase: 5.1, color: '#fbbf24', size: 0.07 }, // misc / open club — amber
+];
+
+/* ------------------------------------------------------------------ */
+/* Root component                                                      */
+/* ------------------------------------------------------------------ */
+
+export function TechCouncilOrb3D({
+  colorA = '#0ea5e9', // electric blue
+  colorB = '#8b5cf6', // violet
+  wireColor = '#93c5fd',
+}: {
+  colorA?: string;
+  colorB?: string;
+  wireColor?: string;
+}) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Check if device is mobile
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    // Fetch blob settings on component mount
-    const fetchBlobSettings = async () => {
-      try {
-        const response = await fetch('/api/admin/blob-settings');
-        if (response.ok) {
-          const settings = await response.json();
-          setBlobColor(settings.color);
-        }
-      } catch (error) {
-        console.error('Error fetching blob settings:', error);
-      }
-    };
-
-    fetchBlobSettings();
-
-    // Set up polling to check for color changes every 5 seconds
-    const interval = setInterval(fetchBlobSettings, 5000);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('resize', checkMobile);
-    };
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Don't render on mobile devices
-  if (isMobile) {
-    return null;
-  }
+  if (isMobile) return null;
 
   return (
     <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] min-h-[300px] sm:min-h-[400px] md:min-h-[500px] flex justify-center items-center relative overflow-visible">
       <Canvas
-        camera={{ position: [0.0, 0.0, 8.0] }}
-        style={{
-          width: '100%',
-          height: '100%',
-          minHeight: '500px'
-        }}
-        gl={{
-          antialias: true,
-          alpha: true
-        }}
+        camera={{ position: [0, 0, 9] }}
+        style={{ width: '100%', height: '100%', minHeight: '500px' }}
+        gl={{ antialias: true, alpha: true }}
       >
-        <planeGeometry args={[0.026, 0.5]} />
-        <Environment preset="studio" environmentIntensity={0.5} />
-        <Blob color={blobColor} scale={1} />
+        <Environment preset="city" environmentIntensity={0.4} />
+        <ambientLight intensity={0.3} />
+
+        <WireShell color={wireColor} />
+        <Core colorA={colorA} colorB={colorB} />
+        {ORBIT_NODES.map((cfg, i) => (
+          <OrbitNode key={i} config={cfg} />
+        ))}
+
         <Environment
           files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
           resolution={1024}
         >
           <group rotation={[-Math.PI / 3, 0, 0]}>
-            <Lightformer
-              intensity={4}
-              rotation-x={Math.PI / 2}
-              position={[0, 5, -9]}
-              scale={[10, 10, 1]}
-            />
-            {[2, 0, 2, 0, 2, 0, 2, 0].map((x, i) => (
+            <Lightformer intensity={3} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
+            {[2, 0, 2, 0].map((x, i) => (
               <Lightformer
                 key={i}
                 form="circle"
-                intensity={4}
+                intensity={3}
                 rotation={[Math.PI / 2, 0, 0]}
                 position={[x, 4, i * 4]}
                 scale={[4, 1, 1]}
               />
             ))}
-            <Lightformer
-              intensity={2}
-              rotation-y={Math.PI / 2}
-              position={[-5, 1, -1]}
-              scale={[50, 2, 1]}
-            />
-            <Lightformer
-              intensity={2}
-              rotation-y={-Math.PI / 2}
-              position={[10, 1, 0]}
-              scale={[50, 2, 1]}
-            />
+            <Lightformer intensity={1.5} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={[50, 2, 1]} />
+            <Lightformer intensity={1.5} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[50, 2, 1]} />
           </group>
         </Environment>
       </Canvas>

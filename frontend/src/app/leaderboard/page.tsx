@@ -56,12 +56,6 @@ export default function LeaderboardPage() {
     }
   };
 
-  const formatEmail = (email: string) => {
-    const [local, domain] = email.split("@");
-    if (local.length <= 3) return email;
-    return `${local.substring(0, 3)}...@${domain}`;
-  };
-
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 font-sans">
 
@@ -151,7 +145,7 @@ export default function LeaderboardPage() {
                                   <div>
                                     <div className={nameClass}>{student.name}</div>
                                     <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-1.5 mt-0.5">
-                                      <span>{formatEmail(student.email)}</span>
+                                      <span>{(student.email)}</span>
                                       <Badge variant="secondary" className="md:hidden text-[10px] px-1.5 py-0 bg-gray-200/50 dark:bg-gray-800/50 border-0">
                                         {student.participations} {student.participations === 1 ? 'event' : 'events'}
                                       </Badge>

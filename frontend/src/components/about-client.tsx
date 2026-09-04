@@ -4,7 +4,7 @@ import { Target, Eye, MapPin, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TeamMember, defaultTeamData } from "@/lib/team-data";
-import { TechCube3D } from "@/components/ui/tech-cube-3d";
+import { TechCouncilOrb3D } from "@/components/ui/tech-cube-3d";
 import { TeamMemberImage } from "@/components/ui/team-member-image";
 import { useTeam } from "@/lib/queries";
 
@@ -33,7 +33,7 @@ export function AboutClient() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative py-24 lg:py-32">
+      <section className="relative py-12 lg:py-20">
         <div className="absolute inset-0 gradient-bg opacity-10" />
         <div className="container relative z-10 px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
@@ -48,7 +48,7 @@ export function AboutClient() {
       </section>
 
       {/* About Tech Team Section */}
-      <section className="py-16 bg-muted/50">
+      <section className="py-5 bg-muted/50">
         <div className="container px-4 md:px-6">
           <div className="grid gap-8 md:gap-12 lg:grid-cols-2 lg:gap-16 items-center">
             <div className="space-y-6 order-1 lg:order-1">
@@ -74,7 +74,7 @@ export function AboutClient() {
               </div>
             </div>
             <div className="relative flex justify-center items-center overflow-visible min-h-[600px] hidden lg:block order-2 lg:order-2">
-              <TechCube3D />
+              <TechCouncilOrb3D />
             </div>
           </div>
         </div>
@@ -85,33 +85,33 @@ export function AboutClient() {
         <div className="container px-4 md:px-6">
           <div className="grid gap-8 md:grid-cols-3">
             {/* Mission */}
-            <div className="space-y-4 text-center">
+            <div className="space-y-4 text-center p-4 rounded-2xl border border-blue-900 hover:border-violet-500 hover:scale-105 transition-all duration-200 ease-in-out">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
                 <Target className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold">Mission</h3>
+              <h3 className="text-2xl font-bold text-blue-600">Mission</h3>
               <p className="text-muted-foreground">
                 To provide students a platform to learn and understand technologies that drive innovation. We enable skill development through hobby groups, clubs, workshops, and hackathons. Our initiatives equip students with knowledge for successful careers in academia and industry.
               </p>
             </div>
 
             {/* Vision */}
-            <div className="space-y-4 text-center">
+            <div className="space-y-4 text-center p-4 rounded-2xl border border-blue-900 hover:border-violet-500 hover:scale-105 transition-all duration-200 ease-in-out">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
                 <Eye className="h-8 w-8 text-purple-600" />
               </div>
-              <h3 className="text-2xl font-bold">Vision</h3>
+              <h3 className="text-2xl font-bold text-purple-600">Vision</h3>
               <p className="text-muted-foreground">
                 To create an environment that nurtures future technology leaders who positively impact the world. We foster a culture of giving back through student-run courses and peer mentorship. Our goal is to develop leaders who drive meaningful change.
               </p>
             </div>
 
             {/* Plan */}
-            <div className="space-y-4 text-center">
+            <div className="space-y-4 text-center p-4 rounded-2xl border border-blue-900 hover:border-violet-500 hover:scale-105 transition-all duration-200 ease-in-out">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
                 <MapPin className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold">Plan</h3>
+              <h3 className="text-2xl font-bold text-green-600">Plan</h3>
               <p className="text-muted-foreground">
                 Through four specialized clubs, Tinkerers&apos; Lab, and diverse hobby groups, we promote exploration across multiple technical domains. We host hackathons and invite industry experts to provide students with insights into their future career paths.
               </p>

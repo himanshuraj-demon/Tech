@@ -17,6 +17,7 @@ const navigation = [
   { name: "Clubs", href: "/clubs" },
   { name: "Hackathons", href: "/hackathons" },
   { name: "Achievements", href: "/achievements" },
+  { name: "Gallery", href: "/gallery" },
   { name: "Leaderboard", href: "/leaderboard" },
   { name: "Contact Us", href: "/contact" },
 ]
