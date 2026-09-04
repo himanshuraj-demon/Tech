@@ -77,11 +77,16 @@ export function EventDetailClient({ id }: EventDetailClientProps) {
   return (
     <div className="flex flex-col">
       {/* Back Navigation */}
-      <div className="container px-4 md:px-6 py-6">
+      <div className="container px-4 md:px-6 py-6 flex items-center gap-3">
         <Button asChild variant="ghost" className="mb-4">
-          <Link href="/achievements">
+          <Link href="/gallery">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Achievements
+            Back to Gallery
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" className="mb-4 text-muted-foreground">
+          <Link href="/achievements">
+            Achievements
           </Link>
         </Button>
       </div>

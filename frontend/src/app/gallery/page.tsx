@@ -1,18 +1,21 @@
 "use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Trophy,
-  Medal,
-  Award,
   Calendar,
   Users,
   Camera,
   ArrowRight,
+  SlidersHorizontal,
+  LayoutGrid,
 } from "lucide-react";
 import { useEvents } from "@/lib/queries";
+import { HorizontalGallery } from "@/components/gallery/horizontal-gallery";
+import { Event } from "@/lib/events-data";
 
-function getEventThumbnail(event: any): string {
+export function getEventThumbnail(event: Event | any): string {
   if (!event || !event.gallery) return "/events/placeholder-1.svg";
   let gallery = event.gallery;
   if (typeof gallery === "string") {
@@ -34,7 +37,7 @@ function getEventThumbnail(event: any): string {
   return "/events/placeholder-1.svg";
 }
 
-function getEventImageAlt(event: any): string {
+export function getEventImageAlt(event: Event | any): string {
   if (!event || !event.gallery) return event?.title || "Event Image";
   let gallery = event.gallery;
   if (typeof gallery === "string") {
@@ -55,83 +58,122 @@ function getEventImageAlt(event: any): string {
 
 const Gallery = () => {
   const { data: eventGallery = [], isLoading: eventsLoading } = useEvents();
+  const [viewMode, setViewMode] = useState<"slider" | "grid">("slider");
 
-  const loading = eventsLoading;
-
-  if (loading) {
+  if (eventsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Loading achievements...
+          <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-6 text-sm font-mono tracking-widest uppercase text-neutral-400">
+            Loading Event Gallery...
           </p>
         </div>
       </div>
     );
   }
+
+  // If in slider view and there are events, render the Jesper Landberg-style GSAP horizontal gallery
+  if (viewMode === "slider" && eventGallery.length > 0) {
+    return (
+      <HorizontalGallery
+        events={eventGallery}
+        onSwitchToGrid={() => setViewMode("grid")}
+        getEventThumbnail={getEventThumbnail}
+        getEventImageAlt={getEventImageAlt}
+      />
+    );
+  }
+
+  // Classic Grid View (previously shown gallery page)
   return (
-    <div>
-      <section className="py-16">
+    <div className="min-h-screen bg-background">
+      <section className="py-12 md:py-16">
         <div className="container px-4 md:px-6">
           <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-space-grotesk">
-                Event Gallery
-              </h2>
-              <p className="mx-auto max-w-[600px] text-muted-foreground">
-                Explore our recent events, workshops, and conferences that
-                showcase innovation and learning
-              </p>
+            {/* Header with Switcher */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight font-space-grotesk">
+                  Event Gallery
+                </h1>
+              </div>
+
+              {/* Toggle to return to Jesper Landberg Horizontal Slider */}
+              <div className="flex items-center gap-2 self-start sm:self-center bg-muted/60 p-1 rounded-full border border-border">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("slider")}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/80 transition-all duration-200"
+                  title="Switch to Horizontal Slider View"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Featured Slider</span>
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-background text-foreground shadow-sm transition-all duration-200"
+                  title="Grid View Active"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  <span>Grid View</span>
+                </button>
+              </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            {/* Grid of Event Cards */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {eventGallery.length > 0 ? (
                 eventGallery.map((event, index) => (
                   <Link
-                    key={index}
+                    key={event.id || index}
                     href={`/achievements/events/${event.id}`}
-                    className="group block">
-                    <div className="glass rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                    className="group block"
+                  >
+                    <div className="glass rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-border/50 flex flex-col h-full">
                       {/* Event Image */}
-                      <div className="relative h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
+                      <div className="relative h-52 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center overflow-hidden">
                         <Image
                           src={getEventThumbnail(event)}
                           alt={getEventImageAlt(event)}
                           width={400}
-                          height={200}
-                          className="w-full h-full object-cover"
+                          height={240}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
-                        <div className="absolute top-4 right-4">
-                          <span className="inline-block rounded-full bg-white/90 dark:bg-gray-900/90 px-3 py-1 text-xs font-medium text-gray-900 dark:text-gray-100">
+                        <div className="absolute top-3 right-3">
+                          <span className="inline-block rounded-full bg-background/90 backdrop-blur-md px-3 py-1 text-xs font-medium text-foreground shadow-sm">
                             {event.category}
                           </span>
                         </div>
-                        <div className="absolute bottom-4 right-4">
-                          <Camera className="h-5 w-5 text-white/80" />
+                        <div className="absolute bottom-3 right-3">
+                          <Camera className="h-4 w-4 text-white/90" />
                         </div>
                       </div>
 
                       {/* Event Content */}
-                      <div className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
-                            {event.title}
-                          </h3>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300" />
+                      <div className="p-5 flex flex-col flex-1 justify-between">
+                        <div>
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
+                              {event.title}
+                            </h3>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 mt-1 ml-2" />
+                          </div>
+
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                            {event.description}
+                          </p>
                         </div>
 
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                          {event.description}
-                        </p>
-
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2 text-blue-600">
+                        <div className="flex items-center justify-between text-xs pt-3 border-t border-border/40">
+                          <div className="flex items-center gap-1.5 text-blue-600 font-medium">
                             <Users className="h-3 w-3" />
                             {event.organizer}
                           </div>
-                          <div className="flex items-center gap-2 text-muted-foreground">
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
                             <Calendar className="h-3 w-3" />
                             {event.date}
                           </div>
@@ -141,9 +183,9 @@ const Gallery = () => {
                   </Link>
                 ))
               ) : (
-                <div className="col-span-full text-center py-12">
-                  <Camera className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+                <div className="col-span-full text-center py-16">
+                  <Camera className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-40" />
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-1">
                     No Events Yet
                   </h3>
                   <p className="text-sm text-muted-foreground">
