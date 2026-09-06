@@ -43,7 +43,7 @@ export function HeroSection() {
             </div>
 
             {/* Big Headline */}
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] xl:text-[5.8rem] font-serif tracking-tight leading-[1.08] text-foreground select-none">
+            <h1 className="text-7xl lg:text-[5.2rem] xl:text-[5.8rem] font-serif tracking-tight leading-[1.08] text-foreground select-none">
               <span className="block font-normal text-foreground">IITGN</span>
               <span className="flex items-center flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 my-1 sm:my-2">
                 {/* Technical Council with signature blue to purple gradient */}
@@ -66,7 +66,7 @@ export function HeroSection() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1 justify-center md:justify-start">
               <Button
                 asChild
                 size="lg"
