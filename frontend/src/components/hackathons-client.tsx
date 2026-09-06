@@ -98,7 +98,7 @@ export function HackathonsClient() {
     };
 
     return (
-      <div className="glass rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl group relative overflow-hidden">
+      <div className="glass rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl group relative overflow-hidden ">
         {/* Background Gradient Overlay */}
         <div className={`absolute inset-0 bg-gradient-to-br ${getStatusGradient(hackathon.status)} opacity-0 group-hover:opacity-5 transition-all duration-300 rounded-2xl`} />
 
@@ -202,7 +202,7 @@ export function HackathonsClient() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pt-10">
       {/* Hero Section */}
       <section className="relative py-12 lg:py-20 overflow-hidden">
         <div className="absolute inset-0 gradient-bg opacity-10" />

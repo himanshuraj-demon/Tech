@@ -294,7 +294,7 @@ export function HorizontalGallery({
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-space-grotesk">
+          <h1 className="text-2xl text-black dark:text-white sm:text-3xl font-extrabold tracking-tight font-space-grotesk">
             Event Gallery
           </h1>
         </div>

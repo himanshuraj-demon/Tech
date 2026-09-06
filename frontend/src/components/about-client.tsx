@@ -31,7 +31,7 @@ export function AboutClient() {
   const coordinators = teamMembers.filter(member => member.category === "coordinator");
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pt-10">
       {/* Hero Section */}
       <section className="relative py-12 lg:py-20">
         <div className="absolute inset-0 gradient-bg opacity-10" />
