@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: {
     serverActions: {
-      bodySizeLimit: "2mb", // Increase limit for file uploads
+      bodySizeLimit: "100mb", // Increase limit for file uploads (supports 30MB+ magazines)
     },
   },
   async headers() {

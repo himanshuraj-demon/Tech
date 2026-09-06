@@ -9,6 +9,9 @@ async function checkAdminAuth() {
   return session?.user?.isAdmin || false;
 }
 
+export const dynamic = "force-dynamic";
+export const maxDuration = 300; // Allow 5 minutes for large magazine PDF uploads
+
 // POST /api/admin/torque/upload - Upload magazine PDF to Cloudinary
 export async function POST(request: NextRequest) {
   try {
@@ -25,10 +28,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate size (max 50MB for PDFs)
-    const maxSize = 50 * 1024 * 1024;
+    // Validate size (support up to 60MB for PDFs)
+    const maxSize = 60 * 1024 * 1024;
     if (file.size > maxSize) {
-      return NextResponse.json({ error: "File too large. Maximum size is 50MB." }, { status: 400 });
+      return NextResponse.json({ error: "File too large. Maximum size is 60MB." }, { status: 400 });
     }
 
     // Convert file to buffer
@@ -38,10 +41,12 @@ export async function POST(request: NextRequest) {
     const folder = `magazines/${year}`;
     const filename = file.name;
 
-    console.log(`[Torque Upload] Uploading PDF to Cloudinary: folder=${folder}, filename=${filename}`);
+    console.log(`[Torque Upload] Uploading PDF to Cloudinary: folder=${folder}, filename=${filename}, size=${(file.size / (1024 * 1024)).toFixed(2)} MB`);
 
-    // Upload to Cloudinary
-    const result = await uploadToCloudinary(buffer, folder, filename);
+    // Upload to Cloudinary using raw resource_type to avoid Cloudinary's 20MB image processing limit
+    const result = await uploadToCloudinary(buffer, folder, filename, {
+      resource_type: "raw",
+    });
 
     return NextResponse.json({
       filePath: result.url,
