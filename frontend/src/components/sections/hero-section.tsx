@@ -70,7 +70,7 @@ export function HeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full px-6 py-2.5 h-auto text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/20 transition-all duration-200 border-0">
+                className="rounded-full px-6 py-2.5 h-auto text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:text-white  shadow-lg shadow-blue-500/20 transition-all duration-200 border-0">
                 <Link href="/clubs" className="flex items-center gap-2">
                   <ArrowRight className="w-4 h-4" />
                   <span>Explore Clubs</span>
@@ -80,7 +80,7 @@ export function HeroSection() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="rounded-full px-6 py-2.5 text-yellow-500 h-auto text-sm font-medium border-border/80 hover:bg-blue-500/10 hover:border-blue-500/40 transition-all duration-200">
+                className="rounded-full px-6 py-2.5 text-yellow-700 dark:text-yellow-400 h-auto text-sm font-medium border-2 dark:border-yellow-400 border-yellow-400 hover:bg-blue-500/10 hover:border-blue-500/40 transition-all duration-200 ">
                 <Link href="/torque">
                   <span>Torque Magazine</span>
                 </Link>
