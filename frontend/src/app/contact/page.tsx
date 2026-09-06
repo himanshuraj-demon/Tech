@@ -67,7 +67,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pt-10">
       {/* Hero Section with Background Boxes */}
       <ContactHero />
 

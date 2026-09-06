@@ -57,7 +57,7 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 font-sans">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 font-sans pt-10">
 
       <main className="flex-1 py-12">
         <div className="container px-4 md:px-6">

@@ -87,7 +87,7 @@ const Gallery = () => {
 
   // Classic Grid View (previously shown gallery page)
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-20">
       <section className="py-12 md:py-16">
         <div className="container px-4 md:px-6">
           <div className="space-y-8">

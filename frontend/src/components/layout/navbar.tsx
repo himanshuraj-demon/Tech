@@ -29,8 +29,8 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden xl:flex">
+      <div className="container flex h-16 ">
+        <div className="mr-4 hidden xl:flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <ThemeAwareLogo
               width={48}

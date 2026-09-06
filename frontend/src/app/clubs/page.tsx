@@ -53,7 +53,7 @@ export default function ClubsPage() {
     );
   }
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pt-20">
       {/* Hero Section */}
       <section className="relative section-padding">
         <div className="absolute inset-0 gradient-bg opacity-10" />

@@ -265,7 +265,7 @@ export function HorizontalGallery({
         handlePointerUp();
         setCursorState("idle");
       }}
-      className="relative w-full h-[calc(100vh-4rem)] min-h-[600px] overflow-hidden select-none cursor-grab active:cursor-grabbing  text-white flex flex-col justify-between"
+      className="relative w-full h-[100vh] min-h-[600px] overflow-hidden select-none cursor-grab active:cursor-grabbing  text-white flex flex-col justify-between pt-20"
     >
       {/* Dynamic Floating Cursor follower (Jesper Landberg aesthetic) */}
       <div
