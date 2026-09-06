@@ -15,7 +15,7 @@ import { useEvents } from "@/lib/queries";
 import { HorizontalGallery } from "@/components/gallery/horizontal-gallery";
 import { Event } from "@/lib/events-data";
 
-export function getEventThumbnail(event: Event | any): string {
+function getEventThumbnail(event: Event | any): string {
   if (!event || !event.gallery) return "/events/placeholder-1.svg";
   let gallery = event.gallery;
   if (typeof gallery === "string") {
@@ -37,7 +37,7 @@ export function getEventThumbnail(event: Event | any): string {
   return "/events/placeholder-1.svg";
 }
 
-export function getEventImageAlt(event: Event | any): string {
+function getEventImageAlt(event: Event | any): string {
   if (!event || !event.gallery) return event?.title || "Event Image";
   let gallery = event.gallery;
   if (typeof gallery === "string") {
