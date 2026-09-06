@@ -26,7 +26,7 @@ const tickerItems = [
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[100vh] flex flex-col justify-between overflow-hidden bg-background border-b border-border/40">
+    <section className="relative min-h-[100vh] flex flex-col justify-between overflow-hidden bg-background ">
       {/* Ambient blue & violet gradient overlays */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-600/10 via-purple-600/5 to-transparent pointer-events-none" />
       <div className="absolute -top-32 -right-32 w-80 h-80 sm:w-96 sm:h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
