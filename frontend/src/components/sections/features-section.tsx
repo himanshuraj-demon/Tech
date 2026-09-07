@@ -184,7 +184,7 @@ export function FeaturesSection() {
           </p>
 
           {/* Interactive Category Filter Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-8 p-1.5 rounded-full bg-gray-100/90 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/80 backdrop-blur shadow-xs">
+          <div className=" hidden md:flex flex-wrap items-center justify-center gap-2 mt-8 p-1.5 rounded-full bg-gray-100/90 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/80 backdrop-blur shadow-xs">
             {(
               [
                 { id: "all", label: "All Pillars", icon: Layers },
@@ -326,14 +326,14 @@ export function FeaturesSection() {
           <div className="flex items-center gap-3 flex-shrink-0">
             <Link
               href="/clubs"
-              className="bg-gradient-to-r px-5 py-2.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 flex items-center gap-2 select-none"
+              className="bg-gradient-to-r px-5 py-2.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 flex justify-center items-center gap-2 select-none"
             >
-              <span>Explore All Clubs</span>
+              <span>Clubs</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
             <Link
               href="/about"
-              className="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium text-sm rounded-full transition-all duration-200"
+              className="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium text-sm rounded-full transition-all duration-200 text-center"
             >
               About Council
             </Link>

@@ -26,7 +26,7 @@ const tickerItems = [
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[100vh] flex flex-col justify-between overflow-hidden bg-background ">
+    <section className="relative min-h-[100vh] pt-5 md:pt-0 flex flex-col justify-between overflow-hidden bg-background ">
       {/* Ambient blue & violet gradient overlays */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-600/10 via-purple-600/5 to-transparent pointer-events-none" />
       <div className="absolute -top-32 -right-32 w-80 h-80 sm:w-96 sm:h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -43,7 +43,7 @@ export function HeroSection() {
             </div>
 
             {/* Big Headline */}
-            <h1 className="text-7xl lg:text-[5.2rem] xl:text-[5.8rem] font-serif tracking-tight leading-[1.08] text-foreground select-none">
+            <h1 className="text-6xl lg:text-[5.2rem] xl:text-[5.8rem] font-serif tracking-tight leading-[1.08] text-foreground select-none">
               <span className="block font-normal text-foreground">IITGN</span>
               <span className="flex items-center flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 my-1 sm:my-2">
                 {/* Technical Council with signature blue to purple gradient */}
@@ -55,10 +55,10 @@ export function HeroSection() {
           </div>
 
           {/* Right Column: Bordered Quote + Actions + Stats */}
-          <div className="lg:col-span-5 flex flex-col space-y-6 lg:pl-6">
+          <div className="lg:col-span-5 flex flex-col space-y-6 lg:pl-6 ">
             {/* Bordered Quote/Description */}
-            <div className="border-l-2 border-blue-600 dark:border-purple-500 pl-4 py-1">
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
+            <div className="border-l-2  border-blue-600 dark:border-purple-500 pl-4 py-1">
+              <p className="text-xs sm:text-base text-muted-foreground leading-relaxed max-w-lg">
                 Technical Council is the apex student technical body at IIT
                 Gandhinagar. We empower students to innovate, learn, and build
                 cutting-edge technology together.
@@ -66,7 +66,7 @@ export function HeroSection() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1 justify-center md:justify-start">
+            <div className="flex  items-center gap-3 sm:gap-4 pt-1 justify-center md:justify-start">
               <Button
                 asChild
                 size="lg"

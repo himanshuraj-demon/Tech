@@ -125,7 +125,7 @@ export default function ClubsPage() {
       </section>
 
       {/* Interactive Controls: Search & Tabs */}
-      <section className="sticky top-16 z-30 bg-white/85 dark:bg-gray-900/85 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4">
+      <section className="md:sticky hidden top-16 z-30 bg-white/85 dark:bg-gray-900/85 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-center gap-4">
           
           {/* Category Tabs */}
