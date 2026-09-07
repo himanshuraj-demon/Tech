@@ -150,12 +150,14 @@ export const eventCategories = [
 // Organizing bodies
 export const organizingBodies = [
   "Technical Council",
-  "Robotics Club",
-  "Programming Club",
+  "Mean Mechanics",
+  "GRASP",
   "AI/ML Club",
-  "Cybersecurity Club",
-  "Web Development Club",
-  "Electronics Club",
-  "Aero Club",
+  "CyberSentinel ",
+  "Metis",
+  "Cronos(Systems) Club",
+  "Embed Club",
+  "Lambda",
+  "Odyssey,Astronomy Club",
   "Other"
 ];
