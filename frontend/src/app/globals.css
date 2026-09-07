@@ -175,6 +175,15 @@
   .section-margin {
     @apply my-8 sm:my-12 md:my-16;
   }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 @keyframes fadeIn {
@@ -307,23 +316,4 @@ html {
   background: rgb(55 65 81);
 }
 
-/* Infinite Marquee Animation for Hero Ticker */
-@keyframes marquee-scroll {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
 
-.animate-marquee-scroll {
-  display: flex;
-  width: max-content;
-  animation: marquee-scroll 35s linear infinite;
-  will-change: transform;
-}
-
-.animate-marquee-scroll:hover {
-  animation-play-state: paused;
-}
