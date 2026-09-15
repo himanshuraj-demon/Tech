@@ -34,7 +34,7 @@ const dockItems = [
 export function HeroSection() {
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-between overflow-hidden pt-10 sm:pt-24 pb-4 md:pb-6">
+    <section className="relative min-h-screen flex flex-col justify-between overflow-hidden pt-10 sm:pt-20 pb-4 md:pb-6">
       {/* Background Images: Dark & Light Mode */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none">
         {/* Dark Mode Background */}
@@ -46,7 +46,7 @@ export function HeroSection() {
             priority
             unoptimized
             sizes="100vw"
-            className="object-cover object-[75%_center] lg:object-center brightness-[0.92] contrast-[1.05]"
+            className="object-cover object-[40%_center] lg:object-center brightness-[0.92] contrast-[1.05]"
           />
         </div>
 
@@ -59,7 +59,7 @@ export function HeroSection() {
             priority
             unoptimized
             sizes="100vw"
-            className="object-cover object-[75%_center] lg:object-center brightness-[0.98] contrast-[1.02]"
+            className="object-cover object-[25%_center] lg:object-center brightness-[1.05] contrast-[1]"
           />
         </div>
 
@@ -130,7 +130,7 @@ export function HeroSection() {
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 max-w-md bg-white rounded-2xl p-4 text-center dark:bg-transparent">
+            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 max-w-md dark:bg-black bg-white rounded-2xl p-4 text-center dark:bg-transparent">
               <div className="space-y-1 border-r border-slate-300/80 dark:border-slate-800 pr-4">
                 <div className="text-3xl sm:text-4xl font-bold font-space-grotesk tracking-tight text-blue-600 dark:text-blue-400">
                   11+
