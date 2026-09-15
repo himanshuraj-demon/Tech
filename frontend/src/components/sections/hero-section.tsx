@@ -97,7 +97,7 @@ export function HeroSection() {
           <div className="lg:col-span-5 flex flex-col space-y-6 lg:pl-4">
             {/* Bordered Quote/Description */}
             <div className="border-l-2 border-purple-500 dark:border-purple-500 pl-4 py-1">
-              <p className="text-xs sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed max-w-lg font-normal">
+              <p className="text-xs sm:text-base text-white dark:text-slate-300 leading-relaxed max-w-lg font-normal">
                 Technical Council is the apex student technical body at IIT
                 Gandhinagar. We empower students to innovate, learn, and build
                 cutting-edge technology together.
@@ -130,12 +130,12 @@ export function HeroSection() {
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 max-w-md dark:bg-black bg-white rounded-2xl p-4 text-center dark:bg-transparent">
+            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 max-w-md  bg-white rounded-2xl p-4 text-center dark:bg-transparent">
               <div className="space-y-1 border-r border-slate-300/80 dark:border-slate-800 pr-4">
                 <div className="text-3xl sm:text-4xl font-bold font-space-grotesk tracking-tight text-blue-600 dark:text-blue-400">
                   11+
                 </div>
-                <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                <div className="text-xs text-slate-600 dark:text-white font-medium">
                   Active Clubs
                 </div>
               </div>
@@ -143,7 +143,7 @@ export function HeroSection() {
                 <div className="text-3xl sm:text-4xl font-bold font-space-grotesk tracking-tight text-indigo-600 dark:text-indigo-400">
                   20+
                 </div>
-                <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                <div className="text-xs text-slate-600 dark:text-white font-medium">
                   Events/Year
                 </div>
               </div>
@@ -151,7 +151,7 @@ export function HeroSection() {
                 <div className="text-3xl sm:text-4xl font-bold font-space-grotesk tracking-tight text-purple-600 dark:text-purple-400">
                   7+
                 </div>
-                <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                <div className="text-xs text-slate-600 dark:text-white font-medium">
                   Inter-IIT Wins
                 </div>
               </div>
