@@ -99,7 +99,7 @@ export function ClubCard({ club, variant = "technical" }: ClubCardProps) {
         <div>
           {/* Card Top Row: Logo + Badge + Arrow */}
           <div className="relative z-10 flex items-start justify-between gap-3 mb-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80 p-2 flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-2xs">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80  flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-2xs">
               {getLogoPath(club) ? (
                 <Image
                   src={getLogoPath(club)!}

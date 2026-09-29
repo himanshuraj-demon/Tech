@@ -1,70 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { Mail, Phone, Send } from "lucide-react"
-import { Button } from "@/components/ui/button"
+
 import { ContactHero } from "@/components/contact-hero"
 import { GoogleMaps } from "@/components/google-maps"
 import { FAQAccordion } from "@/components/faq-accordion"
-import { api } from "../../../services/api"
+
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<{
-    type: 'success' | 'error' | null;
-    message: string;
-  }>({ type: null, message: '' })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus({ type: null, message: '' })
 
-    try {
-      const response = await api.fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const result = await response.json()
-
-      if (response.ok) {
-        setSubmitStatus({
-          type: 'success',
-          message: result.message || 'Thank you for your message! We\'ll get back to you soon.'
-        })
-        setFormData({ name: "", email: "", subject: "", message: "" })
-      } else {
-        setSubmitStatus({
-          type: 'error',
-          message: result.error || 'Failed to send message. Please try again.'
-        })
-      }
-    } catch (error) {
-      setSubmitStatus({
-        type: 'error',
-        message: 'Network error. Please check your connection and try again.'
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
 
   return (
     <div className="flex flex-col pt-10">

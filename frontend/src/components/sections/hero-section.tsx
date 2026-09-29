@@ -20,19 +20,63 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const dockItems = [
-  { label: "OPEN SOURCE", icon: Box, href: "/clubs", color: "text-blue-500 dark:text-blue-400" },
-  { label: "RESEARCH", icon: FlaskConical, href: "/about", color: "text-purple-500 dark:text-purple-400" },
-  { label: "HACKATHONS", icon: Code2, href: "/hackathons", color: "text-cyan-500 dark:text-cyan-400" },
-  { label: "WORKSHOPS", icon: Users, href: "/clubs", color: "text-violet-500 dark:text-violet-400" },
-  { label: "ROBOTICS", icon: Bot, href: "/clubs", color: "text-indigo-500 dark:text-indigo-400" },
-  { label: "BLOCKCHAIN", icon: Layers, href: "/clubs", color: "text-blue-500 dark:text-blue-400" },
-  { label: "GAME DEV", icon: Gamepad2, href: "/clubs", color: "text-pink-500 dark:text-pink-400" },
-  { label: "DATA SCIENCE", icon: BarChart3, href: "/clubs", color: "text-sky-500 dark:text-sky-400" },
-  { label: "COMPETITIONS", icon: Trophy, href: "/achievements", color: "text-purple-500 dark:text-purple-400" },
+  {
+    label: "OPEN SOURCE",
+    icon: Box,
+    href: "/clubs",
+    color: "text-blue-500 dark:text-blue-400",
+  },
+  {
+    label: "RESEARCH",
+    icon: FlaskConical,
+    href: "/about",
+    color: "text-purple-500 dark:text-purple-400",
+  },
+  {
+    label: "HACKATHONS",
+    icon: Code2,
+    href: "/hackathons",
+    color: "text-cyan-500 dark:text-cyan-400",
+  },
+  {
+    label: "WORKSHOPS",
+    icon: Users,
+    href: "/clubs",
+    color: "text-violet-500 dark:text-violet-400",
+  },
+  {
+    label: "ROBOTICS",
+    icon: Bot,
+    href: "/clubs",
+    color: "text-indigo-500 dark:text-indigo-400",
+  },
+  {
+    label: "BLOCKCHAIN",
+    icon: Layers,
+    href: "/clubs",
+    color: "text-blue-500 dark:text-blue-400",
+  },
+  {
+    label: "GAME DEV",
+    icon: Gamepad2,
+    href: "/clubs",
+    color: "text-pink-500 dark:text-pink-400",
+  },
+  {
+    label: "DATA SCIENCE",
+    icon: BarChart3,
+    href: "/clubs",
+    color: "text-sky-500 dark:text-sky-400",
+  },
+  {
+    label: "COMPETITIONS",
+    icon: Trophy,
+    href: "/achievements",
+    color: "text-purple-500 dark:text-purple-400",
+  },
 ];
 
 export function HeroSection() {
-
   return (
     <section className="relative min-h-screen flex flex-col justify-between overflow-hidden pt-10 sm:pt-20 pb-4 md:pb-6">
       {/* Background Images: Dark & Light Mode */}
@@ -62,13 +106,11 @@ export function HeroSection() {
             className="object-cover object-[25%_center] lg:object-center brightness-[1.05] contrast-[1]"
           />
         </div>
-
       </div>
 
       {/* Main Hero Content Area */}
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-center my-auto py-8">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          
           {/* Left Column: Pill Badge + Big Headline + Tagline + Scroll */}
           <div className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-5">
             {/* Pill Badge */}
@@ -79,18 +121,36 @@ export function HeroSection() {
             </div>
 
             {/* Big Stacked Headline */}
-            <h1 className="text-6xl sm:text-7xl lg:text-[5.4rem] xl:text-[6.2rem] font-bold font-space-grotesk tracking-tight leading-[0.98] select-none">
-              <span className="block text-slate-950 dark:text-white font-extrabold drop-shadow-xs">
+            <h1 className="text-5xl sm:text-7xl lg:text-[5.4rem] xl:text-[6.2rem] font-bold font-space-grotesk tracking-tight leading-[0.98] select-none">
+              {/* IITGN */}
+              <span className="block text-slate-950 dark:text-white font-extrabold drop-shadow-sm">
                 IITGN
               </span>
-              <span className="block bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 bg-clip-text text-transparent font-extrabold my-1">
+
+              {/* Technical */}
+              <span
+                className="
+      block font-extrabold my-1
+      bg-gradient-to-r
+      from-cyan-600 via-sky-600 to-blue-700
+      dark:from-cyan-400 dark:via-sky-400 dark:to-blue-500
+      bg-clip-text text-transparent
+    ">
                 Technical
               </span>
-              <span className="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-500 bg-clip-text text-transparent font-extrabold">
+
+              {/* Council */}
+              <span
+                className="
+      block font-extrabold
+      bg-gradient-to-r
+      from-indigo-600 via-purple-600 to-pink-600
+      dark:from-indigo-400 dark:via-purple-400 dark:to-pink-500
+      bg-clip-text text-transparent
+    ">
                 Council
               </span>
             </h1>
-
           </div>
 
           {/* Right Column: Bordered Quote + Actions + Stats */}
@@ -109,8 +169,7 @@ export function HeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full px-5 py-2.5 h-auto text-sm font-medium bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 dark:text-white shadow-lg shadow-blue-500/25 transition-all duration-200 border-0 hover:scale-105 active:scale-95"
-              >
+                className="rounded-full px-5 py-2.5 h-auto text-sm font-medium bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 dark:text-white shadow-lg shadow-blue-500/25 transition-all duration-200 border-0 hover:scale-105 active:scale-95">
                 <Link href="/clubs" className="flex items-center gap-2 ">
                   <Compass className="w-4 h-4" />
                   <span>Explore Clubs</span>
@@ -120,8 +179,7 @@ export function HeroSection() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="rounded-full px-5 py-2.5 h-auto text-sm font-medium border border-slate-300 dark:border-white/20 bg-white/60 dark:bg-slate-900/50 hover:bg-white/90 dark:hover:bg-slate-800/80 text-slate-800 dark:text-white backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95"
-              >
+                className="rounded-full px-5 py-2.5 h-auto text-sm font-medium border border-slate-300 dark:border-white/20 bg-white/60 dark:bg-slate-900/50 hover:bg-white/90 dark:hover:bg-slate-800/80 text-slate-800 dark:text-white backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95">
                 <Link href="/torque" className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <span>Torque Magazine</span>
@@ -157,7 +215,6 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -171,13 +228,16 @@ export function HeroSection() {
               return (
                 <div
                   key={`d1-${item.label}`}
-                  className="flex items-center gap-6 sm:gap-8 flex-shrink-0"
-                >
+                  className="flex items-center gap-6 sm:gap-8 flex-shrink-0">
                   <Link
                     href={item.href}
-                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300 transition-colors group select-none py-0.5"
-                  >
-                    <Icon className={cn("w-4 h-4 transition-transform duration-200 group-hover:scale-110", item.color)} />
+                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300 transition-colors group select-none py-0.5">
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 transition-transform duration-200 group-hover:scale-110",
+                        item.color,
+                      )}
+                    />
                     <span className="font-mono text-[11px] sm:text-xs font-semibold tracking-wider whitespace-nowrap">
                       {item.label}
                     </span>
@@ -193,13 +253,16 @@ export function HeroSection() {
               return (
                 <div
                   key={`d2-${item.label}`}
-                  className="flex items-center gap-6 sm:gap-8 flex-shrink-0"
-                >
+                  className="flex items-center gap-6 sm:gap-8 flex-shrink-0">
                   <Link
                     href={item.href}
-                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300 transition-colors group select-none py-0.5"
-                  >
-                    <Icon className={cn("w-4 h-4 transition-transform duration-200 group-hover:scale-110", item.color)} />
+                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300 transition-colors group select-none py-0.5">
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 transition-transform duration-200 group-hover:scale-110",
+                        item.color,
+                      )}
+                    />
                     <span className="font-mono text-[11px] sm:text-xs font-semibold tracking-wider whitespace-nowrap">
                       {item.label}
                     </span>

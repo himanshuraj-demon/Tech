@@ -8,11 +8,8 @@ import {
   Users,
   Camera,
   ArrowRight,
-  SlidersHorizontal,
-  LayoutGrid,
 } from "lucide-react";
 import { useEvents } from "@/lib/queries";
-import { HorizontalGallery } from "@/components/gallery/horizontal-gallery";
 import { Event } from "@/lib/events-data";
 
 function getEventThumbnail(event: Event | any): string {
@@ -58,11 +55,10 @@ function getEventImageAlt(event: Event | any): string {
 
 const Gallery = () => {
   const { data: eventGallery = [], isLoading: eventsLoading } = useEvents();
-  const [viewMode, setViewMode] = useState<"slider" | "grid">("slider");
 
   if (eventsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-neutral-950 text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-6 text-sm font-mono tracking-widest uppercase text-neutral-400">
@@ -73,17 +69,6 @@ const Gallery = () => {
     );
   }
 
-  // If in slider view and there are events, render the Jesper Landberg-style GSAP horizontal gallery
-  if (viewMode === "slider" && eventGallery.length > 0) {
-    return (
-      <HorizontalGallery
-        events={eventGallery}
-        onSwitchToGrid={() => setViewMode("grid")}
-        getEventThumbnail={getEventThumbnail}
-        getEventImageAlt={getEventImageAlt}
-      />
-    );
-  }
 
   // Classic Grid View (previously shown gallery page)
   return (
@@ -101,26 +86,6 @@ const Gallery = () => {
                 </h1>
               </div>
 
-              {/* Toggle to return to Jesper Landberg Horizontal Slider */}
-              <div className="flex items-center gap-2 self-start sm:self-center bg-muted/60 p-1 rounded-full border border-border">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("slider")}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/80 transition-all duration-200"
-                  title="Switch to Horizontal Slider View"
-                >
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>Featured Slider</span>
-                </button>
-                <button
-                  type="button"
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-background text-foreground shadow-sm transition-all duration-200"
-                  title="Grid View Active"
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                  <span>Grid View</span>
-                </button>
-              </div>
             </div>
 
             {/* Grid of Event Cards */}
