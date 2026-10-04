@@ -218,62 +218,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Bottom Capsule Categories Bar with Continuous Horizontal Moving Animation */}
-      <div className="w-full relative z-10 px-4 sm:px-6 lg:px-8 mt-4">
-        <div className="max-w-7xl mx-auto rounded-2xl lg:rounded-full border border-slate-200/80 dark:border-blue-500/20 bg-white/75 dark:bg-slate-950/65 backdrop-blur-xl py-2.5 px-4 sm:px-6 shadow-xl dark:shadow-2xl dark:shadow-black/60 overflow-hidden select-none">
-          <div className="animate-marquee-scroll flex items-center gap-6 sm:gap-8">
-            {/* First set of items */}
-            {dockItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={`d1-${item.label}`}
-                  className="flex items-center gap-6 sm:gap-8 flex-shrink-0">
-                  <Link
-                    href={item.href}
-                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300 transition-colors group select-none py-0.5">
-                    <Icon
-                      className={cn(
-                        "w-4 h-4 transition-transform duration-200 group-hover:scale-110",
-                        item.color,
-                      )}
-                    />
-                    <span className="font-mono text-[11px] sm:text-xs font-semibold tracking-wider whitespace-nowrap">
-                      {item.label}
-                    </span>
-                  </Link>
-                  <div className="h-4 w-px bg-slate-200 dark:bg-slate-800/80 shrink-0" />
-                </div>
-              );
-            })}
-
-            {/* Second duplicate set of items for seamless infinite scroll */}
-            {dockItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={`d2-${item.label}`}
-                  className="flex items-center gap-6 sm:gap-8 flex-shrink-0">
-                  <Link
-                    href={item.href}
-                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-300 transition-colors group select-none py-0.5">
-                    <Icon
-                      className={cn(
-                        "w-4 h-4 transition-transform duration-200 group-hover:scale-110",
-                        item.color,
-                      )}
-                    />
-                    <span className="font-mono text-[11px] sm:text-xs font-semibold tracking-wider whitespace-nowrap">
-                      {item.label}
-                    </span>
-                  </Link>
-                  <div className="h-4 w-px bg-slate-200 dark:bg-slate-800/80 shrink-0" />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      
     </section>
   );
 }

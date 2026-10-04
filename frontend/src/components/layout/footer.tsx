@@ -353,6 +353,10 @@ export function Footer() {
                 <Mail className="h-4 w-4" />
                 <span>{contactInfo?.email || 'technical.secretary@iitgn.ac.in'}</span>
               </div>
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <Phone className="h-4 w-4" />
+                <span>{'+91 7415233022'}</span>
+              </div>
             </div>
             <div className="flex items-center justify-center space-x-3">
               <a

@@ -178,7 +178,7 @@ export function AboutClient() {
                     { bg: "indigo", text: "text-indigo-600", hover: "indigo-600" },
                     { bg: "orange", text: "text-orange-600", hover: "orange-600" }
                   ];
-                  const colorScheme = colorSchemes[index % colorSchemes.length];
+                  const colorScheme = colorSchemes[2];
 
                   return (
                     <div key={coordinator.id} className="glass rounded-2xl p-3 lg:p-4 text-center transition-all duration-300 hover:scale-105 w-full max-w-[240px]">

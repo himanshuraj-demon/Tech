@@ -226,7 +226,7 @@ export function FeaturesSection() {
                 onMouseMove={(e) => handleMouseMove(e, item.id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 className={cn(
-                  "group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md p-6 sm:p-8 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1",
+                  "group relative flex flex-col justify-between overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md p-6 sm:p-8 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-600 hover:border-2 dark:hover:border-white/70",
                   item.colSpanClass,
                   item.borderHover
                 )}
@@ -234,7 +234,7 @@ export function FeaturesSection() {
                 {/* Dynamic Mouse Spotlight Glow */}
                 {isHovered && (
                   <div
-                    className="pointer-events-none absolute -inset-px rounded-2xl opacity-100 transition-opacity duration-300"
+                    className="pointer-events-none absolute  rounded-2xl opacity-100 transition-opacity duration-200"
                     style={{
                       background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(59, 130, 246, 0.12), transparent 80%)`,
                     }}
@@ -244,7 +244,7 @@ export function FeaturesSection() {
                 {/* Top Ambient Card Gradient */}
                 <div
                   className={cn(
-                    "absolute top-0 right-0 w-3/4 h-1/2 bg-gradient-to-bl opacity-40 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
+                    "absolute top-0 right-0 w-full h-1/2 bg-gradient-to-bl opacity-40 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
                     item.gradient
                   )}
                 />
