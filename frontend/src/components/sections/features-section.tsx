@@ -183,35 +183,7 @@ export function FeaturesSection() {
             We are the hub of technical innovation at IIT Gandhinagar, fostering creativity, collaboration, and cutting-edge research across multiple domains.
           </p>
 
-          {/* Interactive Category Filter Pills */}
-          <div className=" hidden md:flex flex-wrap items-center justify-center gap-2 mt-8 p-1.5 rounded-full bg-gray-100/90 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/80 backdrop-blur shadow-xs">
-            {(
-              [
-                { id: "all", label: "All Pillars", icon: Layers },
-                { id: "tech", label: "Software & AI", icon: Terminal },
-                { id: "hardware", label: "Hardware & Robotics", icon: Cpu },
-                { id: "ecosystem", label: "Competitions & Ventures", icon: Trophy },
-              ] as const
-            ).map((cat) => {
-              const Icon = cat.icon;
-              const isActive = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 select-none",
-                    isActive
-                      ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-xs font-semibold"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200/60 dark:hover:bg-gray-700/50"
-                  )}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{cat.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          
         </div>
 
         {/* Bento Grid */}

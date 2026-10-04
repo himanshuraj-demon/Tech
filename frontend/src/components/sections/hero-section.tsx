@@ -113,12 +113,7 @@ export function HeroSection() {
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Pill Badge + Big Headline + Tagline + Scroll */}
           <div className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-5">
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-50/80 dark:bg-blue-950/40 backdrop-blur-md shadow-[0_0_15px_rgba(59,130,246,0.15)]">
-              <span className="text-blue-600 dark:text-cyan-300 text-[11px] sm:text-xs font-mono tracking-widest font-semibold uppercase">
-                LEARN &bull; BUILD &bull; INNOVATE &bull; TOGETHER
-              </span>
-            </div>
+            
 
             {/* Big Stacked Headline */}
             <h1 className="text-5xl sm:text-7xl lg:text-[5.4rem] xl:text-[6.2rem] font-bold font-space-grotesk tracking-tight leading-[0.98] select-none">
