@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { api } from "../../services/api";
 import { useHackathonDetail, useHackathonRegistrationStatus } from "@/lib/queries";
 import { useSession, signIn } from "next-auth/react";
+import { MarkdownContent } from "@/components/ui/markdown-content";
 
 interface HackathonDetailClientProps {
   id: string;
@@ -177,7 +178,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
   };
 
   return (
-    <div className="flex flex-col font-sans w-full">
+    <div className="flex flex-col font-sans w-full mt-5">
       {/* Header */}
       <section className="py-12 bg-muted/50">
         <div className="container px-4 md:px-6">
@@ -280,9 +281,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                   <CardTitle>About the Event</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {hackathon.longDescription}
-                  </p>
+                  <MarkdownContent content={hackathon.longDescription} />
                 </CardContent>
               </Card>
 
@@ -293,9 +292,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     <CardTitle>Themes & Tracks</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {hackathon.themes}
-                    </p>
+                    <MarkdownContent content={hackathon.themes} />
                   </CardContent>
                 </Card>
               )}
@@ -306,23 +303,35 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                   <CardHeader>
                     <CardTitle>Requirements & Eligibility</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
                     {hackathon.eligibility && (
                       <div>
                         <h4 className="font-semibold mb-2">Eligibility Criteria</h4>
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                          {hackathon.eligibility}
-                        </p>
+                        <MarkdownContent content={hackathon.eligibility} />
                       </div>
                     )}
                     {hackathon.requirements && (
                       <div>
                         <h4 className="font-semibold mb-2">Technical Requirements</h4>
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                          {hackathon.requirements}
-                        </p>
+                        <MarkdownContent content={hackathon.requirements} />
                       </div>
                     )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Special Prizes */}
+              {hackathon.specialPrizes && (
+                <Card className="border-yellow-200/50 dark:border-yellow-900/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-yellow-500" />
+                      Special Prizes & Track Awards
+                    </CardTitle>
+                    <CardDescription>Extra opportunities and sponsor tracks</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <MarkdownContent content={hackathon.specialPrizes} />
                   </CardContent>
                 </Card>
               )}
@@ -334,9 +343,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     <CardTitle>Event Timeline</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {hackathon.timeline}
-                    </p>
+                    <MarkdownContent content={hackathon.timeline} />
                   </CardContent>
                 </Card>
               )}
@@ -352,9 +359,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     <CardDescription>Follow these guidelines when submitting your project</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {hackathon.submissionGuidelines}
-                    </p>
+                    <MarkdownContent content={hackathon.submissionGuidelines} />
                   </CardContent>
                 </Card>
               )}
@@ -370,9 +375,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     <CardDescription>How your project will be evaluated</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {hackathon.judingCriteria}
-                    </p>
+                    <MarkdownContent content={hackathon.judingCriteria} />
                   </CardContent>
                 </Card>
               )}
@@ -389,9 +392,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-orange-800 dark:text-orange-300 leading-relaxed whitespace-pre-line">
-                      {hackathon.importantNotes}
-                    </p>
+                    <MarkdownContent content={hackathon.importantNotes} />
                   </CardContent>
                 </Card>
               )}

@@ -14,6 +14,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon, type WinnerTier } from "@/lib/hackathons-data";
 import { Combobox } from "@/components/ui/combobox";
 import { api } from "../../../../../../services/api";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 interface BasicHackathon {
   id: string;
   name: string;
@@ -326,17 +327,16 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="longDescription">Detailed Description *</Label>
-                <Textarea
-                  id="longDescription"
-                  value={formData.longDescription}
-                  onChange={(e) => handleInputChange("longDescription", e.target.value)}
-                  placeholder="Full details about the hackathon (for the main page)"
-                  required
-                  rows={6}
-                />
-              </div>
+              <MarkdownEditor
+                id="longDescription"
+                label="Detailed Description"
+                description="Full details about the hackathon with headings, lists, bold, and formatting"
+                value={formData.longDescription}
+                onChange={(val) => handleInputChange("longDescription", val)}
+                required
+                placeholder="Full details about the hackathon (for the main page)"
+                rows={8}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -452,28 +452,26 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                 Participation requirements and team information
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="eligibility">Eligibility Criteria</Label>
-                <Textarea
-                  id="eligibility"
-                  value={formData.eligibility}
-                  onChange={(e) => handleInputChange("eligibility", e.target.value)}
-                  placeholder="Who can participate? Any age restrictions, student requirements, etc."
-                  rows={3}
-                />
-              </div>
+            <CardContent className="space-y-6">
+              <MarkdownEditor
+                id="eligibility"
+                label="Eligibility Criteria"
+                description="Who can participate? Grade, branches, or team rules (Markdown supported)"
+                value={formData.eligibility}
+                onChange={(val) => handleInputChange("eligibility", val)}
+                placeholder="- Open to all undergraduate & postgraduate students&#10;- Inter-college teams allowed"
+                rows={3}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="requirements">Technical Requirements</Label>
-                <Textarea
-                  id="requirements"
-                  value={formData.requirements}
-                  onChange={(e) => handleInputChange("requirements", e.target.value)}
-                  placeholder="What participants need to bring or have (laptop, software, etc.)"
-                  rows={3}
-                />
-              </div>
+              <MarkdownEditor
+                id="requirements"
+                label="Technical Requirements"
+                description="What participants need to bring or have (Markdown supported)"
+                value={formData.requirements}
+                onChange={(val) => handleInputChange("requirements", val)}
+                placeholder="- Laptop with Wi-Fi capability&#10;- GitHub account&#10;- Relevant software installed"
+                rows={3}
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="teamSize">Team Size</Label>
@@ -494,16 +492,15 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
               <CardDescription>Specify any general tracks or sponsors' special awards</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="specialPrizes">Special Prizes / Track Details</Label>
-                <Textarea
-                  id="specialPrizes"
-                  value={formData.specialPrizes}
-                  onChange={(e) => handleInputChange("specialPrizes", e.target.value)}
-                  placeholder="General details about sponsors' special tracks, API prizes, etc."
-                  rows={3}
-                />
-              </div>
+              <MarkdownEditor
+                id="specialPrizes"
+                label="Special Prizes / Track Details"
+                description="Details about sponsor bounties, track awards, or perks (Markdown supported)"
+                value={formData.specialPrizes}
+                onChange={(val) => handleInputChange("specialPrizes", val)}
+                placeholder="### Sponsor Track Prizes&#10;- **Best AI Project**: ₹25,000&#10;- **Best Web3 App**: ₹20,000"
+                rows={3}
+              />
             </CardContent>
           </Card>
 
@@ -515,61 +512,56 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
                 Schedule and important details for participants
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="timeline">Timeline</Label>
-                <Textarea
-                  id="timeline"
-                  value={formData.timeline}
-                  onChange={(e) => handleInputChange("timeline", e.target.value)}
-                  placeholder="Day 1: Registration & Opening - 9:00 AM&#10;Day 1: Hacking Begins - 10:00 AM&#10;Day 2: Final Presentations - 4:00 PM&#10;Day 2: Results & Closing - 6:00 PM"
-                  rows={6}
-                />
-              </div>
+            <CardContent className="space-y-6">
+              <MarkdownEditor
+                id="timeline"
+                label="Timeline"
+                description="Event schedule and milestones (Markdown supported)"
+                value={formData.timeline}
+                onChange={(val) => handleInputChange("timeline", val)}
+                placeholder="### Day 1: October 15&#10;- **09:00 AM**: Check-in & Breakfast&#10;- **10:00 AM**: Opening Ceremony & Hacking Begins&#10;&#10;### Day 2: October 16&#10;- **04:00 PM**: Project Submissions Close&#10;- **06:00 PM**: Award Ceremony"
+                rows={6}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="themes">Themes/Tracks</Label>
-                <Textarea
-                  id="themes"
-                  value={formData.themes}
-                  onChange={(e) => handleInputChange("themes", e.target.value)}
-                  placeholder="Education Technology, Healthcare Innovation, Smart Cities, etc."
-                  rows={3}
-                />
-              </div>
+              <MarkdownEditor
+                id="themes"
+                label="Themes / Tracks"
+                description="Themes, problem statements, and focus areas (Markdown supported)"
+                value={formData.themes}
+                onChange={(val) => handleInputChange("themes", val)}
+                placeholder="- **FinTech & DeFi**&#10;- **Healthcare & BioTech**&#10;- **Smart Cities & Sustainability**"
+                rows={3}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="judingCriteria">Judging Criteria</Label>
-                <Textarea
-                  id="judingCriteria"
-                  value={formData.judingCriteria}
-                  onChange={(e) => handleInputChange("judingCriteria", e.target.value)}
-                  placeholder="Innovation (30%), Technical Implementation (25%), Impact (25%), Presentation (20%)"
-                  rows={3}
-                />
-              </div>
+              <MarkdownEditor
+                id="judingCriteria"
+                label="Judging Criteria"
+                description="Rubric and scoring weights (Markdown supported)"
+                value={formData.judingCriteria}
+                onChange={(val) => handleInputChange("judingCriteria", val)}
+                placeholder="- **Innovation & Originality** (30%)&#10;- **Technical Execution** (25%)&#10;- **Design & UX** (25%)&#10;- **Presentation & Pitch** (20%)"
+                rows={3}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="submissionGuidelines">Submission Guidelines</Label>
-                <Textarea
-                  id="submissionGuidelines"
-                  value={formData.submissionGuidelines}
-                  onChange={(e) => handleInputChange("submissionGuidelines", e.target.value)}
-                  placeholder="What to submit: GitHub repo, demo video, presentation slides, etc."
-                  rows={3}
-                />
-              </div>
+              <MarkdownEditor
+                id="submissionGuidelines"
+                label="Submission Guidelines"
+                description="What participants must submit (Markdown supported)"
+                value={formData.submissionGuidelines}
+                onChange={(val) => handleInputChange("submissionGuidelines", val)}
+                placeholder="### Deliverables:&#10;1. Public GitHub repository link&#10;2. 2-minute demo video (YouTube/Loom)&#10;3. Slide deck or README documentation"
+                rows={4}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="importantNotes">Important Notes</Label>
-                <Textarea
-                  id="importantNotes"
-                  value={formData.importantNotes}
-                  onChange={(e) => handleInputChange("importantNotes", e.target.value)}
-                  placeholder="Any special instructions, rules, or important information for participants"
-                  rows={4}
-                />
-              </div>
+              <MarkdownEditor
+                id="importantNotes"
+                label="Important Notes"
+                description="Special rules, code of conduct, or warnings (Markdown supported)"
+                value={formData.importantNotes}
+                onChange={(val) => handleInputChange("importantNotes", val)}
+                placeholder="> **Note:** All code must be written during the hackathon period. Pre-existing code must be disclosed."
+                rows={4}
+              />
             </CardContent>
           </Card>
 
