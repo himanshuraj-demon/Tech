@@ -6,12 +6,14 @@ export async function GET() {
   try {
     const contactInfo = await getContactInfo();
     
-    // Return only the necessary public information
+    // Return public contact information
     return NextResponse.json({
       address: contactInfo.address,
       phone: contactInfo.phone,
       email: contactInfo.email,
-      socialMedia: contactInfo.socialMedia
+      socialMedia: contactInfo.socialMedia,
+      lastModified: contactInfo.lastModified,
+      modifiedBy: contactInfo.modifiedBy,
     });
   } catch (error) {
     console.error('Error fetching public contact info:', error);

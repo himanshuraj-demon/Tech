@@ -39,7 +39,7 @@ export function Footer() {
         <div className="py-4 md:hidden">
           <div className="flex items-center justify-center space-x-4 mx-auto max-w-fit">
             <a
-              href={contactInfo?.socialMedia.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
+              href={contactInfo?.socialMedia?.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200 touch-target"
@@ -51,7 +51,7 @@ export function Footer() {
             </a>
 
             <a
-              href={contactInfo?.socialMedia.youtube || "https://www.youtube.com/@tech_iitgn"}
+              href={contactInfo?.socialMedia?.youtube || "https://www.youtube.com/@tech_iitgn"}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full bg-red-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200 touch-target"
@@ -63,7 +63,7 @@ export function Footer() {
             </a>
 
             <a
-              href={contactInfo?.socialMedia.linkedin || "https://www.linkedin.com/school/tech-council-iitgn/"}
+              href={contactInfo?.socialMedia?.linkedin || "https://www.linkedin.com/school/tech-council-iitgn/"}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full bg-blue-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200 touch-target"
@@ -75,7 +75,7 @@ export function Footer() {
             </a>
 
             <a
-              href={contactInfo?.socialMedia.facebook || "https://www.facebook.com/tech.iitgn"}
+              href={contactInfo?.socialMedia?.facebook || "https://www.facebook.com/tech.iitgn"}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-full bg-blue-500 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200 touch-target"
@@ -109,7 +109,7 @@ export function Footer() {
                 <span className="truncate max-w-[250px]">{contactInfo?.email || 'technical.secretary@iitgn.ac.in'}</span>
               </a>
 
-              {contactInfo?.phone && (
+              {contactInfo?.phone ? (
                 <a
                   href={`tel:${contactInfo.phone}`}
                   className="flex items-center justify-center space-x-2 text-sm text-green-600 dark:text-green-400 hover:underline touch-target py-1"
@@ -117,13 +117,21 @@ export function Footer() {
                   <Phone className="h-4 w-4" />
                   <span>{contactInfo.phone}</span>
                 </a>
+              ) : (
+                <a
+                  href="tel:+91-79-2395-2001"
+                  className="flex items-center justify-center space-x-2 text-sm text-green-600 dark:text-green-400 hover:underline touch-target py-1"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span>+91-79-2395-2001</span>
+                </a>
               )}
 
               <div className="flex items-center justify-center space-x-1 text-xs text-gray-500 dark:text-gray-500 mt-2">
                 <MapPin className="h-3 w-3" />
                 <span className="text-center leading-tight">
-                  {contactInfo ? (
-                    `${contactInfo.address.city}, ${contactInfo.address.state}`
+                  {contactInfo?.address?.city || contactInfo?.address?.state ? (
+                    [contactInfo.address.city, contactInfo.address.state].filter(Boolean).join(', ')
                   ) : (
                     'Gandhinagar, Gujarat'
                   )}
@@ -336,10 +344,11 @@ export function Footer() {
               <div className="flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
                 <span className="leading-relaxed">
-                  {contactInfo ? (
+                  {contactInfo?.address ? (
                     <>
-                      {contactInfo.address.street}<br />
-                      {contactInfo.address.city}, {contactInfo.address.state} - {contactInfo.address.postalCode}
+                      {contactInfo.address.street && <>{contactInfo.address.street}<br /></>}
+                      {[contactInfo.address.city, contactInfo.address.state].filter(Boolean).join(", ")}
+                      {contactInfo.address.postalCode ? ` - ${contactInfo.address.postalCode}` : ""}
                     </>
                   ) : (
                     <>
@@ -350,17 +359,30 @@ export function Footer() {
                 </span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <Mail className="h-4 w-4" />
-                <span>{contactInfo?.email || 'technical.secretary@iitgn.ac.in'}</span>
+                <Mail className="h-4 w-4 flex-shrink-0" />
+                <a
+                  href={`mailto:${contactInfo?.email || 'technical.secretary@iitgn.ac.in'}`}
+                  className="hover:underline"
+                >
+                  {contactInfo?.email || 'technical.secretary@iitgn.ac.in'}
+                </a>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <Phone className="h-4 w-4" />
-                <span>{'+91 7415233022'}</span>
+                <Phone className="h-4 w-4 flex-shrink-0" />
+                {contactInfo?.phone ? (
+                  <a href={`tel:${contactInfo.phone}`} className="hover:underline">
+                    {contactInfo.phone}
+                  </a>
+                ) : (
+                  <a href="tel:+91-79-2395-2001" className="hover:underline">
+                    +91-79-2395-2001
+                  </a>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-center space-x-3">
               <a
-                href={contactInfo?.socialMedia.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
+                href={contactInfo?.socialMedia?.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-1.5 rounded-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200"
@@ -372,7 +394,7 @@ export function Footer() {
               </a>
 
               <a
-                href={contactInfo?.socialMedia.youtube || "https://www.youtube.com/@tech_iitgn"}
+                href={contactInfo?.socialMedia?.youtube || "https://www.youtube.com/@tech_iitgn"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-1.5 rounded-full bg-red-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200"
@@ -384,7 +406,7 @@ export function Footer() {
               </a>
 
               <a
-                href={contactInfo?.socialMedia.linkedin || "https://www.linkedin.com/school/tech-council-iitgn/"}
+                href={contactInfo?.socialMedia?.linkedin || "https://www.linkedin.com/school/tech-council-iitgn/"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-1.5 rounded-full bg-blue-600 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200"
@@ -396,7 +418,7 @@ export function Footer() {
               </a>
 
               <a
-                href={contactInfo?.socialMedia.facebook || "https://www.facebook.com/tech.iitgn"}
+                href={contactInfo?.socialMedia?.facebook || "https://www.facebook.com/tech.iitgn"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-1.5 rounded-full bg-blue-500 text-white hover:scale-110 flex justify-center items-center transition-transform duration-200"

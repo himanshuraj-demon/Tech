@@ -32,3 +32,4 @@ export const db = globalForDb.db;
 
 export * from './schema';
 export * from './leaderboard';
+export * from './contact';

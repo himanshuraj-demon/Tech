@@ -254,3 +254,25 @@ export const leaderboard = pgTable('leaderboard', {
 export type LeaderboardDB = typeof leaderboard.$inferSelect;
 export type NewLeaderboardDB = typeof leaderboard.$inferInsert;
 
+// Contact Information Table
+export const contactInfo = pgTable('contact_info', {
+  id: text('id').primaryKey().default('default'),
+  street: text('street').notNull().default(''),
+  city: text('city').notNull().default(''),
+  state: text('state').notNull().default(''),
+  postalCode: text('postal_code').notNull().default(''),
+  country: text('country').notNull().default('India'),
+  phone: text('phone').notNull().default(''),
+  email: text('email').notNull().default(''),
+  instagram: text('instagram').notNull().default(''),
+  youtube: text('youtube').notNull().default(''),
+  linkedin: text('linkedin').notNull().default(''),
+  facebook: text('facebook').notNull().default(''),
+  modifiedBy: text('modified_by').notNull().default('System'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type ContactInfoDB = typeof contactInfo.$inferSelect;
+export type NewContactInfoDB = typeof contactInfo.$inferInsert;
+

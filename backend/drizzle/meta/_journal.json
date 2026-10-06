@@ -43,6 +43,13 @@
       "when": 1786293868888,
       "tag": "0005_stiff_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791299034054,
+      "tag": "0006_broken_hellion",
+      "breakpoints": true
     }
   ]
 }

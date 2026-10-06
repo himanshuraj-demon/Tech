@@ -23,10 +23,13 @@ import {
   Trophy
 } from "lucide-react";
 import { api } from "../../../../services/api";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queries";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState({
     siteName: "Tech@IITGN",
@@ -120,7 +123,20 @@ export default function SettingsPage() {
       const response = await  api.fetch("/api/admin/contact-info");
       if (response.ok) {
         const data = await response.json();
-        setContactInfo(data);
+        if (data) {
+          setContactInfo(prev => ({
+            ...prev,
+            ...data,
+            address: {
+              ...prev.address,
+              ...(data.address || {})
+            },
+            socialMedia: {
+              ...prev.socialMedia,
+              ...(data.socialMedia || {})
+            }
+          }));
+        }
       }
     } catch (error) {
       console.error("Error fetching contact info:", error);
@@ -247,7 +263,21 @@ export default function SettingsPage() {
 
       if (response.ok) {
         const result = await response.json();
-        setContactInfo(result.contactInfo);
+        if (result.contactInfo) {
+          setContactInfo(prev => ({
+            ...prev,
+            ...result.contactInfo,
+            address: {
+              ...prev.address,
+              ...(result.contactInfo.address || {})
+            },
+            socialMedia: {
+              ...prev.socialMedia,
+              ...(result.contactInfo.socialMedia || {})
+            }
+          }));
+        }
+        await queryClient.invalidateQueries({ queryKey: queryKeys.contactInfo });
         alert("Contact information updated successfully!");
       } else {
         const errorText = await response.text();
@@ -274,7 +304,21 @@ export default function SettingsPage() {
 
       if (response.ok) {
         const result = await response.json();
-        setContactInfo(result.contactInfo);
+        if (result.contactInfo) {
+          setContactInfo(prev => ({
+            ...prev,
+            ...result.contactInfo,
+            address: {
+              ...prev.address,
+              ...(result.contactInfo.address || {})
+            },
+            socialMedia: {
+              ...prev.socialMedia,
+              ...(result.contactInfo.socialMedia || {})
+            }
+          }));
+        }
+        await queryClient.invalidateQueries({ queryKey: queryKeys.contactInfo });
         alert("Contact information reset to default successfully!");
       } else {
         throw new Error("Failed to reset contact information");
@@ -666,7 +710,7 @@ export default function SettingsPage() {
                     <Label htmlFor="street">Street Address</Label>
                     <Input
                       id="street"
-                      value={contactInfo.address.street}
+                      value={contactInfo.address?.street || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         address: { ...prev.address, street: e.target.value }
@@ -678,7 +722,7 @@ export default function SettingsPage() {
                     <Label htmlFor="city">City</Label>
                     <Input
                       id="city"
-                      value={contactInfo.address.city}
+                      value={contactInfo.address?.city || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         address: { ...prev.address, city: e.target.value }
@@ -690,7 +734,7 @@ export default function SettingsPage() {
                     <Label htmlFor="state">State</Label>
                     <Input
                       id="state"
-                      value={contactInfo.address.state}
+                      value={contactInfo.address?.state || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         address: { ...prev.address, state: e.target.value }
@@ -702,12 +746,24 @@ export default function SettingsPage() {
                     <Label htmlFor="postalCode">Postal Code</Label>
                     <Input
                       id="postalCode"
-                      value={contactInfo.address.postalCode}
+                      value={contactInfo.address?.postalCode || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         address: { ...prev.address, postalCode: e.target.value }
                       }))}
                       placeholder="382355"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
+                      value={contactInfo.address?.country || ""}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        address: { ...prev.address, country: e.target.value }
+                      }))}
+                      placeholder="India"
                     />
                   </div>
                 </div>
@@ -721,7 +777,7 @@ export default function SettingsPage() {
                     <Label htmlFor="phone">Phone Number</Label>
                     <Input
                       id="phone"
-                      value={contactInfo.phone}
+                      value={contactInfo.phone || ""}
                       onChange={(e) => setContactInfo(prev => ({ ...prev, phone: e.target.value }))}
                       placeholder="+91-79-2395-2001"
                     />
@@ -731,7 +787,7 @@ export default function SettingsPage() {
                     <Input
                       id="email"
                       type="email"
-                      value={contactInfo.email}
+                      value={contactInfo.email || ""}
                       onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
                       placeholder="technical.secretary@iitgn.ac.in"
                     />
@@ -747,7 +803,7 @@ export default function SettingsPage() {
                     <Label htmlFor="instagram">Instagram URL</Label>
                     <Input
                       id="instagram"
-                      value={contactInfo.socialMedia.instagram}
+                      value={contactInfo.socialMedia?.instagram || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         socialMedia: { ...prev.socialMedia, instagram: e.target.value }
@@ -759,7 +815,7 @@ export default function SettingsPage() {
                     <Label htmlFor="youtube">YouTube URL</Label>
                     <Input
                       id="youtube"
-                      value={contactInfo.socialMedia.youtube}
+                      value={contactInfo.socialMedia?.youtube || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         socialMedia: { ...prev.socialMedia, youtube: e.target.value }
@@ -771,7 +827,7 @@ export default function SettingsPage() {
                     <Label htmlFor="linkedin">LinkedIn URL</Label>
                     <Input
                       id="linkedin"
-                      value={contactInfo.socialMedia.linkedin}
+                      value={contactInfo.socialMedia?.linkedin || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
@@ -783,7 +839,7 @@ export default function SettingsPage() {
                     <Label htmlFor="facebook">Facebook URL</Label>
                     <Input
                       id="facebook"
-                      value={contactInfo.socialMedia.facebook}
+                      value={contactInfo.socialMedia?.facebook || ""}
                       onChange={(e) => setContactInfo(prev => ({
                         ...prev,
                         socialMedia: { ...prev.socialMedia, facebook: e.target.value }
