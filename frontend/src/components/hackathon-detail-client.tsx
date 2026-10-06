@@ -12,14 +12,13 @@ import {
   ArrowLeft,
   CheckCircle,
   LogIn,
-  Plus,
-  Trash2,
   Award,
   Trophy,
   Github
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -65,6 +64,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
   // Project submission states
   const [githubLink, setGithubLink] = useState("");
   const [docsLink, setDocsLink] = useState("");
+  const [submissionValues, setSubmissionValues] = useState<Record<string, string>>({});
   const [submittingProject, setSubmittingProject] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
@@ -79,6 +79,9 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
       setTeamMembers(regStatus.registration?.teamMembers || []);
       setGithubLink(regStatus.registration?.githubLink || "");
       setDocsLink(regStatus.registration?.docsLink || "");
+
+      const existingData = regStatus.registration?.submissionData || {};
+      setSubmissionValues(existingData);
     }
   }, [regStatus]);
 
@@ -110,7 +113,11 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ githubLink, docsLink }),
+        body: JSON.stringify({
+          githubLink,
+          docsLink,
+          submissionData: submissionValues,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -480,35 +487,73 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                             Project Submission
                           </h4>
                           <p className="text-xs text-muted-foreground">
-                            Submit or update your repository and documentation links here. This form is only active during ongoing events.
+                            {hackathon.submissionFields && hackathon.submissionFields.length > 0
+                              ? "Submit your project details as requested by the organizers below."
+                              : "Submit or update your repository and documentation links here. This form is only active during ongoing events."}
                           </p>
                           
                           <form onSubmit={handleProjectSubmit} className="space-y-4">
-                            <div>
-                              <Label htmlFor="githubLink" className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">GitHub Repository URL</Label>
-                              <Input
-                                id="githubLink"
-                                value={githubLink}
-                                onChange={(e) => setGithubLink(e.target.value)}
-                                placeholder="e.g. https://github.com/myusername/myproject"
-                                className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
-                              />
-                            </div>
-                            
-                            <div>
-                              <Label htmlFor="docsLink" className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">Submission Docs Link</Label>
-                              <Input
-                                id="docsLink"
-                                value={docsLink}
-                                onChange={(e) => setDocsLink(e.target.value)}
-                                placeholder="e.g. Google Drive PDF, Notion Doc, or Loom Video"
-                                className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500"
-                              />
-                            </div>
+                            {hackathon.submissionFields && hackathon.submissionFields.length > 0 ? (
+                              hackathon.submissionFields.map((field: any, idx: number) => {
+                                const fieldKey = field.id || `field_${idx}`;
+                                const val = submissionValues[fieldKey] !== undefined ? submissionValues[fieldKey] : "";
+                                return (
+                                  <div key={fieldKey} className="space-y-1">
+                                    <Label htmlFor={fieldKey} className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">
+                                      {field.title} {field.required !== false && <span className="text-red-500">*</span>}
+                                    </Label>
+                                    {field.type === "textarea" ? (
+                                      <Textarea
+                                        id={fieldKey}
+                                        value={val}
+                                        onChange={(e) => setSubmissionValues((prev) => ({ ...prev, [fieldKey]: e.target.value }))}
+                                        placeholder={field.placeholder || `Enter ${field.title}...`}
+                                        required={field.required !== false}
+                                        rows={4}
+                                        className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500 text-xs"
+                                      />
+                                    ) : (
+                                      <Input
+                                        id={fieldKey}
+                                        value={val}
+                                        onChange={(e) => setSubmissionValues((prev) => ({ ...prev, [fieldKey]: e.target.value }))}
+                                        placeholder={field.placeholder || `Enter ${field.title}...`}
+                                        required={field.required !== false}
+                                        className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500 text-xs"
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <>
+                                <div>
+                                  <Label htmlFor="githubLink" className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">GitHub Repository URL</Label>
+                                  <Input
+                                    id="githubLink"
+                                    value={githubLink}
+                                    onChange={(e) => setGithubLink(e.target.value)}
+                                    placeholder="e.g. https://github.com/myusername/myproject"
+                                    className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500 text-xs"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="docsLink" className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">Submission Docs Link</Label>
+                                  <Input
+                                    id="docsLink"
+                                    value={docsLink}
+                                    onChange={(e) => setDocsLink(e.target.value)}
+                                    placeholder="e.g. Google Drive PDF, Notion Doc, or Loom Video"
+                                    className="mt-1 border-gray-300 dark:border-gray-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-gray-500 text-xs"
+                                  />
+                                </div>
+                              </>
+                            )}
 
                             {submissionSuccess && (
                               <p className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
-                                <CheckCircle className="h-3.5 w-3.5" /> Project submission links saved successfully!
+                                <CheckCircle className="h-3.5 w-3.5" /> Project submission saved successfully!
                               </p>
                             )}
 
@@ -521,9 +566,9 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                             <Button 
                               type="submit" 
                               disabled={submittingProject}
-                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
                             >
-                              {submittingProject ? "Saving Submission..." : "Save Submission Links"}
+                              {submittingProject ? "Saving Submission..." : "Save Submission"}
                             </Button>
                           </form>
                         </div>

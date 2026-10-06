@@ -15,6 +15,8 @@ import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon
 import { Combobox } from "@/components/ui/combobox";
 import { api } from "../../../../../../services/api";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { HackathonSubmissionBuilder, DEFAULT_SUBMISSION_FIELD, type SubmissionField } from "@/components/admin/hackathon-submission-builder";
+
 interface BasicHackathon {
   id: string;
   name: string;
@@ -39,6 +41,7 @@ interface BasicHackathon {
   themes?: string;
   judingCriteria?: string;
   submissionGuidelines?: string;
+  submissionFields?: SubmissionField[];
   createdAt: string;
   updatedAt: string;
   draft: boolean;
@@ -88,6 +91,9 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     themes: "",
     judingCriteria: "",
     submissionGuidelines: "",
+
+    // Custom submission fields for students
+    submissionFields: [DEFAULT_SUBMISSION_FIELD] as SubmissionField[],
 
     // Custom configurations
     draft: false,
@@ -146,6 +152,11 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
         themes: expandedHackathon.themes || "",
         judingCriteria: expandedHackathon.judingCriteria || "",
         submissionGuidelines: expandedHackathon.submissionGuidelines || "",
+
+        // Custom submission fields for students
+        submissionFields: (data.submissionFields && data.submissionFields.length > 0)
+          ? data.submissionFields
+          : [DEFAULT_SUBMISSION_FIELD],
  
         // Custom config mapping
         draft: expandedHackathon.draft || false,
@@ -160,7 +171,7 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
     }
   }, [router]);
 
-  const handleInputChange = (field: string, value: string | boolean | number) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -565,6 +576,11 @@ export default function EditHackathonPage({ params }: { params: Promise<{ id: st
             </CardContent>
           </Card>
 
+          {/* Custom Project Submission Form Builder */}
+          <HackathonSubmissionBuilder
+            fields={formData.submissionFields}
+            onChange={(fields) => handleInputChange("submissionFields", fields)}
+          />
 
           <div className="flex justify-end gap-3">
             <Button

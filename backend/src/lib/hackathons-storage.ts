@@ -10,7 +10,7 @@ import {
   getHackathonsCount as dbGetHackathonsCount
 } from '@/lib/db/hackathons';
 
-import { type Hackathon, type WinnerTier } from '@/lib/db/schema';
+import { type Hackathon, type WinnerTier, type SubmissionField } from '@/lib/db/schema';
 
 // Export type
 export interface BasicHackathon {
@@ -48,6 +48,7 @@ export interface BasicHackathon {
   themes?: string;
   judingCriteria?: string;
   submissionGuidelines?: string;
+  submissionFields?: SubmissionField[];
   
   createdAt: string;
   updatedAt: string;
@@ -112,6 +113,7 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     themes: h.themes || undefined,
     judingCriteria: h.judingCriteria || undefined,
     submissionGuidelines: h.submissionGuidelines || undefined,
+    submissionFields: h.submissionFields || [],
     createdAt: h.createdAt.toISOString(),
     updatedAt: h.updatedAt.toISOString(),
     draft: h.draft,

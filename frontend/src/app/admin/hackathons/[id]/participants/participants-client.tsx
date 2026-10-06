@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { Loader2, Trophy, ArrowLeft, Save, Users, AlertCircle, Calendar, UserCheck, ExternalLink, Github, Download } from "lucide-react";
+import { Loader2, Trophy, ArrowLeft, Save, Users, AlertCircle, Calendar, UserCheck, ExternalLink, Github, Download, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ interface Registration {
   winnerPlace: number | null;
   githubLink: string | null;
   docsLink: string | null;
+  submissionData?: Record<string, string> | null;
   createdAt: string;
 }
 
@@ -200,8 +201,10 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
   };
 
   const handleExportToCSV = () => {
+    const customFields: Array<{ id: string; title: string }> = hackathon?.submissionFields || [];
+
     // 1. Define CSV headers
-    const headers = [
+    const baseHeaders = [
       "Student Name",
       "Student Email",
       "Degree Type",
@@ -209,8 +212,18 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
       "Year of Joining",
       "Team Members",
       "Winner Place",
-      "GitHub Repo Link",
-      "Submission Docs Link",
+    ];
+
+    let submissionHeaders: string[] = [];
+    if (customFields.length > 0) {
+      submissionHeaders = customFields.map(f => f.title);
+    } else {
+      submissionHeaders = ["GitHub Repo Link", "Submission Docs Link"];
+    }
+
+    const headers = [
+      ...baseHeaders,
+      ...submissionHeaders,
       "Registration Date"
     ];
 
@@ -225,6 +238,26 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
       else if (reg.winnerPlace === 2) winnerStatus = "2nd Place (Silver)";
       else if (reg.winnerPlace === 3) winnerStatus = "3rd Place (Bronze)";
 
+      let submissionCells: string[] = [];
+      if (customFields.length > 0) {
+        submissionCells = customFields.map(field => {
+          const data = reg.submissionData || {};
+          const val = data[field.id] !== undefined ? data[field.id] : data[field.title];
+          if (val) return val;
+
+          const lower = field.title.toLowerCase();
+          if ((lower.includes('github') || lower.includes('repo')) && reg.githubLink) return reg.githubLink;
+          if ((lower.includes('doc') || lower.includes('link') || lower.includes('drive')) && reg.docsLink) return reg.docsLink;
+
+          return "Not Submitted";
+        });
+      } else {
+        submissionCells = [
+          reg.githubLink || "Not Submitted",
+          reg.docsLink || "Not Submitted"
+        ];
+      }
+
       return [
         reg.userName,
         reg.userEmail,
@@ -233,8 +266,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
         reg.yearOfJoining,
         teamMembersStr,
         winnerStatus,
-        reg.githubLink || "Not Submitted",
-        reg.docsLink || "Not Submitted",
+        ...submissionCells,
         new Date(reg.createdAt).toLocaleDateString()
       ];
     });
@@ -264,6 +296,122 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleImportFromCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let curr = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const c = line[i];
+          if (c === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              curr += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (c === ',' && !inQuotes) {
+            result.push(curr.trim());
+            curr = "";
+          } else {
+            curr += c;
+          }
+        }
+        result.push(curr.trim());
+        return result;
+      };
+
+      const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+      if (lines.length < 2) {
+        alert("The uploaded CSV appears to be empty or has no data rows.");
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const emailIdx = headers.findIndex(h => h.toLowerCase().includes("email"));
+      if (emailIdx === -1) {
+        alert("Could not find a 'Student Email' column in the CSV.");
+        return;
+      }
+
+      const customFields: Array<{ id: string; title: string }> = hackathon?.submissionFields || [];
+      const itemsToImport: Array<{
+        email: string;
+        submissionData: Record<string, string>;
+        githubLink?: string;
+        docsLink?: string;
+      }> = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = parseCSVLine(lines[i]);
+        const email = row[emailIdx];
+        if (!email) continue;
+
+        const subData: Record<string, string> = {};
+        let ghLink: string | undefined;
+        let dLink: string | undefined;
+
+        headers.forEach((header, colIdx) => {
+          const cellVal = row[colIdx];
+          if (!cellVal || cellVal === "Not Submitted") return;
+
+          const matchedField = customFields.find(
+            f => f.title.toLowerCase() === header.toLowerCase() || f.id === header
+          );
+          if (matchedField) {
+            subData[matchedField.id] = cellVal;
+          }
+
+          if (header.toLowerCase().includes("github") || header.toLowerCase().includes("repo")) {
+            ghLink = cellVal;
+          }
+          if (header.toLowerCase().includes("docs") || header.toLowerCase().includes("drive")) {
+            dLink = cellVal;
+          }
+        });
+
+        itemsToImport.push({
+          email,
+          submissionData: subData,
+          githubLink: ghLink,
+          docsLink: dLink,
+        });
+      }
+
+      if (itemsToImport.length === 0) {
+        alert("No valid participant rows found in the CSV.");
+        return;
+      }
+
+      setIsSaving(true);
+      const res = await api.fetch(`/api/admin/hackathons/${hackathonId}/import-submissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: itemsToImport }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to import CSV");
+      }
+
+      const resData = await res.json();
+      alert(resData.message || "Excel/CSV imported successfully! 🎉");
+      fetchHackathonAndParticipants();
+    } catch (err) {
+      console.error("Error importing CSV:", err);
+      alert(err instanceof Error ? err.message : "Failed to parse or import CSV file.");
+    } finally {
+      setIsSaving(false);
+      e.target.value = "";
+    }
   };
 
   if (status === "loading" || isLoading) {
@@ -300,16 +448,29 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
               </p>
             </div>
           </div>
-          {registrations.length > 0 && (
-            <Button 
-              onClick={handleExportToCSV} 
-              variant="outline" 
-              className="flex items-center gap-2 border-emerald-600/30 hover:bg-emerald-600/10 hover:border-emerald-600/50 transition-all duration-300 text-emerald-600 dark:text-emerald-400"
-            >
-              <Download className="h-4 w-4" />
-              Export to Excel (CSV)
-            </Button>
-          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            {registrations.length > 0 && (
+              <Button 
+                onClick={handleExportToCSV} 
+                variant="outline" 
+                className="flex items-center gap-2 border-emerald-600/30 hover:bg-emerald-600/10 hover:border-emerald-600/50 transition-all duration-300 text-emerald-600 dark:text-emerald-400 text-xs font-semibold"
+              >
+                <Download className="h-4 w-4" />
+                Export to Excel (CSV)
+              </Button>
+            )}
+            <label className="inline-flex items-center gap-2 px-3 py-2 border border-blue-600/30 hover:bg-blue-600/10 hover:border-blue-600/50 rounded-md text-xs font-semibold text-blue-600 dark:text-blue-400 cursor-pointer transition-all duration-300">
+              <Upload className="h-4 w-4" />
+              Import Excel (CSV)
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleImportFromCSV}
+                className="hidden"
+                disabled={isSaving}
+              />
+            </label>
+          </div>
         </div>
         {/* Winner Selection Box (At Top) */}
         <Card className="glass border-primary/20 bg-primary/5">
@@ -477,35 +638,88 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                             <span className="text-xs text-muted-foreground italic">Individual</span>
                           )}
                         </td>
-                        <td className="px-4 py-3.5 max-w-xs">
-                          <div className="flex flex-col gap-1">
-                            {reg.githubLink ? (
-                              <a 
-                                href={reg.githubLink.startsWith('http') ? reg.githubLink : `https://${reg.githubLink}`} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
-                              >
-                                <Github className="h-3.5 w-3.5 flex-shrink-0" />
-                                GitHub Repo
-                              </a>
-                            ) : (
-                              <span className="text-xs text-muted-foreground italic">No Repo link</span>
-                            )}
-                            {reg.docsLink ? (
-                              <a 
-                                href={reg.docsLink.startsWith('http') ? reg.docsLink : `https://${reg.docsLink}`} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
-                              >
-                                <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
-                                Docs Link
-                              </a>
-                            ) : (
-                              <span className="text-xs text-muted-foreground italic">No Docs link</span>
-                            )}
-                          </div>
+                        <td className="px-4 py-3.5 max-w-sm">
+                          {hackathon?.submissionFields && hackathon.submissionFields.length > 0 ? (
+                            <div className="flex flex-col gap-1.5">
+                              {hackathon.submissionFields.map((field: any) => {
+                                const data = reg.submissionData || {};
+                                const val = data[field.id] !== undefined ? data[field.id] : data[field.title];
+                                const fallbackVal = !val ? (
+                                  (field.title.toLowerCase().includes("github") || field.title.toLowerCase().includes("repo")) ? reg.githubLink :
+                                  (field.title.toLowerCase().includes("doc") || field.title.toLowerCase().includes("link") || field.title.toLowerCase().includes("drive")) ? reg.docsLink :
+                                  null
+                                ) : null;
+                                const displayVal = val || fallbackVal;
+
+                                if (!displayVal) {
+                                  return (
+                                    <div key={field.id} className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="font-semibold text-gray-500">{field.title}:</span>
+                                      <span className="italic text-gray-400">Not submitted</span>
+                                    </div>
+                                  );
+                                }
+
+                                const isUrl = typeof displayVal === "string" && (
+                                  displayVal.startsWith("http://") || 
+                                  displayVal.startsWith("https://") || 
+                                  displayVal.startsWith("www.") || 
+                                  displayVal.includes("github.com") || 
+                                  displayVal.includes("drive.google.com")
+                                );
+
+                                return (
+                                  <div key={field.id} className="text-xs">
+                                    <span className="font-semibold text-gray-700 dark:text-gray-300">{field.title}: </span>
+                                    {isUrl ? (
+                                      <a
+                                        href={displayVal.startsWith("http") ? displayVal : `https://${displayVal}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary hover:underline inline-flex items-center gap-1 font-medium break-all"
+                                      >
+                                        <ExternalLink className="h-3 w-3 inline flex-shrink-0" />
+                                        Link
+                                      </a>
+                                    ) : (
+                                      <span className="text-muted-foreground line-clamp-2" title={displayVal}>
+                                        {displayVal}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-1">
+                              {reg.githubLink ? (
+                                <a 
+                                  href={reg.githubLink.startsWith('http') ? reg.githubLink : `https://${reg.githubLink}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
+                                >
+                                  <Github className="h-3.5 w-3.5 flex-shrink-0" />
+                                  GitHub Repo
+                                </a>
+                              ) : (
+                                <span className="text-xs text-muted-foreground italic">No Repo link</span>
+                              )}
+                              {reg.docsLink ? (
+                                <a 
+                                  href={reg.docsLink.startsWith('http') ? reg.docsLink : `https://${reg.docsLink}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+                                  Docs Link
+                                </a>
+                              ) : (
+                                <span className="text-xs text-muted-foreground italic">No Docs link</span>
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-3.5 text-center align-middle">
                           {reg.winnerPlace ? (

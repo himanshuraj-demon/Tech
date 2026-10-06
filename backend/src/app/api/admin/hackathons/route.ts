@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getAllHackathons, createHackathon } from '@/lib/hackathons-storage';
 import { expandBasicHackathon } from '@/lib/hackathons-data';
+import { DEFAULT_SUBMISSION_FIELD } from '@/lib/db/schema';
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -56,6 +57,9 @@ export async function POST(request: NextRequest) {
     // Ensure arrays are properly initialized
     const hackathonData = {
       ...body,
+      submissionFields: body.submissionFields && body.submissionFields.length > 0
+        ? body.submissionFields
+        : [DEFAULT_SUBMISSION_FIELD],
       prizes: body.prizes || [],
       organizers: body.organizers || [],
       requirements: body.requirements || [],

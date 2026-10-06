@@ -1,4 +1,4 @@
-import { WinnerTier } from "./db/schema";
+import { WinnerTier, SubmissionField } from "./db/schema";
 
 export interface Hackathon {
   id: string;
@@ -36,6 +36,7 @@ export interface Hackathon {
   themes?: string;
   judingCriteria?: string;
   submissionGuidelines?: string;
+  submissionFields?: SubmissionField[];
   
   createdAt: string;
   updatedAt: string;

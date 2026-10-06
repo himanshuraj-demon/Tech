@@ -15,6 +15,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { hackathonCategories, hackathonStatuses, type WinnerTier } from "@/lib/hackathons-data";
 import { api } from "../../../../../services/api";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { HackathonSubmissionBuilder, DEFAULT_SUBMISSION_FIELD, type SubmissionField } from "@/components/admin/hackathon-submission-builder";
 
 export default function NewHackathonPage() {
   const router = useRouter();
@@ -53,11 +54,14 @@ export default function NewHackathonPage() {
     judingCriteria: "",
     submissionGuidelines: "",
 
+    // Custom submission fields for students
+    submissionFields: [DEFAULT_SUBMISSION_FIELD] as SubmissionField[],
+
     // draft config
     draft: false,
   });
 
-  const handleInputChange = (field: string, value: string | boolean | number) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -418,6 +422,12 @@ export default function NewHackathonPage() {
               />
             </CardContent>
           </Card>
+
+          {/* Custom Project Submission Form Builder */}
+          <HackathonSubmissionBuilder
+            fields={formData.submissionFields}
+            onChange={(fields) => handleInputChange("submissionFields", fields)}
+          />
           
           <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? "Creating..." : "Create Hackathon"}

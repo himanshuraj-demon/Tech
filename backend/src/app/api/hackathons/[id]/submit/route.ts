@@ -8,6 +8,7 @@ import { z } from "zod";
 const submissionSchema = z.object({
   githubLink: z.string().trim().optional().nullable(),
   docsLink: z.string().trim().optional().nullable(),
+  submissionData: z.record(z.string()).optional().nullable(),
 });
 
 export async function POST(
@@ -24,7 +25,7 @@ export async function POST(
     const body = await request.json();
     const validatedData = submissionSchema.parse(body);
 
-    const { githubLink, docsLink } = validatedData;
+    const { githubLink, docsLink, submissionData } = validatedData;
 
     // 1. Verify the hackathon exists and is ongoing
     const [hackathon] = await db
@@ -67,12 +68,41 @@ export async function POST(
       );
     }
 
-    // 3. Update the registration record with submission links
+    // Compute final githubLink and docsLink with backward compatibility
+    let finalGithubLink = githubLink;
+    let finalDocsLink = docsLink;
+
+    const mergedSubmissionData: Record<string, string> = {
+      ...(registration.submissionData || {}),
+      ...(submissionData || {}),
+    };
+
+    // If explicit githubLink or docsLink were not sent, try to infer from submissionData
+    if (!finalGithubLink && mergedSubmissionData) {
+      for (const [key, val] of Object.entries(mergedSubmissionData)) {
+        if (typeof val === 'string' && (key.toLowerCase().includes('github') || val.includes('github.com'))) {
+          finalGithubLink = val;
+          break;
+        }
+      }
+    }
+
+    if (!finalDocsLink && mergedSubmissionData) {
+      for (const [key, val] of Object.entries(mergedSubmissionData)) {
+        if (typeof val === 'string' && (key.toLowerCase().includes('doc') || key.toLowerCase().includes('link') || val.includes('drive.google.com') || val.includes('notion.so'))) {
+          finalDocsLink = val;
+          break;
+        }
+      }
+    }
+
+    // 3. Update the registration record with submission data and links
     await db
       .update(eventRegistrations)
       .set({
-        githubLink: githubLink || null,
-        docsLink: docsLink || null,
+        githubLink: finalGithubLink || null,
+        docsLink: finalDocsLink || null,
+        submissionData: mergedSubmissionData,
         updatedAt: new Date(),
       })
       .where(eq(eventRegistrations.id, registration.id));
@@ -80,8 +110,9 @@ export async function POST(
     return NextResponse.json({
       success: true,
       message: "Project submitted successfully",
-      githubLink,
-      docsLink,
+      githubLink: finalGithubLink,
+      docsLink: finalDocsLink,
+      submissionData: mergedSubmissionData,
     });
   } catch (error) {
     console.error("Error submitting project links:", error);

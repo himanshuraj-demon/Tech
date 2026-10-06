@@ -1,5 +1,19 @@
 import { db, hackathons, type Hackathon, type NewHackathon } from '@/lib/db';
-import { eq, desc, and, count } from 'drizzle-orm';
+import { eq, desc, and, count, sql } from 'drizzle-orm';
+
+let schemaEnsured = false;
+export async function ensureHackathonSubmissionSchema(): Promise<void> {
+  if (schemaEnsured) return;
+  try {
+    await db.execute(sql`
+      ALTER TABLE "hackathons" ADD COLUMN IF NOT EXISTS "submission_fields" jsonb DEFAULT '[]'::jsonb;
+      ALTER TABLE "event_registrations" ADD COLUMN IF NOT EXISTS "submission_data" jsonb DEFAULT '{}'::jsonb;
+    `);
+    schemaEnsured = true;
+  } catch (err) {
+    console.warn('Notice: verifying hackathon submission columns:', err);
+  }
+}
 
 // Helper function to generate an ID from name
 function generateHackathonId(name: string): string {
@@ -12,6 +26,7 @@ function generateHackathonId(name: string): string {
 // Get all hackathons
 export async function getAllHackathons(): Promise<Record<string, Hackathon>> {
   try {
+    await ensureHackathonSubmissionSchema();
     const list = await db.select().from(hackathons).where(eq(hackathons.deleted, false));
     const result: Record<string, Hackathon> = {};
     list.forEach((h) => {
@@ -27,6 +42,7 @@ export async function getAllHackathons(): Promise<Record<string, Hackathon>> {
 // Get hackathon by ID
 export async function getHackathonById(id: string): Promise<Hackathon | null> {
   try {
+    await ensureHackathonSubmissionSchema();
     const [h] = await db
       .select()
       .from(hackathons)
@@ -44,6 +60,7 @@ export async function createHackathon(
   hackathonInput: Omit<NewHackathon, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Hackathon> {
   try {
+    await ensureHackathonSubmissionSchema();
     const baseId = generateHackathonId(hackathonInput.name);
     let uniqueId = baseId;
     let counter = 1;
@@ -79,6 +96,7 @@ export async function updateHackathon(
   updates: Partial<Omit<NewHackathon, 'id' | 'createdAt'>>
 ): Promise<Hackathon> {
   try {
+    await ensureHackathonSubmissionSchema();
     const [updated] = await db
       .update(hackathons)
       .set({

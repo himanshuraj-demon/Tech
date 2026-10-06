@@ -161,6 +161,22 @@ export interface WinnerTier {
   points: number;
 }
 
+export interface SubmissionField {
+  id: string;
+  title: string;
+  type: 'textarea' | 'text';
+  placeholder?: string;
+  required?: boolean;
+}
+
+export const DEFAULT_SUBMISSION_FIELD: SubmissionField = {
+  id: 'field_default',
+  title: 'Project Submission Details',
+  type: 'textarea',
+  placeholder: 'Enter project description, repository link, demo video, or notes...',
+  required: true,
+};
+
 // Hackathons Table
 export const hackathons = pgTable('hackathons', {
   id: text('id').primaryKey(),
@@ -188,6 +204,7 @@ export const hackathons = pgTable('hackathons', {
   submissionGuidelines: text('submission_guidelines'),
   draft: boolean('draft').default(false).notNull(),
   teamRequired: boolean('team_required').default(false).notNull(),
+  submissionFields: jsonb('submission_fields').$type<SubmissionField[]>().default([]).notNull(),
   winnerTiers: jsonb('winner_tiers').$type<WinnerTier[]>().default([]).notNull(),
   pointsParticipation: integer('points_participation').default(0).notNull(),
   deleted: boolean('deleted').default(false).notNull(),
@@ -224,6 +241,7 @@ export const eventRegistrations = pgTable('event_registrations', {
   winnerPlace: integer('winner_place'), // 1 = 1st, 2 = 2nd, 3 = 3rd, 0/null = participation only
   githubLink: text('github_link'),
   docsLink: text('docs_link'),
+  submissionData: jsonb('submission_data').$type<Record<string, string>>().default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
