@@ -42,7 +42,7 @@ export function Footer() {
               href={contactInfo?.socialMedia?.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200 touch-target"
+              className="p-2.5 rounded-full flex justify-center items-center bg-linear-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200 touch-target"
               aria-label="Instagram"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -342,7 +342,7 @@ export function Footer() {
             <h3 className="text-lg font-bold font-space-grotesk text-green-600">Connect With Us</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
                 <span className="leading-relaxed">
                   {contactInfo?.address ? (
                     <>
@@ -359,7 +359,7 @@ export function Footer() {
                 </span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <Mail className="h-4 w-4 flex-shrink-0" />
+                <Mail className="h-4 w-4 shrink-0" />
                 <a
                   href={`mailto:${contactInfo?.email || 'technical.secretary@iitgn.ac.in'}`}
                   className="hover:underline"
@@ -368,7 +368,7 @@ export function Footer() {
                 </a>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <Phone className="h-4 w-4 flex-shrink-0" />
+                <Phone className="h-4 w-4 shrink-0" />
                 {contactInfo?.phone ? (
                   <a href={`tel:${contactInfo.phone}`} className="hover:underline">
                     {contactInfo.phone}
@@ -385,7 +385,7 @@ export function Footer() {
                 href={contactInfo?.socialMedia?.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-full flex justify-center items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200"
+                className="p-1.5 rounded-full flex justify-center items-center bg-linear-to-r from-purple-500 to-pink-500 text-white hover:scale-110 transition-transform duration-200"
                 aria-label="Instagram"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">

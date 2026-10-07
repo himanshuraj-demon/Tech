@@ -100,16 +100,16 @@ export function HackathonsClient() {
     return (
       <div className="glass rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl group relative overflow-hidden ">
         {/* Background Gradient Overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${getStatusGradient(hackathon.status)} opacity-0 group-hover:opacity-5 transition-all duration-300 rounded-2xl`} />
+        <div className={`absolute inset-0 bg-linear-to-br ${getStatusGradient(hackathon.status)} opacity-0 group-hover:opacity-5 transition-all duration-300 rounded-2xl`} />
 
         <div className="relative z-10 space-y-4">
           {/* Header */}
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-              <h3 className="text-lg font-bold group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300 line-clamp-2 font-space-grotesk">
+              <h3 className="text-lg font-bold group-hover:text-transparent group-hover:bg-linear-to-r group-hover:bg-clip-text group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300 line-clamp-2 font-space-grotesk">
                 {hackathon.name}
               </h3>
-              <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBg(hackathon.status)} backdrop-blur-sm border border-current/20`}>
+              <div className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBg(hackathon.status)} backdrop-blur-xs border border-current/20`}>
                 {hackathon.status}
               </div>
             </div>
@@ -121,7 +121,7 @@ export function HackathonsClient() {
           {/* Event Details Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
-              <Calendar className="h-4 w-4 text-blue-500 flex-shrink-0" />
+              <Calendar className="h-4 w-4 text-blue-500 shrink-0" />
               <div className="flex flex-col">
                 {hackathon.status === 'upcoming' ? (
                   <>
@@ -137,29 +137,29 @@ export function HackathonsClient() {
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
-              <MapPin className="h-4 w-4 text-green-500 flex-shrink-0" />
+              <MapPin className="h-4 w-4 text-green-500 shrink-0" />
               <span className="truncate">{hackathon.location}</span>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
-              <Clock className="h-4 w-4 text-purple-500 flex-shrink-0" />
+              <Clock className="h-4 w-4 text-purple-500 shrink-0" />
               <span className="truncate">{hackathon.category}</span>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
-              <Users className="h-4 w-4 text-orange-500 flex-shrink-0" />
+              <Users className="h-4 w-4 text-orange-500 shrink-0" />
               <span className="truncate">Individual Only</span>
             </div>
           </div>
 
           {/* Category */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-purple-600 dark:text-purple-400 border border-purple-600/20 w-fit">
+            <div className="px-3 py-1 rounded-full text-xs font-medium bg-linear-to-r from-purple-600/10 to-blue-600/10 text-purple-600 dark:text-purple-400 border border-purple-600/20 w-fit">
               {hackathon.category}
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button asChild className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+            <Button asChild className="flex-1 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <Link href={`/hackathons/${hackathon.id}`}>
                 View Details
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -206,12 +206,12 @@ export function HackathonsClient() {
       {/* Hero Section */}
       <section className="relative py-12 lg:py-20 overflow-hidden">
         <div className="absolute inset-0 gradient-bg opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5" />
+        <div className="absolute inset-0 bg-linear-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5" />
         <div className="container relative z-10 px-4 md:px-6">
           <div className="flex flex-col items-center space-y-6 text-center">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-space-grotesk leading-tight">
-                <span className="bg-gradient-to-r  from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Events</span>
+                <span className="bg-linear-to-r  from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Events</span>
                 <br />
                 <span className="text-gray-900 dark:text-white">& Competitions</span>
               </h1>
@@ -230,12 +230,12 @@ export function HackathonsClient() {
             {/* Total Events */}
             <div className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl group">
               <div className="relative mb-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 flex items-center justify-center mb-3 group-hover:from-purple-600/30 group-hover:to-blue-600/30 transition-all duration-300">
+                <div className="w-16 h-16 mx-auto rounded-full bg-linear-to-r from-purple-600/20 to-blue-600/20 flex items-center justify-center mb-3 group-hover:from-purple-600/30 group-hover:to-blue-600/30 transition-all duration-300">
                   <Trophy className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/10 to-blue-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 rounded-full bg-linear-to-r from-purple-600/10 to-blue-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+              <div className="text-3xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
                 {stats.totalCount}
               </div>
               <p className="text-sm font-medium text-muted-foreground">Total Events</p>
@@ -244,12 +244,12 @@ export function HackathonsClient() {
             {/* Upcoming Events */}
             <div className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl group">
               <div className="relative mb-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-blue-600/20 to-cyan-600/20 flex items-center justify-center mb-3 group-hover:from-blue-600/30 group-hover:to-cyan-600/30 transition-all duration-300">
+                <div className="w-16 h-16 mx-auto rounded-full bg-linear-to-r from-blue-600/20 to-cyan-600/20 flex items-center justify-center mb-3 group-hover:from-blue-600/30 group-hover:to-cyan-600/30 transition-all duration-300">
                   <Calendar className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600/10 to-cyan-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 rounded-full bg-linear-to-r from-blue-600/10 to-cyan-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+              <div className="text-3xl font-bold bg-linear-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
                 {stats.upcomingCount}
               </div>
               <p className="text-sm font-medium text-muted-foreground">Upcoming</p>
@@ -258,12 +258,12 @@ export function HackathonsClient() {
             {/* Total Participants */}
             <div className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl group">
               <div className="relative mb-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-green-600/20 to-emerald-600/20 flex items-center justify-center mb-3 group-hover:from-green-600/30 group-hover:to-emerald-600/30 transition-all duration-300">
+                <div className="w-16 h-16 mx-auto rounded-full bg-linear-to-r from-green-600/20 to-emerald-600/20 flex items-center justify-center mb-3 group-hover:from-green-600/30 group-hover:to-emerald-600/30 transition-all duration-300">
                   <Users className="h-8 w-8 text-green-600 dark:text-green-400" />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-600/10 to-emerald-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 rounded-full bg-linear-to-r from-green-600/10 to-emerald-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
+              <div className="text-3xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
                 {stats.ongoingCount}
               </div>
               <p className="text-sm font-medium text-muted-foreground">Ongoing</p>
@@ -272,12 +272,12 @@ export function HackathonsClient() {
             {/* Completed Events */}
             <div className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl group">
               <div className="relative mb-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-gray-600/20 to-slate-600/20 flex items-center justify-center mb-3 group-hover:from-gray-600/30 group-hover:to-slate-600/30 transition-all duration-300">
+                <div className="w-16 h-16 mx-auto rounded-full bg-linear-to-r from-gray-600/20 to-slate-600/20 flex items-center justify-center mb-3 group-hover:from-gray-600/30 group-hover:to-slate-600/30 transition-all duration-300">
                   <CheckCircle className="h-8 w-8 text-gray-600 dark:text-gray-400" />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-600/10 to-slate-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                <div className="absolute inset-0 rounded-full bg-linear-to-r from-gray-600/10 to-slate-600/10 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
               </div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent mb-2">
+              <div className="text-3xl font-bold bg-linear-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent mb-2">
                 {stats.completedCount}
               </div>
               <p className="text-sm font-medium text-muted-foreground">Completed</p>
@@ -292,11 +292,11 @@ export function HackathonsClient() {
           <div className="container px-4 md:px-6">
             <div className="space-y-12">
               <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-r from-blue-600/20 to-purple-600/20 mb-4">
                   <Calendar className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-space-grotesk">
-                  Upcoming <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Events</span>
+                  Upcoming <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Events</span>
                 </h2>
                 <p className="mx-auto max-w-[600px] text-lg text-muted-foreground leading-relaxed">
                   Don't miss out on these exciting upcoming hackathons and competitions
@@ -330,11 +330,11 @@ export function HackathonsClient() {
           <div className="container px-4 md:px-6">
             <div className="space-y-12">
               <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-green-600/20 to-emerald-600/20 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-r from-green-600/20 to-emerald-600/20 mb-4">
                   <Clock className="h-8 w-8 text-green-600 dark:text-green-400" />
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-space-grotesk">
-                  Ongoing <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Events</span>
+                  Ongoing <span className="bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Events</span>
                 </h2>
                 <p className="mx-auto max-w-[600px] text-lg text-muted-foreground leading-relaxed">
                   These hackathons are currently in progress - join the action now!
@@ -368,11 +368,11 @@ export function HackathonsClient() {
           <div className="container px-4 md:px-6">
             <div className="space-y-12">
               <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-gray-600/20 to-purple-600/20 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-r from-gray-600/20 to-purple-600/20 mb-4">
                   <Trophy className="h-8 w-8 text-gray-600 dark:text-gray-400" />
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-space-grotesk">
-                  Previous <span className="bg-gradient-to-r from-gray-600 to-purple-600 bg-clip-text text-transparent">Events</span>
+                  Previous <span className="bg-linear-to-r from-gray-600 to-purple-600 bg-clip-text text-transparent">Events</span>
                 </h2>
                 <p className="mx-auto max-w-[600px] text-lg text-muted-foreground leading-relaxed">
                   Explore our past hackathons and their amazing outcomes
@@ -406,7 +406,7 @@ export function HackathonsClient() {
           <div className="container px-4 md:px-6">
             <div className="text-center space-y-6 max-w-2xl mx-auto">
               <div className="glass rounded-2xl p-12">
-                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 flex items-center justify-center mb-6">
+                <div className="w-24 h-24 mx-auto rounded-full bg-linear-to-r from-purple-600/20 to-blue-600/20 flex items-center justify-center mb-6">
                   <Trophy className="h-12 w-12 text-primary" />
                 </div>
                 <h3 className="text-2xl font-bold font-space-grotesk">No Hackathons Found</h3>

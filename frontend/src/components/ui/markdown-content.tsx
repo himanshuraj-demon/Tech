@@ -16,7 +16,7 @@ export function MarkdownContent({ content, className }: MarkdownContentProps) {
   }
 
   return (
-    <div className={cn("markdown-content text-foreground leading-relaxed break-words", className)}>
+    <div className={cn("markdown-content text-foreground leading-relaxed wrap-break-word", className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

@@ -406,7 +406,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
 
               {/* Event Winners Section (Only visible when completed & winners declared) */}
               {hackathon.status === 'completed' && hackathon.winners && hackathon.winners.length > 0 && (
-                <Card className="border-yellow-200/50 dark:border-yellow-900/30 bg-gradient-to-b from-yellow-50/10 to-transparent dark:from-yellow-950/5">
+                <Card className="border-yellow-200/50 dark:border-yellow-900/30 bg-linear-to-b from-yellow-50/10 to-transparent dark:from-yellow-950/5">
                   <CardHeader className="text-center">
                     <CardTitle className="flex justify-center items-center gap-2 text-2xl font-bold font-space-grotesk text-yellow-600 dark:text-yellow-400">
                       <Trophy className="h-6 w-6" />
@@ -428,7 +428,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                         const pointsAwarded = tier ? tier.points : 0;
 
                         return (
-                          <Card key={winner.id} className="relative overflow-hidden border-yellow-150 dark:border-yellow-900/20 bg-white/50 dark:bg-neutral-900/40 shadow-sm hover:shadow-md transition-all duration-300">
+                          <Card key={winner.id} className="relative overflow-hidden border-yellow-150 dark:border-yellow-900/20 bg-white/50 dark:bg-neutral-900/40 shadow-xs hover:shadow-md transition-all duration-300">
                             <div className="absolute top-0 right-0 left-0 h-1 bg-yellow-500" />
                             <CardHeader className="pb-3 text-center">
                               <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">{tierName}</span>
@@ -452,7 +452,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
 
               {/* Dynamic Registration Section */}
               {!hackathon.draft && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
-                <div id="registration-section" className="scroll-mt-6 p-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 backdrop-blur shadow-sm">
+                <div id="registration-section" className="scroll-mt-6 p-8 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 backdrop-blur-sm shadow-xs">
                   <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl font-space-grotesk mb-2 text-center">
                     Hackathon Registration
                   </h2>
@@ -566,7 +566,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                             <Button 
                               type="submit" 
                               disabled={submittingProject}
-                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
+                              className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium"
                             >
                               {submittingProject ? "Saving Submission..." : "Save Submission"}
                             </Button>
@@ -588,7 +588,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                       </div>
                       <Button
                         onClick={() => signIn("google", { callbackUrl: window.location.href })}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-md border-0 rounded-full px-6 py-2"
+                        className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-md border-0 rounded-full px-6 py-2"
                       >
                         Sign In with Google
                       </Button>
@@ -605,7 +605,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                       <Button
                         type="submit"
                         disabled={submittingReg}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2.5 rounded-xl shadow-md border-0"
+                        className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2.5 rounded-xl shadow-md border-0"
                       >
                         {submittingReg ? (
                           <div className="flex items-center justify-center gap-2">
@@ -626,7 +626,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
             <div className="space-y-6">
               {/* Registration/Join Action Box */}
               {!hackathon.draft && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
-                <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                <Card className="border-primary/20 bg-linear-to-br from-primary/5 to-primary/10">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       {hackathon.status === 'upcoming' ? (

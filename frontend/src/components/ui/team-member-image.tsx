@@ -53,7 +53,7 @@ export function TeamMemberImage({
   return (
     <div className={`relative aspect-square ${className}`}>
       {showGradient ? (
-        <div className={`w-full h-full rounded-xl bg-gradient-to-r ${gradientFrom} ${gradientTo} flex items-center justify-center text-white font-bold ${gradientSizeClasses}`}>
+        <div className={`w-full h-full rounded-xl bg-linear-to-r ${gradientFrom} ${gradientTo} flex items-center justify-center text-white font-bold ${gradientSizeClasses}`}>
           {initials}
         </div>
       ) : (
@@ -70,7 +70,7 @@ export function TeamMemberImage({
           />
           {/* Show gradient overlay if image is loading or failed */}
           {!imageLoaded && (
-            <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${gradientFrom} ${gradientTo} flex items-center justify-center text-white font-bold ${gradientSizeClasses}`}>
+            <div className={`absolute inset-0 rounded-xl bg-linear-to-r ${gradientFrom} ${gradientTo} flex items-center justify-center text-white font-bold ${gradientSizeClasses}`}>
               {initials}
             </div>
           )}

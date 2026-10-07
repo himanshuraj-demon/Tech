@@ -491,7 +491,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
               <div className="space-y-4">
                 <div className="space-y-3">
                   {winnerRows.map((row, index) => (
-                    <div key={index} className="flex flex-col md:flex-row gap-3 items-end bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl border border-gray-150/40 dark:border-gray-800 shadow-sm w-full">
+                    <div key={index} className="flex flex-col md:flex-row gap-3 items-end bg-white/50 dark:bg-neutral-900/50 p-4 rounded-xl border border-gray-150/40 dark:border-gray-800 shadow-xs w-full">
                       <div className="flex-1 space-y-1.5 w-full">
                         <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Winner Label</label>
                         <Input 
@@ -506,7 +506,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                         <select
                           value={row.regId}
                           onChange={e => handleUpdateRow(index, "regId", e.target.value)}
-                          className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                           required
                         >
                           <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select Participant</option>
@@ -678,7 +678,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                                         rel="noopener noreferrer"
                                         className="text-primary hover:underline inline-flex items-center gap-1 font-medium break-all"
                                       >
-                                        <ExternalLink className="h-3 w-3 inline flex-shrink-0" />
+                                        <ExternalLink className="h-3 w-3 inline shrink-0" />
                                         Link
                                       </a>
                                     ) : (
@@ -699,7 +699,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                                   rel="noopener noreferrer" 
                                   className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
                                 >
-                                  <Github className="h-3.5 w-3.5 flex-shrink-0" />
+                                  <Github className="h-3.5 w-3.5 shrink-0" />
                                   GitHub Repo
                                 </a>
                               ) : (
@@ -712,7 +712,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                                   rel="noopener noreferrer" 
                                   className="text-xs text-primary hover:underline flex items-center gap-1 font-medium"
                                 >
-                                  <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+                                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                                   Docs Link
                                 </a>
                               ) : (

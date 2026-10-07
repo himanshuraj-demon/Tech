@@ -99,7 +99,7 @@ const Gallery = () => {
                   >
                     <div className="glass rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-border/50 flex flex-col h-full">
                       {/* Event Image */}
-                      <div className="relative h-52 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center overflow-hidden">
+                      <div className="relative h-52 bg-linear-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center overflow-hidden">
                         <Image
                           src={getEventThumbnail(event)}
                           alt={getEventImageAlt(event)}
@@ -109,7 +109,7 @@ const Gallery = () => {
                         />
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
                         <div className="absolute top-3 right-3">
-                          <span className="inline-block rounded-full bg-background/90 backdrop-blur-md px-3 py-1 text-xs font-medium text-foreground shadow-sm">
+                          <span className="inline-block rounded-full bg-background/90 backdrop-blur-md px-3 py-1 text-xs font-medium text-foreground shadow-xs">
                             {event.category}
                           </span>
                         </div>
@@ -125,7 +125,7 @@ const Gallery = () => {
                             <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
                               {event.title}
                             </h3>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 mt-1 ml-2" />
+                            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300 shrink-0 mt-1 ml-2" />
                           </div>
 
                           <p className="text-sm text-muted-foreground mb-4 line-clamp-2">

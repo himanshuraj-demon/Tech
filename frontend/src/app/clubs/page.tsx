@@ -77,14 +77,14 @@ export default function ClubsPage() {
       {/* Hero Section */}
       <section className="relative py-16 border-b border-gray-200 dark:border-gray-800 overflow-hidden">
         {/* Ambient background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-[36rem] h-64 bg-blue-500/5 dark:bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-xl h-64 bg-blue-500/5 dark:bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px] pointer-events-none" />
 
         <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center space-y-4 text-center max-w-3xl mx-auto">
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight font-space-grotesk text-gray-900 dark:text-gray-100">
-              Explore Our <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Clubs & Communities</span>
+              Explore Our <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Clubs & Communities</span>
             </h1>
 
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl">

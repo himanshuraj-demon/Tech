@@ -38,7 +38,7 @@ export function AboutClient() {
         <div className="container relative z-10 px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-space-grotesk">
-              About <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Tech Council</span>
+              About <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Tech Council</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-lg text-muted-foreground md:text-xl">
               Driving innovation and technical excellence at IIT Gandhinagar
@@ -126,7 +126,7 @@ export function AboutClient() {
           <div className="flex flex-col items-center space-y-12">
             <div className="text-center space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-space-grotesk">
-                Our <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Team</span>
+                Our <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Team</span>
               </h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-lg">
                 Meet the dedicated leaders driving innovation and technical excellence at IIT Gandhinagar
@@ -151,7 +151,7 @@ export function AboutClient() {
                         className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] mx-auto"
                         isSecretary={true}
                       />
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600/30 to-purple-600/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                      <div className="absolute inset-0 rounded-xl bg-linear-to-r from-blue-600/30 to-purple-600/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300" />
                     </div>
                     <h3 className="font-bold text-lg sm:text-xl md:text-2xl mb-2 font-space-grotesk">{secretary.name}</h3>
                     <p className="text-sm sm:text-base md:text-lg font-semibold text-blue-600 dark:text-blue-400 mb-3 sm:mb-4">{secretary.position}</p>
@@ -194,7 +194,7 @@ export function AboutClient() {
                           className="w-[140px] h-[140px] sm:w-[160px] sm:h-[160px] lg:w-[180px] lg:h-[180px] mx-auto"
                           isSecretary={false}
                         />
-                        <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />
+                        <div className={`absolute inset-0 rounded-xl bg-linear-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                       </div>
                       <h3 className="font-bold text-xs sm:text-sm lg:text-base mb-1 lg:mb-2 font-space-grotesk">{coordinator.name}</h3>
                       <p className={`text-xs lg:text-sm font-semibold ${colorScheme.text} dark:text-${colorScheme.bg}-400 mb-2 lg:mb-3`}>
@@ -217,7 +217,7 @@ export function AboutClient() {
               <div className="flex justify-center mt-12">
                 <a
                   href="/about/council-members"
-                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
+                  className="inline-flex items-center px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
                   <span className="mr-2">View All Council Members</span>
                   <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,7 +273,7 @@ export function AboutClient() {
             {/* Read Magazine Button */}
             <div className="flex justify-center">
               <Link href="/torque">
-                <Button className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white hover:text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+                <Button className="bg-linear-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white hover:text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
                   <BookOpen className="h-5 w-5 mr-2" />
                   <span>Read Magazine</span>
                   <svg className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

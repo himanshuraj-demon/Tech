@@ -265,7 +265,7 @@ export function HorizontalGallery({
         handlePointerUp();
         setCursorState("idle");
       }}
-      className="relative w-full h-[100vh] min-h-[600px] overflow-hidden select-none cursor-grab active:cursor-grabbing  text-white flex flex-col justify-between pt-20"
+      className="relative w-full h-screen min-h-[600px] overflow-hidden select-none cursor-grab active:cursor-grabbing  text-white flex flex-col justify-between pt-20"
     >
       {/* Dynamic Floating Cursor follower (Jesper Landberg aesthetic) */}
       <div
@@ -286,8 +286,8 @@ export function HorizontalGallery({
       </div>
 
       {/* Background Ambience / Subtle Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/15 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-900/15 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[32px_32px] pointer-events-none" />
 
       {/* Top Bar: Title & Mode Switcher */}
       <header className="relative z-20 container mx-auto px-4 sm:px-6 pt-6 pb-2 flex items-center justify-between">
@@ -304,7 +304,7 @@ export function HorizontalGallery({
           <div className="bg-neutral-900/90 border border-neutral-800 rounded-full p-1 flex items-center shadow-lg backdrop-blur-md">
             <button
               type="button"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-950 shadow-sm transition-all duration-300"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-neutral-950 shadow-xs transition-all duration-300"
               title="Horizontal Slider Mode"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -377,13 +377,13 @@ export function HorizontalGallery({
                     />
                   </div>
                   {/* Subtle darkened vignettes */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-black/20" />
+                  <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-neutral-950/40 to-black/20" />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
 
                 {/* Top Badge & Index */}
                 <div className="absolute top-4 sm:top-6 inset-x-4 sm:inset-x-6 flex items-center justify-between z-10">
-                  <span className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium tracking-wide bg-neutral-950/70 border border-white/10 backdrop-blur-md text-white/90 shadow-sm">
+                  <span className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium tracking-wide bg-neutral-950/70 border border-white/10 backdrop-blur-md text-white/90 shadow-xs">
                     {event.category || "Event"}
                   </span>
                   <span className="font-mono text-xs sm:text-sm text-white/60 tracking-wider">
@@ -420,7 +420,7 @@ export function HorizontalGallery({
                     </div>
 
                     {/* Circular Action Indicator (Jesper Landberg button motif) */}
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-neutral-950 flex items-center justify-center flex-shrink-0 shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-neutral-950 flex items-center justify-center shrink-0 shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white">
                       <ArrowUpRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
                   </div>
@@ -445,7 +445,7 @@ export function HorizontalGallery({
         {/* Dynamic Progress Bar */}
         <div className="w-full sm:w-64 h-1.5 bg-neutral-800/80 rounded-full overflow-hidden relative">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-150"
+            className="h-full bg-linear-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-150"
             style={{ width: `${Math.max(8, progress * 100)}%` }}
           />
         </div>

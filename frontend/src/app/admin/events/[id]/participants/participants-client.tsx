@@ -180,7 +180,7 @@ export default function ParticipantsClient({ eventId }: ParticipantsClientProps)
                       <select
                         value={firstPlace}
                         onChange={(e) => setFirstPlace(e.target.value)}
-                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select 1st Place Winner</option>
                         {registrations.map(r => (
@@ -196,7 +196,7 @@ export default function ParticipantsClient({ eventId }: ParticipantsClientProps)
                       <select
                         value={secondPlace}
                         onChange={(e) => setSecondPlace(e.target.value)}
-                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select 2nd Place Winner</option>
                         {registrations.map(r => (
@@ -212,7 +212,7 @@ export default function ParticipantsClient({ eventId }: ParticipantsClientProps)
                       <select
                         value={thirdPlace}
                         onChange={(e) => setThirdPlace(e.target.value)}
-                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="w-full flex h-10 rounded-md border border-input text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <option value="" className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">Select 3rd Place Winner</option>
                         {registrations.map(r => (

@@ -152,7 +152,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
             {session?.user && (
               <div className="flex items-center space-x-3 px-3 py-2">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {session.user.image ? (
                     <Image
                       src={session.user.image}

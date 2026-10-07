@@ -60,16 +60,16 @@ export function Navbar() {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
         isScrolled
-          ? "bg-white/95 dark:bg-[#070c1b]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/10 shadow-xs"
+          ? "bg-white/95 dark:bg-[#070c1b]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/10 shadow-2xs"
           : pathname === "/"
           ? "bg-transparent border-b border-transparent"
-          : "bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800"
+          : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800"
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
         
         {/* Brand Logo & Name */}
-        <Link href="/" className="group flex items-center gap-3 select-none flex-shrink-0">
+        <Link href="/" className="group flex items-center gap-3 select-none shrink-0">
           <ThemeAwareLogo
             width={40}
             height={40}
@@ -87,7 +87,7 @@ export function Navbar() {
         </Link>
 
         {/* Center Pill Navigation Capsule (Desktop XL) */}
-        <nav className="hidden xl:flex items-center gap-1 bg-white/60 dark:bg-slate-950/50 p-1 rounded-full border border-gray-200/80 dark:border-white/10 backdrop-blur-md shadow-xs">
+        <nav className="hidden xl:flex items-center gap-1 bg-white/60 dark:bg-slate-950/50 p-1 rounded-full border border-gray-200/80 dark:border-white/10 backdrop-blur-md shadow-2xs">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -97,7 +97,7 @@ export function Navbar() {
                 className={cn(
                   "relative px-4 py-1.5 text-[12px] font-medium rounded-full transition-all duration-200 select-none",
                   isActive
-                    ? "bg-white dark:bg-slate-900/90 text-gray-900 dark:text-gray-100 shadow-xs font-semibold"
+                    ? "bg-white dark:bg-slate-900/90 text-gray-900 dark:text-gray-100 shadow-2xs font-semibold"
                     : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200/60 dark:hover:bg-slate-800/50"
                 )}
               >
@@ -156,7 +156,7 @@ export function Navbar() {
             ) : (
               <button
                 onClick={() => signIn("google", { callbackUrl: window.location.href })}
-                className="bg-gradient-to-r px-4 py-2 from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-xs rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 border-0 flex items-center gap-1.5 select-none"
+                className="bg-linear-to-r px-4 py-2 from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-xs rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 border-0 flex items-center gap-1.5 select-none"
               >
                 <span>Sign In</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -294,7 +294,7 @@ export function Navbar() {
                   setIsOpen(false);
                   signIn("google", { callbackUrl: window.location.href });
                 }}
-                className="w-full bg-gradient-to-r py-2.5 from-blue-600 via-indigo-600 to-purple-600 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/25 flex items-center justify-center gap-2"
+                className="w-full bg-linear-to-r py-2.5 from-blue-600 via-indigo-600 to-purple-600 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/25 flex items-center justify-center gap-2"
               >
                 <span>Sign In</span>
                 <ArrowRight className="w-4 h-4" />

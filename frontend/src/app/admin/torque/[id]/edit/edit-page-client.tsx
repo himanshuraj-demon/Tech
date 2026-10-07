@@ -397,7 +397,7 @@ export default function EditMagazinePage() {
             {magazine.coverPhoto ? (
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="relative w-32 h-40 flex-shrink-0">
+                  <div className="relative w-32 h-40 shrink-0">
                     <img
                       src={magazine.coverPhoto}
                       alt="Current cover photo"

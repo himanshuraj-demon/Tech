@@ -86,20 +86,20 @@ export function ClubCard({ club, variant = "technical" }: ClubCardProps) {
   return (
     <Link
       href={`/clubs/${club.id}`}
-      className="group block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-2xl"
+      className="group block h-full focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-2xl"
     >
       <div
         className={`relative h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md p-5 sm:p-8 transition-all duration-300 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 ${theme.borderHover}`}
       >
         {/* Ambient Top Glow on Hover */}
         <div
-          className={`absolute top-0 right-0 w-full h-1/2 bg-gradient-to-bl ${theme.ambientGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+          className={`absolute top-0 right-0 w-full h-1/2 bg-linear-to-bl ${theme.ambientGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
         />
 
         <div>
           {/* Card Top Row: Logo + Badge + Arrow */}
           <div className="relative z-10 flex items-start justify-between gap-3 mb-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80  flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-2xs">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700/80  flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-2xs">
               {getLogoPath(club) ? (
                 <Image
                   src={getLogoPath(club)!}

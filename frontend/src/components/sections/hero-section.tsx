@@ -118,7 +118,7 @@ export function HeroSection() {
             {/* Big Stacked Headline */}
             <h1 className="text-5xl sm:text-7xl lg:text-[5.4rem] xl:text-[6.2rem] font-bold font-space-grotesk tracking-tight leading-[0.98] select-none">
               {/* IITGN */}
-              <span className="block text-slate-950 dark:text-white font-extrabold drop-shadow-sm">
+              <span className="block text-slate-950 dark:text-white font-extrabold drop-shadow-xs">
                 IITGN
               </span>
 
@@ -126,7 +126,7 @@ export function HeroSection() {
               <span
                 className="
       block font-extrabold my-1
-      bg-gradient-to-r
+      bg-linear-to-r
       from-cyan-600 via-sky-600 to-blue-700
       dark:from-cyan-400 dark:via-sky-400 dark:to-blue-500
       bg-clip-text text-transparent
@@ -138,7 +138,7 @@ export function HeroSection() {
               <span
                 className="
       block font-extrabold
-      bg-gradient-to-r
+      bg-linear-to-r
       from-indigo-600 via-purple-600 to-pink-600
       dark:from-indigo-400 dark:via-purple-400 dark:to-pink-500
       bg-clip-text text-transparent
@@ -164,7 +164,7 @@ export function HeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full px-5 py-2.5 h-auto text-sm font-medium bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 dark:text-white shadow-lg shadow-blue-500/25 transition-all duration-200 border-0 hover:scale-105 active:scale-95">
+                className="rounded-full px-5 py-2.5 h-auto text-sm font-medium bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 dark:text-white shadow-lg shadow-blue-500/25 transition-all duration-200 border-0 hover:scale-105 active:scale-95">
                 <Link href="/clubs" className="flex items-center gap-2 ">
                   <Compass className="w-4 h-4" />
                   <span>Explore Clubs</span>

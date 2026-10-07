@@ -58,7 +58,7 @@ export function HackathonSubmissionBuilder({ fields, onChange }: SubmissionBuild
   };
 
   return (
-    <Card className="border-blue-200/50 dark:border-blue-900/40 bg-gradient-to-br from-blue-50/20 via-transparent to-transparent">
+    <Card className="border-blue-200/50 dark:border-blue-900/40 bg-linear-to-br from-blue-50/20 via-transparent to-transparent">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
@@ -87,7 +87,7 @@ export function HackathonSubmissionBuilder({ fields, onChange }: SubmissionBuild
         {activeFields.map((field, idx) => (
           <div
             key={field.id}
-            className="p-4 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm space-y-3 transition-all"
+            className="p-4 rounded-xl border border-gray-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-xs space-y-3 transition-all"
           >
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export function HackathonSubmissionBuilder({ fields, onChange }: SubmissionBuild
                   id={`field-type-${idx}`}
                   value={field.type}
                   onChange={(e) => handleUpdateField(idx, { type: e.target.value as "textarea" | "text" })}
-                  className="w-full flex h-9 rounded-md border border-input bg-background px-3 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="w-full flex h-9 rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="textarea">Textarea (Multiline)</option>
                   <option value="text">Single-line (Text / URL)</option>

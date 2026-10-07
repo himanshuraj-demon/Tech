@@ -165,10 +165,10 @@ export function FeaturesSection() {
   return (
     <section className="relative py-20 overflow-hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       {/* Subtle decorative grid backdrop */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px] pointer-events-none" />
       
       {/* Ambient background glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 sm:w-[32rem] h-96 bg-blue-500/5 dark:bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 sm:w-lg h-96 bg-blue-500/5 dark:bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -176,7 +176,7 @@ export function FeaturesSection() {
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-12 sm:mb-16">
 
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight font-space-grotesk text-gray-900 dark:text-gray-100">
-            Why Choose Tech Council? <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Innovation</span>
+            Why Choose Tech Council? <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Innovation</span>
           </h2>
           
           <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl">
@@ -216,7 +216,7 @@ export function FeaturesSection() {
                 {/* Top Ambient Card Gradient */}
                 <div
                   className={cn(
-                    "absolute top-0 right-0 w-full h-1/2 bg-gradient-to-bl opacity-40 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
+                    "absolute top-0 right-0 w-full h-1/2 bg-linear-to-bl opacity-40 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
                     item.gradient
                   )}
                 />
@@ -225,7 +225,7 @@ export function FeaturesSection() {
                 <div className="relative z-10 space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     {/* Icon container */}
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800/90 border border-gray-200/80 dark:border-gray-700/80  group-hover:border-blue-500/40 transition-all duration-300 shadow-xs">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800/90 border border-gray-200/80 dark:border-gray-700/80  group-hover:border-blue-500/40 transition-all duration-300 shadow-2xs">
                       <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300" />
                     </div>
 
@@ -285,7 +285,7 @@ export function FeaturesSection() {
         </div>
 
         {/* Bottom Banner / Invitation Card */}
-        <div className="mt-12 sm:mt-16 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900/90 dark:via-gray-800/60 dark:to-gray-900/90 p-8 sm:p-10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-12 sm:mt-16 rounded-2xl border border-gray-200 dark:border-gray-800 bg-linear-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900/90 dark:via-gray-800/60 dark:to-gray-900/90 p-8 sm:p-10 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
             <h4 className="text-xl sm:text-2xl font-bold font-space-grotesk text-gray-900 dark:text-gray-100">
               Ready to build something impactful with us?
@@ -295,10 +295,10 @@ export function FeaturesSection() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             <Link
               href="/clubs"
-              className="bg-gradient-to-r px-5 py-2.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 flex justify-center items-center gap-2 select-none"
+              className="bg-linear-to-r px-5 py-2.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 flex justify-center items-center gap-2 select-none"
             >
               <span>Clubs</span>
               <ArrowUpRight className="w-4 h-4" />

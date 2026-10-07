@@ -17,7 +17,7 @@ export default function InternshipsPage() {
         <div className="container relative z-10 px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-space-grotesk">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Internships</span>
+              <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Internships</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-lg text-muted-foreground md:text-xl">
               Bridging the gap between academic learning and industry experience
@@ -91,23 +91,23 @@ export default function InternshipsPage() {
                 <h3 className="text-2xl font-bold">For Students</h3>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Curated internship listings from partner companies</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Application tracking and status updates</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Interview preparation resources and mock sessions</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Mentorship matching with industry professionals</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Skill assessment and development recommendations</span>
                   </li>
                 </ul>
@@ -117,23 +117,23 @@ export default function InternshipsPage() {
                 <h3 className="text-2xl font-bold">For Companies</h3>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Access to top talent from IIT Gandhinagar</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Streamlined recruitment and selection process</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Customized internship program design</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Regular progress tracking and feedback systems</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-purple-600 mt-2 shrink-0" />
                     <span className="text-muted-foreground">Long-term partnership opportunities</span>
                   </li>
                 </ul>

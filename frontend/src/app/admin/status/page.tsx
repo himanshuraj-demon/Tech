@@ -42,7 +42,7 @@ export default function AdminStatusPage() {
     description: string 
   }) => (
     <div className="flex items-start gap-3 p-4 rounded-lg border">
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+      <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
         status === 'success' ? 'bg-green-100 dark:bg-green-900/20' :
         status === 'error' ? 'bg-red-100 dark:bg-red-900/20' :
         'bg-yellow-100 dark:bg-yellow-900/20'

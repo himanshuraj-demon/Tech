@@ -63,19 +63,19 @@ function AccordionItem({ faq, index, isExpanded, onToggle }: AccordionItemProps)
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-gray-200/50 dark:border-gray-800/50 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300/50 dark:hover:border-blue-700/50",
-        isExpanded && "shadow-lg shadow-blue-500/20 border-blue-300/70 dark:border-blue-700/70 bg-gradient-to-br from-blue-50/50 to-purple-50/30 dark:from-blue-950/30 dark:to-purple-950/20"
+        "group relative overflow-hidden rounded-xl border border-gray-200/50 dark:border-gray-800/50 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300/50 dark:hover:border-blue-700/50",
+        isExpanded && "shadow-lg shadow-blue-500/20 border-blue-300/70 dark:border-blue-700/70 bg-linear-to-br from-blue-50/50 to-purple-50/30 dark:from-blue-950/30 dark:to-purple-950/20"
       )}
     >
       {/* Gradient overlay for expanded state */}
       <div className={cn(
-        "absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500",
+        "absolute inset-0 bg-linear-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 transition-opacity duration-500",
         isExpanded && "opacity-100"
       )} />
 
       {/* Animated border */}
       <div className={cn(
-        "absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-500",
+        "absolute inset-0 rounded-xl bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-500",
         isExpanded && "opacity-20"
       )} style={{ padding: "1px" }}>
         <div className="h-full w-full rounded-xl bg-white dark:bg-gray-900" />
@@ -83,7 +83,7 @@ function AccordionItem({ faq, index, isExpanded, onToggle }: AccordionItemProps)
 
       <button
         onClick={onToggle}
-        className="relative w-full px-6 py-5 text-left flex items-start justify-between group-hover:bg-white/30 dark:group-hover:bg-black/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-transparent"
+        className="relative w-full px-6 py-5 text-left flex items-start justify-between group-hover:bg-white/30 dark:group-hover:bg-black/20 transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-transparent"
         aria-expanded={isExpanded}
         aria-controls={`faq-content-${index}`}
       >
@@ -92,7 +92,7 @@ function AccordionItem({ faq, index, isExpanded, onToggle }: AccordionItemProps)
             <div className={cn(
               "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300",
               isExpanded
-                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
+                ? "bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-500 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600"
             )}>
               {isExpanded ? (
@@ -121,7 +121,7 @@ function AccordionItem({ faq, index, isExpanded, onToggle }: AccordionItemProps)
         </div>
 
         <div className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 flex-shrink-0",
+          "flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 shrink-0",
           isExpanded
             ? "bg-blue-500 text-white shadow-lg rotate-180"
             : "bg-gray-100 dark:bg-gray-800 text-gray-500 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600 group-hover:scale-110"
@@ -142,7 +142,7 @@ function AccordionItem({ faq, index, isExpanded, onToggle }: AccordionItemProps)
             <div className={cn(
               "p-4 rounded-lg border-l-4 transition-all duration-300",
               isExpanded
-                ? "bg-gradient-to-r from-blue-50/50 to-purple-50/30 dark:from-blue-950/20 dark:to-purple-950/10 border-l-blue-500"
+                ? "bg-linear-to-r from-blue-50/50 to-purple-50/30 dark:from-blue-950/20 dark:to-purple-950/10 border-l-blue-500"
                 : "bg-gray-50/50 dark:bg-gray-800/30 border-l-gray-300 dark:border-l-gray-700"
             )}>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -166,7 +166,7 @@ export function FAQAccordion() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-200/50 dark:border-blue-800/50 mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-200/50 dark:border-blue-800/50 mb-4">
           <Sparkles className="h-4 w-4 text-blue-600" />
           <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Interactive FAQ</span>
         </div>

@@ -17,7 +17,7 @@ export function GoogleMaps() {
   return (
     <div className="glass rounded-2xl p-8 space-y-8 shadow-2xl">
       <div className="text-center space-y-3">
-        <h2 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <h2 className="text-4xl font-bold tracking-tighter bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Find Us
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">

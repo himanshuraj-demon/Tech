@@ -66,7 +66,7 @@ export default function LeaderboardPage() {
               <Trophy className="h-10 w-10" />
             </div>
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl font-space-grotesk">
-              Student <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">Leaderboard</span>
+              Student <span className="bg-linear-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">Leaderboard</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-lg text-muted-foreground">
               Participate in Technical Council events, win challenges, and accumulate points to climb the leaderboard ranking.
@@ -83,7 +83,7 @@ export default function LeaderboardPage() {
               <p className="text-red-600 dark:text-red-400 font-medium">Failed to load leaderboard data. Please try again later.</p>
             </div>
           ) : leaderboard.length === 0 ? (
-            <div className="text-center py-20 max-w-md mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-12 shadow-sm">
+            <div className="text-center py-20 max-w-md mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-12 shadow-xs">
               <Trophy className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-700 mb-4" />
               <h3 className="text-xl font-bold mb-2">No scores recorded yet</h3>
               <p className="text-muted-foreground">
@@ -122,15 +122,15 @@ export default function LeaderboardPage() {
                           let scoreClass = "text-primary text-base md:text-lg font-extrabold";
                           
                           if (finalRank === 0) {
-                            rowClass = "border-l-4 border-l-amber-500 bg-amber-500/[0.03] dark:bg-amber-500/[0.06] hover:bg-amber-500/[0.06] dark:hover:bg-amber-500/[0.10]";
+                            rowClass = "border-l-4 border-l-amber-500 bg-amber-500/3 dark:bg-amber-500/6 hover:bg-amber-500/6 dark:hover:bg-amber-500/10";
                             nameClass = "font-extrabold text-amber-900 dark:text-amber-400 text-base md:text-lg";
                             scoreClass = "text-amber-600 dark:text-amber-400 text-lg md:text-xl font-black";
                           } else if (finalRank === 1) {
-                            rowClass = "border-l-4 border-l-slate-400 dark:border-l-slate-500 bg-slate-500/[0.03] dark:bg-slate-500/[0.06] hover:bg-slate-500/[0.06] dark:hover:bg-slate-500/[0.10]";
+                            rowClass = "border-l-4 border-l-slate-400 dark:border-l-slate-500 bg-slate-500/3 dark:bg-slate-500/6 hover:bg-slate-500/6 dark:hover:bg-slate-500/10";
                             nameClass = "font-bold text-slate-800 dark:text-slate-300 text-sm md:text-base";
                             scoreClass = "text-slate-650 dark:text-slate-400 text-base md:text-lg font-extrabold";
                           } else if (finalRank === 2) {
-                            rowClass = "border-l-4 border-l-orange-400 dark:border-l-orange-500 bg-orange-500/[0.03] dark:bg-orange-500/[0.06] hover:bg-orange-500/[0.06] dark:hover:bg-orange-500/[0.10]";
+                            rowClass = "border-l-4 border-l-orange-400 dark:border-l-orange-500 bg-orange-500/3 dark:bg-orange-500/6 hover:bg-orange-500/6 dark:hover:bg-orange-500/10";
                             nameClass = "font-bold text-orange-850 dark:text-orange-400 text-sm md:text-base";
                             scoreClass = "text-orange-600 dark:text-orange-400 text-base md:text-lg font-extrabold";
                           }
@@ -177,9 +177,9 @@ export default function LeaderboardPage() {
                                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Points Breakdown</div>
                                     <div className="grid gap-2">
                                       {student.events.map((e, evIdx) => (
-                                        <div key={evIdx} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950/60 shadow-sm text-sm gap-2">
+                                        <div key={evIdx} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950/60 shadow-xs text-sm gap-2">
                                           <div className="flex flex-wrap items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
                                             <span className="font-medium text-gray-700 dark:text-gray-300 break-all">{e.title}</span>
                                             {e.place && (
                                                <Badge className={

@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="w-full max-w-md">
         <Card className="glass border-0 shadow-2xl">
           <CardHeader className="text-center space-y-4">
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.01] disabled:opacity-50"
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.01] disabled:opacity-50"
               >
                 {loading ? "Signing in..." : "Sign in with Google"}
               </button>

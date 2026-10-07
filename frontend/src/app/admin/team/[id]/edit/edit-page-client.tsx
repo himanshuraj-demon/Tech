@@ -354,7 +354,7 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
                       {gradientOptions.map((gradient) => (
                         <SelectItem key={`${gradient.from}-${gradient.to}`} value={`${gradient.from}-${gradient.to}`}>
                           <div className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded bg-gradient-to-r ${gradient.from} ${gradient.to}`} />
+                            <div className={`w-4 h-4 rounded bg-linear-to-r ${gradient.from} ${gradient.to}`} />
                             {gradient.label}
                           </div>
                         </SelectItem>

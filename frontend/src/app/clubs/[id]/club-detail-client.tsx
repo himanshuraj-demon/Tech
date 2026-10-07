@@ -117,7 +117,7 @@ function SectionTitle({
   return (
     <div className="mb-8 flex items-center gap-3">
       {icon && (
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600/15 to-purple-600/15 ring-1 ring-blue-600/20">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-linear-to-br from-blue-600/15 to-purple-600/15 ring-1 ring-blue-600/20">
           {icon}
         </div>
       )}
@@ -247,7 +247,7 @@ export default function ClubDetailPage() {
                   <Button
                     asChild
                     size="lg"
-                    className="bg-gradient-to-r  from-blue-600 to-purple-600 dark:text-white shadow-lg shadow-blue-600/20 hover:opacity-90 transition-opacity">
+                    className="bg-linear-to-r  from-blue-600 to-purple-600 dark:text-white shadow-lg shadow-blue-600/20 hover:opacity-90 transition-opacity">
                     <a href={`mailto:${club.email}`}>
                       <Mail className="mr-2 h-4 w-4" />
                       Contact Us
@@ -259,8 +259,8 @@ export default function ClubDetailPage() {
 
             {/* Logo card */}
             <div className="order-1 lg:order-2 relative mx-auto w-full max-w-md">
-              <div className="relative aspect-square rounded-3xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-1 shadow-xl">
-                <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[1.4rem]  bg-background/60 backdrop-blur-sm">
+              <div className="relative aspect-square rounded-3xl bg-linear-to-br from-blue-600/20 to-purple-600/20 p-1 shadow-xl">
+                <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[1.4rem]  bg-background/60 backdrop-blur-xs">
                   {logo ? (
                     <Image
                       src={logo}
@@ -271,7 +271,7 @@ export default function ClubDetailPage() {
                       className="w-full h-full object-contain"
                     />
                   ) : (
-                    <div className="text-7xl font-bold font-space-grotesk bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent opacity-80">
+                    <div className="text-7xl font-bold font-space-grotesk bg-linear-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent opacity-80">
                       {getInitials(club.name)}
                     </div>
                   )}
@@ -289,7 +289,7 @@ export default function ClubDetailPage() {
             <h2 className="text-3xl font-bold tracking-tighter font-space-grotesk mb-2">
               About Us
             </h2>
-            <div className="h-1 w-14 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 mb-6" />
+            <div className="h-1 w-14 rounded-full bg-linear-to-r from-blue-600 to-purple-600 mb-6" />
             <p className="text-muted-foreground text-lg leading-relaxed">
               {club.longDescription}
             </p>
@@ -304,7 +304,7 @@ export default function ClubDetailPage() {
             <div className="grid gap-8 lg:grid-cols-2">
               {/* Achievements */}
               {hasAchievements && (
-                <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm">
+                <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs">
                   <SectionTitle
                     icon={<Award className="h-5 w-5 text-yellow-600" />}
                     title="Achievements"
@@ -313,7 +313,7 @@ export default function ClubDetailPage() {
                     {club.achievements.map(
                       (achievement: string, index: number) => (
                         <li key={index} className="flex items-start gap-3">
-                          <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-600/15">
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600/15">
                             <Check className="h-3 w-3 text-blue-600 dark:text-blue-400" />
                           </div>
                           <span className="text-muted-foreground leading-relaxed">
@@ -328,7 +328,7 @@ export default function ClubDetailPage() {
 
               {/* Projects */}
               {hasProjects && (
-                <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm">
+                <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs">
                   <SectionTitle
                     icon={
                       <Rocket className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -338,7 +338,7 @@ export default function ClubDetailPage() {
                   <ul className="space-y-4">
                     {club.projects.map((project: string, index: number) => (
                       <li key={index} className="flex items-start gap-3">
-                        <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-600/15">
+                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-600/15">
                           <div className="h-2 w-2 rounded-full bg-purple-600" />
                         </div>
                         <span className="text-muted-foreground leading-relaxed">
@@ -370,9 +370,9 @@ export default function ClubDetailPage() {
                 <div
                   key={index}
                   className="glass group relative overflow-hidden rounded-2xl border border-border/60 p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/10">
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <div className="mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-[3px] w-fit">
-                    <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-xl ring-4 ring-background">
+                  <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-blue-600 to-purple-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="mx-auto mb-4 rounded-full bg-linear-to-r from-blue-600 to-purple-600 p-[3px] w-fit">
+                    <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-linear-to-r from-blue-600 to-purple-600 text-white font-bold text-xl ring-4 ring-background">
                       {getInitials(member.name)}
                     </div>
                   </div>

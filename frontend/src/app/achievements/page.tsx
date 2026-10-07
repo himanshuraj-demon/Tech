@@ -126,8 +126,8 @@ export default function AchievementsPage() {
       {/* Hero Section */}
       <section className="relative py-16 sm:py-20 border-b border-gray-200 dark:border-gray-800 overflow-hidden">
         {/* Subtle decorative grid and ambient radial washes */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-[36rem] h-64 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 sm:w-xl h-64 bg-amber-500/5 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center space-y-4 text-center max-w-3xl mx-auto">
@@ -138,7 +138,7 @@ export default function AchievementsPage() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight font-space-grotesk text-gray-900 dark:text-gray-100">
-              Our <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Achievements</span>
+              Our <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Achievements</span>
             </h1>
 
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl">
@@ -227,7 +227,7 @@ export default function AchievementsPage() {
                     {/* Top Ambient Glow */}
                     <div
                       className={cn(
-                        "absolute top-0 right-0 w-3/4 h-1/2 bg-gradient-to-bl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
+                        "absolute top-0 right-0 w-3/4 h-1/2 bg-linear-to-bl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
                         glowColor
                       )}
                     />
@@ -241,7 +241,7 @@ export default function AchievementsPage() {
                             badgeBg
                           )}
                         >
-                          <IconComponent className="w-3.5 h-3.5 flex-shrink-0" />
+                          <IconComponent className="w-3.5 h-3.5 shrink-0" />
                           <span>{item.position}</span>
                         </div>
 
@@ -314,7 +314,7 @@ export default function AchievementsPage() {
       {/* Bottom Inspiration CTA */}
       <section className="pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900/90 dark:via-gray-800/60 dark:to-gray-900/90 p-8 sm:p-10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-linear-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900/90 dark:via-gray-800/60 dark:to-gray-900/90 p-8 sm:p-10 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-2 text-center md:text-left">
               <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                 <Flame className="w-3.5 h-3.5" />
@@ -328,10 +328,10 @@ export default function AchievementsPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               <Link
                 href="/clubs"
-                className="bg-gradient-to-r px-5 py-2.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 flex items-center gap-2 select-none"
+                className="bg-linear-to-r px-5 py-2.5 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium text-sm rounded-full transition-all duration-200 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 flex items-center gap-2 select-none"
               >
                 <span>Explore Tech Clubs</span>
                 <ArrowRight className="w-4 h-4" />

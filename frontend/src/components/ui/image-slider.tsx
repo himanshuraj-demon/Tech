@@ -68,7 +68,7 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
 
   if (normalizedImages.length === 0) {
     return (
-      <div className="w-full h-96 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-xl flex items-center justify-center">
+      <div className="w-full h-96 bg-linear-to-br from-blue-600/20 to-purple-600/20 rounded-xl flex items-center justify-center">
         <p className="text-muted-foreground">No images available</p>
       </div>
     );
@@ -80,7 +80,7 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
     <div className="relative w-full max-w-6xl mx-auto group">
       {/* Main Image Container */}
       <div 
-        className="relative aspect-[16/10] bg-black rounded-2xl overflow-hidden shadow-2xl"
+        className="relative aspect-16/10 bg-black rounded-2xl overflow-hidden shadow-2xl"
         onMouseEnter={() => setIsAutoPlaying(false)}
         onMouseLeave={() => setIsAutoPlaying(true)}
       >
@@ -89,7 +89,7 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {normalizedImages.map((image, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0 relative">
+            <div key={index} className="w-full h-full shrink-0 relative">
               <Image
                 src={image.url}
                 alt={image.alt}
@@ -108,7 +108,7 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white border-0 transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white border-0 transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-xs"
               onClick={() => {
                 setIsAutoPlaying(false);
                 handlePrevious();
@@ -121,7 +121,7 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white border-0 transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white border-0 transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-xs"
               onClick={() => {
                 setIsAutoPlaying(false);
                 handleNext();
@@ -135,14 +135,14 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
 
         {/* Caption Overlay */}
         {currentImage.caption && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+          <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6">
             <p className="text-white text-sm font-medium">{currentImage.caption}</p>
           </div>
         )}
 
         {/* Image Counter */}
         {normalizedImages.length > 1 && (
-          <div className="absolute top-4 right-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm">
+          <div className="absolute top-4 right-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-xs">
             {currentIndex + 1} / {normalizedImages.length}
           </div>
         )}
@@ -173,7 +173,7 @@ export function ImageSlider({ images, eventTitle }: ImageSliderProps) {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`relative flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden transition-all duration-300 ${
+              className={`relative shrink-0 w-20 h-16 rounded-lg overflow-hidden transition-all duration-300 ${
                 index === currentIndex 
                   ? 'ring-2 ring-blue-600 opacity-100' 
                   : 'opacity-60 hover:opacity-80'

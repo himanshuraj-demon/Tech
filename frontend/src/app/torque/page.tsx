@@ -109,7 +109,7 @@ export default function TorquePage() {
               <BookOpen className="h-10 w-10 text-orange-600" />
             </div>
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-space-grotesk">
-              Read <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Torque</span>
+              Read <span className="bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Torque</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-lg text-muted-foreground md:text-xl">
               The Annual Tech Council Magazine
@@ -200,7 +200,7 @@ export default function TorquePage() {
               </div>
 
               <div className="relative">
-                <div className="aspect-[3/4] rounded-lg shadow-2xl overflow-hidden relative">
+                <div className="aspect-3/4 rounded-lg shadow-2xl overflow-hidden relative">
                   {latestMagazine.coverPhoto ? (
                     <>
                       {/* Cover Photo Background */}
@@ -209,7 +209,7 @@ export default function TorquePage() {
                         style={{ backgroundImage: `url(${latestMagazine.coverPhoto})` }}
                       />
                       {/* Overlay for text readability */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/30 to-black/70" />
+                      <div className="absolute inset-0 bg-linear-to-br from-black/60 via-black/30 to-black/70" />
                       {/* Content */}
                       <div className="relative h-full p-8 text-white flex flex-col justify-between">
                         <div>
@@ -226,7 +226,7 @@ export default function TorquePage() {
                     </>
                   ) : (
                     /* Default Orange Background */
-                    <div className="bg-gradient-to-br from-orange-600 to-red-600 p-8 text-white h-full">
+                    <div className="bg-linear-to-br from-orange-600 to-red-600 p-8 text-white h-full">
                       <div className="flex h-full flex-col justify-between">
                         <div>
                           <h3 className="text-2xl font-bold mb-2">TORQUE</h3>

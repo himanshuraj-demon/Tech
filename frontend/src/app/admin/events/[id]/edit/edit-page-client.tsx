@@ -517,7 +517,7 @@ export default function EditEvent({ params }: PageProps) {
                     {formData.gallery.map((item, index) => (
                       <div
                         key={item.id || index}
-                        className="relative group aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-primary/80 dark:hover:border-primary/80 transition-all duration-300 shadow-sm"
+                        className="relative group aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-primary/80 dark:hover:border-primary/80 transition-all duration-300 shadow-xs"
                       >
                         <Image
                           src={item.url}
@@ -528,7 +528,7 @@ export default function EditEvent({ params }: PageProps) {
                         />
                         
                         {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-2">
+                        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-2">
                           {/* Top controls */}
                           <div className="flex justify-end gap-1">
                             <Button
