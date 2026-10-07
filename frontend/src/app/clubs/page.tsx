@@ -124,55 +124,9 @@ export default function ClubsPage() {
         </div>
       </section>
 
-      {/* Interactive Controls: Search & Tabs */}
-      <section className="md:sticky hidden top-16 z-30 bg-white/85 dark:bg-gray-900/85 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-center gap-4">
-          
-          {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 p-1 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/80 overflow-x-auto max-w-full">
-            {(
-              [
-                { id: "all", label: "All Groups", icon: Compass, count: clubs.length },
-                { id: "technical", label: "Technical", icon: Cpu, count: technicalClubs.length },
-                { id: "hobby", label: "Hobby", icon: Palette, count: hobbyGroups.length },
-              ] as const
-            ).map((tab) => {
-              const Icon = tab.icon;
-              const isActive = selectedTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setSelectedTab(tab.id)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 select-none whitespace-nowrap",
-                    isActive
-                      ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-xs font-semibold"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                  )}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
-                  <span
-                    className={cn(
-                      "text-[10px] px-1.5 py-0.2 rounded-full",
-                      isActive
-                        ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-                        : "bg-gray-200/80 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                    )}
-                  >
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
       {/* Main Club Directory Grid */}
       <section className="py-12 sm:py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 ">
           {filteredClubs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {filteredClubs.map((club) => {

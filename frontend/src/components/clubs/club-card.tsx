@@ -47,7 +47,7 @@ const getVariantTheme = (variant: "technical" | "hobby" | "council") => {
   switch (variant) {
     case "technical":
       return {
-        badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+        badge: " text-blue-600 dark:text-blue-400 border-blue-500/20",
         hoverText: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
         borderHover: "group-hover:border-blue-500/40",
         ambientGlow: "from-blue-600/10 to-purple-600/10",
@@ -55,7 +55,7 @@ const getVariantTheme = (variant: "technical" | "hobby" | "council") => {
       };
     case "hobby":
       return {
-        badge: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+        badge: " text-purple-600 dark:text-purple-400 border-purple-500/20",
         hoverText: "group-hover:text-purple-600 dark:group-hover:text-purple-400",
         borderHover: "group-hover:border-purple-500/40",
         ambientGlow: "from-purple-600/10 to-pink-600/10",
@@ -63,7 +63,7 @@ const getVariantTheme = (variant: "technical" | "hobby" | "council") => {
       };
     case "council":
       return {
-        badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+        badge: " text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
         hoverText: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
         borderHover: "group-hover:border-emerald-500/40",
         ambientGlow: "from-emerald-600/10 to-teal-600/10",
@@ -71,7 +71,7 @@ const getVariantTheme = (variant: "technical" | "hobby" | "council") => {
       };
     default:
       return {
-        badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+        badge: "text-blue-600 dark:text-blue-400 border-blue-500/20",
         hoverText: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
         borderHover: "group-hover:border-blue-500/40",
         ambientGlow: "from-blue-600/10 to-purple-600/10",
@@ -89,11 +89,11 @@ export function ClubCard({ club, variant = "technical" }: ClubCardProps) {
       className="group block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-2xl"
     >
       <div
-        className={`relative h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md p-5 sm:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 ${theme.borderHover}`}
+        className={`relative h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md p-5 sm:p-8 transition-all duration-300 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1 ${theme.borderHover}`}
       >
         {/* Ambient Top Glow on Hover */}
         <div
-          className={`absolute top-0 right-0 w-3/4 h-1/2 bg-gradient-to-bl ${theme.ambientGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+          className={`absolute top-0 right-0 w-full h-1/2 bg-gradient-to-bl ${theme.ambientGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
         />
 
         <div>
@@ -129,13 +129,10 @@ export function ClubCard({ club, variant = "technical" }: ClubCardProps) {
 
             <div className="flex items-center gap-2">
               <span
-                className={`text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full border tracking-wide uppercase ${theme.badge}`}
+                className={`text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full  tracking-wide uppercase ${theme.badge}`}
               >
                 {club.category || theme.typeLabel}
               </span>
-              <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 group-hover:bg-gray-200/70 dark:group-hover:bg-gray-700 transition-colors">
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </div>
             </div>
           </div>
 

@@ -49,7 +49,7 @@ const featuresData: FeatureCardData[] = [
     icon: Code2,
     gradient: "from-blue-600/15 via-indigo-600/10 to-transparent",
     borderHover: "group-hover:border-blue-500/50",
-    badgeColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    badgeColor: " text-blue-600 dark:text-blue-400 border-blue-500/20",
     href: "/clubs/metis",
     linkText: "Explore Metis Club",
     stats: { value: "10+", label: "OSS Repositories" },
@@ -67,7 +67,7 @@ const featuresData: FeatureCardData[] = [
     icon: BrainCircuit,
     gradient: "from-purple-600/15 via-pink-600/10 to-transparent",
     borderHover: "group-hover:border-purple-500/50",
-    badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+    badgeColor: " text-purple-600 dark:text-purple-400 border-purple-500/20",
     href: "/clubs/machine-learning",
     linkText: "Explore ML Club",
     stats: { value: "Top 3", label: "Inter-IIT ML Podium" },
@@ -84,7 +84,7 @@ const featuresData: FeatureCardData[] = [
     icon: Cpu,
     gradient: "from-amber-600/15 via-orange-600/10 to-transparent",
     borderHover: "group-hover:border-amber-500/50",
-    badgeColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    badgeColor: " text-amber-600 dark:text-amber-400 border-amber-500/20",
     href: "/clubs/mean-mechanics",
     linkText: "Explore Mean Mechanics",
     stats: { value: "24/7", label: "Maker Access" },
@@ -101,7 +101,7 @@ const featuresData: FeatureCardData[] = [
     icon: Zap,
     gradient: "from-emerald-600/15 via-teal-600/10 to-transparent",
     borderHover: "group-hover:border-emerald-500/50",
-    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    badgeColor: " text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     href: "/hackathons",
     linkText: "View Hackathons",
     stats: { value: "₹1L+", label: "Annual Cash Prizes" },
@@ -118,7 +118,7 @@ const featuresData: FeatureCardData[] = [
     icon: Rocket,
     gradient: "from-rose-600/15 via-red-600/10 to-transparent",
     borderHover: "group-hover:border-rose-500/50",
-    badgeColor: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+    badgeColor: " text-rose-600 dark:text-rose-400 border-rose-500/20",
     href: "/about",
     linkText: "Learn Our Mission",
     stats: { value: "5+", label: "Student Startups" },
@@ -135,7 +135,7 @@ const featuresData: FeatureCardData[] = [
     icon: Globe2,
     gradient: "from-cyan-600/15 via-blue-600/10 to-transparent",
     borderHover: "group-hover:border-cyan-500/50",
-    badgeColor: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+    badgeColor: " text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
     href: "/achievements",
     linkText: "See Achievements",
     stats: { value: "7", label: "Podium Finishes" },
@@ -225,14 +225,14 @@ export function FeaturesSection() {
                 <div className="relative z-10 space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     {/* Icon container */}
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800/90 border border-gray-200/80 dark:border-gray-700/80 group-hover:scale-110 group-hover:border-blue-500/40 transition-all duration-300 shadow-xs">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800/90 border border-gray-200/80 dark:border-gray-700/80  group-hover:border-blue-500/40 transition-all duration-300 shadow-xs">
                       <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300" />
                     </div>
 
                     {/* Tag badge */}
                     <span
                       className={cn(
-                        "text-[10px] sm:text-xs font-mono font-semibold px-2.5 py-1 rounded-full border tracking-wide uppercase shadow-2xs",
+                        "text-[10px] sm:text-xs font-mono font-semibold px-2.5 py-1 rounded-full  tracking-wide uppercase ",
                         item.badgeColor
                       )}
                     >
