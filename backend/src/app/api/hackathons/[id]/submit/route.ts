@@ -8,7 +8,7 @@ import { z } from "zod";
 const submissionSchema = z.object({
   githubLink: z.string().trim().optional().nullable(),
   docsLink: z.string().trim().optional().nullable(),
-  submissionData: z.record(z.string()).optional().nullable(),
+  submissionData: z.record(z.any()).optional().nullable(),
 });
 
 export async function POST(

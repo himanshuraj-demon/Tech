@@ -5,6 +5,22 @@ export interface WinnerTier {
   points: number;
 }
 
+export interface SubmissionField {
+  id: string;
+  title: string;
+  type: "textarea" | "text";
+  placeholder?: string;
+  required?: boolean;
+}
+
+export const DEFAULT_SUBMISSION_FIELD: SubmissionField = {
+  id: "field_default",
+  title: "Project Submission Details",
+  type: "textarea",
+  placeholder: "Enter project description, repository link, demo video, or notes...",
+  required: true,
+};
+
 export interface Hackathon {
   id: string;
   name: string;
@@ -40,6 +56,7 @@ export interface Hackathon {
   themes?: string;
   judingCriteria?: string;
   submissionGuidelines?: string;
+  submissionFields?: SubmissionField[];
   
   createdAt: string;
   updatedAt: string;

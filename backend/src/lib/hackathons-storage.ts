@@ -10,7 +10,7 @@ import {
   getHackathonsCount as dbGetHackathonsCount
 } from '@/lib/db/hackathons';
 
-import { type Hackathon, type WinnerTier, type SubmissionField } from '@/lib/db/schema';
+import { type Hackathon, type WinnerTier, type SubmissionField, DEFAULT_SUBMISSION_FIELD } from '@/lib/db/schema';
 
 // Export type
 export interface BasicHackathon {
@@ -89,6 +89,16 @@ function getAutomaticStatus(startDateStr: string, endDateStr: string, fallbackSt
 function mapDBToData(h: Hackathon): BasicHackathon {
   const computedStatus = getAutomaticStatus(h.startDate, h.endDate, h.status);
   
+  let rawSubmissionFields = h.submissionFields;
+  if (typeof rawSubmissionFields === 'string') {
+    try {
+      rawSubmissionFields = JSON.parse(rawSubmissionFields);
+    } catch {}
+  }
+  const resolvedSubmissionFields = Array.isArray(rawSubmissionFields) && rawSubmissionFields.length > 0
+    ? rawSubmissionFields
+    : [DEFAULT_SUBMISSION_FIELD];
+
   return {
     id: h.id,
     name: h.name,
@@ -113,7 +123,7 @@ function mapDBToData(h: Hackathon): BasicHackathon {
     themes: h.themes || undefined,
     judingCriteria: h.judingCriteria || undefined,
     submissionGuidelines: h.submissionGuidelines || undefined,
-    submissionFields: h.submissionFields || [],
+    submissionFields: resolvedSubmissionFields,
     createdAt: h.createdAt.toISOString(),
     updatedAt: h.updatedAt.toISOString(),
     draft: h.draft,
@@ -139,6 +149,16 @@ export async function getHackathonById(id: string): Promise<BasicHackathon | nul
 }
 
 export async function createHackathon(hackathonInput: Record<string, any>): Promise<BasicHackathon> {
+  let rawSubmissionFields = hackathonInput.submissionFields;
+  if (typeof rawSubmissionFields === 'string') {
+    try {
+      rawSubmissionFields = JSON.parse(rawSubmissionFields);
+    } catch {}
+  }
+  const resolvedSubmissionFields = Array.isArray(rawSubmissionFields) && rawSubmissionFields.length > 0
+    ? rawSubmissionFields
+    : [DEFAULT_SUBMISSION_FIELD];
+
   // Convert input to typed values
   const input = {
     name: String(hackathonInput.name || ''),
@@ -163,6 +183,7 @@ export async function createHackathon(hackathonInput: Record<string, any>): Prom
     themes: hackathonInput.themes ? String(hackathonInput.themes) : null,
     judingCriteria: hackathonInput.judingCriteria ? String(hackathonInput.judingCriteria) : null,
     submissionGuidelines: hackathonInput.submissionGuidelines ? String(hackathonInput.submissionGuidelines) : null,
+    submissionFields: resolvedSubmissionFields,
     draft: Boolean(hackathonInput.draft),
     teamRequired: Boolean(hackathonInput.teamRequired),
     winnerTiers: hackathonInput.winnerTiers || [],
@@ -198,6 +219,17 @@ export async function updateHackathon(id: string, updates: Record<string, any>):
   if (updates.themes !== undefined) cleanUpdates.themes = updates.themes ? String(updates.themes) : null;
   if (updates.judingCriteria !== undefined) cleanUpdates.judingCriteria = updates.judingCriteria ? String(updates.judingCriteria) : null;
   if (updates.submissionGuidelines !== undefined) cleanUpdates.submissionGuidelines = updates.submissionGuidelines ? String(updates.submissionGuidelines) : null;
+  if (updates.submissionFields !== undefined) {
+    let rawSubmissionFields = updates.submissionFields;
+    if (typeof rawSubmissionFields === 'string') {
+      try {
+        rawSubmissionFields = JSON.parse(rawSubmissionFields);
+      } catch {}
+    }
+    cleanUpdates.submissionFields = Array.isArray(rawSubmissionFields) && rawSubmissionFields.length > 0
+      ? rawSubmissionFields
+      : [DEFAULT_SUBMISSION_FIELD];
+  }
   if (updates.draft !== undefined) cleanUpdates.draft = Boolean(updates.draft);
   if (updates.teamRequired !== undefined) cleanUpdates.teamRequired = Boolean(updates.teamRequired);
   if (updates.winnerTiers !== undefined) cleanUpdates.winnerTiers = updates.winnerTiers;

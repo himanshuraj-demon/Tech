@@ -139,6 +139,7 @@ export async function deleteHackathon(id: string): Promise<void> {
 // Get hackathons for public display (sorted by date desc)
 export async function getHackathonsForDisplay(limit?: number, offset?: number): Promise<Hackathon[]> {
   try {
+    await ensureHackathonSubmissionSchema();
     const query = db
       .select()
       .from(hackathons)
@@ -177,6 +178,7 @@ export async function getHackathonsCount(): Promise<number> {
 // Get hackathons by status
 export async function getHackathonsByStatus(status: string): Promise<Hackathon[]> {
   try {
+    await ensureHackathonSubmissionSchema();
     const list = await db
       .select()
       .from(hackathons)

@@ -108,14 +108,33 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
     setSubmissionSuccess(false);
     setSubmissionError("");
     try {
+      let finalGithub = githubLink;
+      let finalDocs = docsLink;
+
+      if (hackathon?.submissionFields && hackathon.submissionFields.length > 0) {
+        for (const field of hackathon.submissionFields) {
+          const key = field.id || "";
+          const val = submissionValues[key] !== undefined ? submissionValues[key] : (submissionValues[field.title] || "");
+          if (val && typeof val === "string") {
+            const lowerTitle = (field.title || "").toLowerCase();
+            if (!finalGithub && (lowerTitle.includes("github") || val.includes("github.com"))) {
+              finalGithub = val;
+            }
+            if (!finalDocs && (lowerTitle.includes("doc") || lowerTitle.includes("link") || val.includes("drive.google.com") || val.includes("notion.so"))) {
+              finalDocs = val;
+            }
+          }
+        }
+      }
+
       const res = await api.fetch(`/api/hackathons/${id}/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          githubLink,
-          docsLink,
+          githubLink: finalGithub,
+          docsLink: finalDocs,
           submissionData: submissionValues,
         }),
       });
@@ -253,25 +272,6 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                 </div>
               </div>
             </div>
-
-            {/* Registration Action Button */}
-            {!hackathon.draft && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
-              <div className="flex flex-col sm:flex-row gap-4 items-start">
-                <Button 
-                  onClick={() => document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  size="lg" 
-                  className="w-fit"
-                >
-                  {isRegistered ? 'View Confirmation' : 'Register Now'}
-                </Button>
-                {hackathon.status === 'ongoing' && (
-                  <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400 mt-2">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                    <span className="font-medium">Hackathon is currently ongoing!</span>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -484,11 +484,11 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                         <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 p-6 rounded-2xl mt-6 shadow-md text-left space-y-4">
                           <h4 className="text-lg font-bold font-space-grotesk text-neutral-900 dark:text-neutral-100 flex items-center gap-2 border-b pb-2 dark:border-neutral-850">
                             <Award className="h-5 w-5 text-primary" />
-                            Project Submission
+                            Submission
                           </h4>
                           <p className="text-xs text-muted-foreground">
                             {hackathon.submissionFields && hackathon.submissionFields.length > 0
-                              ? "Submit your project details as requested by the organizers below."
+                              ? "Submit your details as requested by the organizers below."
                               : "Submit or update your repository and documentation links here. This form is only active during ongoing events."}
                           </p>
                           
@@ -496,7 +496,15 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                             {hackathon.submissionFields && hackathon.submissionFields.length > 0 ? (
                               hackathon.submissionFields.map((field: any, idx: number) => {
                                 const fieldKey = field.id || `field_${idx}`;
-                                const val = submissionValues[fieldKey] !== undefined ? submissionValues[fieldKey] : "";
+                                const val = submissionValues[fieldKey] !== undefined 
+                                  ? submissionValues[fieldKey] 
+                                  : (submissionValues[field.title] !== undefined 
+                                      ? submissionValues[field.title] 
+                                      : ((field.title?.toLowerCase().includes("github") || field.title?.toLowerCase().includes("repo"))
+                                          ? githubLink 
+                                          : ((field.title?.toLowerCase().includes("doc") || field.title?.toLowerCase().includes("link") || field.title?.toLowerCase().includes("drive"))
+                                              ? docsLink 
+                                              : "")));
                                 return (
                                   <div key={fieldKey} className="space-y-1">
                                     <Label htmlFor={fieldKey} className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">
