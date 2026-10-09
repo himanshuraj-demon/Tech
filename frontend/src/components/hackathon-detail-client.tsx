@@ -507,7 +507,7 @@ export function HackathonDetailClient({ id }: HackathonDetailClientProps) {
                                               : "")));
                                 return (
                                   <div key={fieldKey} className="space-y-1">
-                                    <Label htmlFor={fieldKey} className="text-xs font-semibold text-neutral-800 dark:text-neutral-250">
+                                    <Label htmlFor={fieldKey} className="text-xs font-semibold text-neutral-800 dark:text-white">
                                       {field.title} {field.required !== false && <span className="text-red-500">*</span>}
                                     </Label>
                                     {field.type === "textarea" ? (

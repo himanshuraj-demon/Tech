@@ -43,22 +43,31 @@ export async function POST(
           updatedAt: new Date(),
         };
 
-        if (item.submissionData) {
+        if (item.submissionData && typeof item.submissionData === "object") {
+          let existingData: Record<string, any> = {};
+          if (typeof existing.submissionData === "string") {
+            try {
+              existingData = JSON.parse(existing.submissionData);
+            } catch {}
+          } else if (existing.submissionData && typeof existing.submissionData === "object") {
+            existingData = existing.submissionData;
+          }
+
           updatePayload.submissionData = {
-            ...(existing.submissionData || {}),
+            ...existingData,
             ...item.submissionData,
           };
         }
 
-        if (item.githubLink !== undefined) {
-          updatePayload.githubLink = item.githubLink || existing.githubLink;
+        if (item.githubLink) {
+          updatePayload.githubLink = item.githubLink;
         }
 
-        if (item.docsLink !== undefined) {
-          updatePayload.docsLink = item.docsLink || existing.docsLink;
+        if (item.docsLink) {
+          updatePayload.docsLink = item.docsLink;
         }
 
-        if (item.winnerPlace !== undefined && item.winnerPlace !== null) {
+        if (item.winnerPlace !== undefined) {
           updatePayload.winnerPlace = item.winnerPlace;
         }
 

@@ -201,90 +201,87 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
   };
 
   const handleExportToCSV = () => {
-    const customFields: Array<{ id: string; title: string }> = hackathon?.submissionFields || [];
+    const customFields: Array<{ id: string; title: string }> = 
+      (hackathon?.submissionFields && hackathon.submissionFields.length > 0)
+        ? hackathon.submissionFields
+        : [{ id: "field_default", title: "Project Submission Details" }];
 
-    // 1. Define CSV headers
-    const baseHeaders = [
+    // 1. Define clean, focused CSV headers based on student info & custom inputs
+    const headers = [
       "Student Name",
       "Student Email",
-      "Degree Type",
-      "Branch Name",
-      "Year of Joining",
-      "Team Members",
-      "Winner Place",
-    ];
-
-    let submissionHeaders: string[] = [];
-    if (customFields.length > 0) {
-      submissionHeaders = customFields.map(f => f.title);
-    } else {
-      submissionHeaders = ["GitHub Repo Link", "Submission Docs Link"];
-    }
-
-    const headers = [
-      ...baseHeaders,
-      ...submissionHeaders,
+      "Winner Status",
+      ...customFields.map(f => f.title),
       "Registration Date"
     ];
 
     // 2. Map registrations to CSV rows
     const rows = registrations.map(reg => {
-      const teamMembersStr = reg.teamMembers && reg.teamMembers.length > 0 
-        ? reg.teamMembers.join("; ") 
-        : "Individual";
-      
       let winnerStatus = "Participant";
       if (reg.winnerPlace === 1) winnerStatus = "1st Place (Gold)";
       else if (reg.winnerPlace === 2) winnerStatus = "2nd Place (Silver)";
       else if (reg.winnerPlace === 3) winnerStatus = "3rd Place (Bronze)";
-
-      let submissionCells: string[] = [];
-      if (customFields.length > 0) {
-        submissionCells = customFields.map(field => {
-          const data = reg.submissionData || {};
-          const val = data[field.id] !== undefined ? data[field.id] : data[field.title];
-          if (val) return val;
-
-          const lower = field.title.toLowerCase();
-          if ((lower.includes('github') || lower.includes('repo')) && reg.githubLink) return reg.githubLink;
-          if ((lower.includes('doc') || lower.includes('link') || lower.includes('drive')) && reg.docsLink) return reg.docsLink;
-
-          return "Not Submitted";
-        });
-      } else {
-        submissionCells = [
-          reg.githubLink || "Not Submitted",
-          reg.docsLink || "Not Submitted"
-        ];
+      else if (reg.winnerPlace) {
+        const tier = hackathon?.winnerTiers?.find((t: any) => t.rank === reg.winnerPlace);
+        winnerStatus = tier ? tier.name : `${reg.winnerPlace}th Place`;
       }
+
+      let data: Record<string, any> = {};
+      if (typeof reg.submissionData === "string") {
+        try {
+          data = JSON.parse(reg.submissionData);
+        } catch {}
+      } else if (reg.submissionData && typeof reg.submissionData === "object") {
+        data = reg.submissionData;
+      }
+
+      const submissionCells = customFields.map(field => {
+        let val = data[field.id] !== undefined ? data[field.id] : data[field.title];
+        if (!val) {
+          const matchedKey = Object.keys(data).find(
+            k => k.toLowerCase() === field.title.toLowerCase() || k.toLowerCase() === field.id.toLowerCase()
+          );
+          if (matchedKey) val = data[matchedKey];
+        }
+
+        if (val) return String(val);
+
+        const lower = field.title.toLowerCase();
+        if ((lower.includes("github") || lower.includes("repo")) && reg.githubLink) return reg.githubLink;
+        if ((lower.includes("doc") || lower.includes("link") || lower.includes("drive")) && reg.docsLink) return reg.docsLink;
+
+        if (customFields.length === 1) {
+          if (reg.githubLink && reg.docsLink) return `${reg.githubLink} | ${reg.docsLink}`;
+          if (reg.githubLink) return reg.githubLink;
+          if (reg.docsLink) return reg.docsLink;
+        }
+
+        return "Not Submitted";
+      });
 
       return [
         reg.userName,
         reg.userEmail,
-        reg.degreeType.toUpperCase(),
-        reg.branchName,
-        reg.yearOfJoining,
-        teamMembersStr,
         winnerStatus,
         ...submissionCells,
         new Date(reg.createdAt).toLocaleDateString()
       ];
     });
 
-    // 3. Helper to escape fields containing quotes or commas
+    // 3. Helper to escape fields containing quotes, newlines, or commas
     const escapeCSV = (field: any) => {
       const cleanField = (field ?? "").toString().replace(/"/g, '""');
-      if (cleanField.includes(",") || cleanField.includes("\n") || cleanField.includes('"')) {
+      if (cleanField.includes(",") || cleanField.includes("\n") || cleanField.includes("\r") || cleanField.includes('"')) {
         return `"${cleanField}"`;
       }
       return cleanField;
     };
 
-    // 4. Construct CSV string
-    const csvContent = [
+    // 4. Construct CSV string with UTF-8 BOM so Excel opens with proper encoding
+    const csvContent = "\uFEFF" + [
       headers.map(escapeCSV).join(","),
       ...rows.map(row => row.map(escapeCSV).join(","))
-    ].join("\n");
+    ].join("\r\n");
 
     // 5. Trigger download in browser
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -304,75 +301,145 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
 
     try {
       const text = await file.text();
-      const parseCSVLine = (line: string): string[] => {
-        const result: string[] = [];
-        let curr = "";
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const c = line[i];
-          if (c === '"') {
-            if (inQuotes && line[i + 1] === '"') {
-              curr += '"';
+      
+      // Robust CSV parser supporting quotes, commas, escaped quotes, and multiline values
+      const parseCSV = (csvText: string): string[][] => {
+        let cleanText = csvText;
+        if (cleanText.charCodeAt(0) === 0xFEFF) {
+          cleanText = cleanText.slice(1);
+        }
+
+        const rows: string[][] = [];
+        let currentRow: string[] = [];
+        let currentCell = "";
+        let insideQuotes = false;
+
+        for (let i = 0; i < cleanText.length; i++) {
+          const char = cleanText[i];
+          const nextChar = cleanText[i + 1];
+
+          if (char === '"') {
+            if (insideQuotes && nextChar === '"') {
+              currentCell += '"';
               i++;
             } else {
-              inQuotes = !inQuotes;
+              insideQuotes = !insideQuotes;
             }
-          } else if (c === ',' && !inQuotes) {
-            result.push(curr.trim());
-            curr = "";
+          } else if (char === "," && !insideQuotes) {
+            currentRow.push(currentCell.trim());
+            currentCell = "";
+          } else if ((char === "\r" || char === "\n") && !insideQuotes) {
+            if (char === "\r" && nextChar === "\n") {
+              i++;
+            }
+            currentRow.push(currentCell.trim());
+            if (currentRow.some(c => c.length > 0)) {
+              rows.push(currentRow);
+            }
+            currentRow = [];
+            currentCell = "";
           } else {
-            curr += c;
+            currentCell += char;
           }
         }
-        result.push(curr.trim());
-        return result;
+
+        currentRow.push(currentCell.trim());
+        if (currentRow.some(c => c.length > 0)) {
+          rows.push(currentRow);
+        }
+
+        return rows;
       };
 
-      const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-      if (lines.length < 2) {
+      const parsedRows = parseCSV(text);
+      if (parsedRows.length < 2) {
         alert("The uploaded CSV appears to be empty or has no data rows.");
         return;
       }
 
-      const headers = parseCSVLine(lines[0]);
+      const headers = parsedRows[0].map(h => h.trim());
       const emailIdx = headers.findIndex(h => h.toLowerCase().includes("email"));
       if (emailIdx === -1) {
         alert("Could not find a 'Student Email' column in the CSV.");
         return;
       }
 
-      const customFields: Array<{ id: string; title: string }> = hackathon?.submissionFields || [];
+      const winnerIdx = headers.findIndex(h => {
+        const lower = h.toLowerCase();
+        return lower.includes("winner") || lower.includes("rank") || lower.includes("place");
+      });
+
+      const customFields: Array<{ id: string; title: string }> = 
+        (hackathon?.submissionFields && hackathon.submissionFields.length > 0)
+          ? hackathon.submissionFields
+          : [{ id: "field_default", title: "Project Submission Details" }];
+
       const itemsToImport: Array<{
         email: string;
         submissionData: Record<string, string>;
         githubLink?: string;
         docsLink?: string;
+        winnerPlace?: number | null;
       }> = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const row = parseCSVLine(lines[i]);
-        const email = row[emailIdx];
+      for (let i = 1; i < parsedRows.length; i++) {
+        const row = parsedRows[i];
+        const email = row[emailIdx]?.trim();
         if (!email) continue;
 
         const subData: Record<string, string> = {};
         let ghLink: string | undefined;
         let dLink: string | undefined;
+        let winnerPlace: number | null | undefined = undefined;
+
+        if (winnerIdx !== -1 && row[winnerIdx] !== undefined) {
+          const wVal = row[winnerIdx].toLowerCase().trim();
+          if (wVal.includes("1") || wVal.includes("first") || wVal.includes("gold")) {
+            winnerPlace = 1;
+          } else if (wVal.includes("2") || wVal.includes("second") || wVal.includes("silver")) {
+            winnerPlace = 2;
+          } else if (wVal.includes("3") || wVal.includes("third") || wVal.includes("bronze")) {
+            winnerPlace = 3;
+          } else if (wVal === "participant" || wVal === "none" || wVal === "0" || wVal === "" || wVal === "-") {
+            winnerPlace = null;
+          } else {
+            const num = parseInt(wVal.replace(/\D/g, ""), 10);
+            winnerPlace = !isNaN(num) && num > 0 ? num : null;
+          }
+        }
 
         headers.forEach((header, colIdx) => {
+          if (colIdx === emailIdx || colIdx === winnerIdx) return;
           const cellVal = row[colIdx];
           if (!cellVal || cellVal === "Not Submitted") return;
 
-          const matchedField = customFields.find(
-            f => f.title.toLowerCase() === header.toLowerCase() || f.id === header
-          );
-          if (matchedField) {
-            subData[matchedField.id] = cellVal;
+          const cleanHeader = header.toLowerCase().trim();
+          if (
+            cleanHeader.includes("student name") || 
+            cleanHeader.includes("registration date") || 
+            cleanHeader.includes("registered at") ||
+            cleanHeader.includes("degree type") ||
+            cleanHeader.includes("branch name") ||
+            cleanHeader.includes("year of joining") ||
+            cleanHeader.includes("team members")
+          ) {
+            return;
           }
 
-          if (header.toLowerCase().includes("github") || header.toLowerCase().includes("repo")) {
+          const matchedField = customFields.find(
+            f => f.title.toLowerCase().trim() === cleanHeader || f.id.toLowerCase().trim() === cleanHeader
+          );
+
+          if (matchedField) {
+            subData[matchedField.id] = cellVal;
+          } else if (customFields.length === 1 && !cleanHeader.includes("email") && !cleanHeader.includes("name")) {
+            subData[customFields[0].id] = cellVal;
+          }
+
+          if (cellVal.includes("github.com") || cleanHeader.includes("github") || cleanHeader.includes("repo")) {
             ghLink = cellVal;
           }
-          if (header.toLowerCase().includes("docs") || header.toLowerCase().includes("drive")) {
+          if (cellVal.includes("drive.google.com") || cellVal.includes("notion.so") || cleanHeader.includes("doc") || cleanHeader.includes("drive")) {
             dLink = cellVal;
           }
         });
@@ -382,6 +449,7 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
           submissionData: subData,
           githubLink: ghLink,
           docsLink: dLink,
+          winnerPlace,
         });
       }
 
@@ -642,12 +710,17 @@ export default function ParticipantsClient({ hackathonId }: ParticipantsClientPr
                           {hackathon?.submissionFields && hackathon.submissionFields.length > 0 ? (
                             <div className="flex flex-col gap-1.5">
                               {hackathon.submissionFields.map((field: any) => {
-                                const data = reg.submissionData || {};
+                                let data: Record<string, any> = {};
+                                if (typeof reg.submissionData === "string") {
+                                  try { data = JSON.parse(reg.submissionData); } catch {}
+                                } else if (reg.submissionData && typeof reg.submissionData === "object") {
+                                  data = reg.submissionData;
+                                }
                                 const val = data[field.id] !== undefined ? data[field.id] : data[field.title];
                                 const fallbackVal = !val ? (
                                   (field.title.toLowerCase().includes("github") || field.title.toLowerCase().includes("repo")) ? reg.githubLink :
                                   (field.title.toLowerCase().includes("doc") || field.title.toLowerCase().includes("link") || field.title.toLowerCase().includes("drive")) ? reg.docsLink :
-                                  null
+                                  (hackathon.submissionFields.length === 1 ? (reg.githubLink || reg.docsLink) : null)
                                 ) : null;
                                 const displayVal = val || fallbackVal;
 
