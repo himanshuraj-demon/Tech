@@ -1,8 +1,8 @@
-import { db } from '@/lib/db';
-import { contactInfo, type ContactInfoDB } from '@/lib/db/schema';
-import { eq, sql } from 'drizzle-orm';
-import fs from 'fs';
-import path from 'path';
+import { db } from "@/lib/db";
+import { contactInfo, type ContactInfoDB } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
+import fs from "fs";
+import path from "path";
 
 export interface ContactInfo {
   address: {
@@ -30,18 +30,19 @@ export const DEFAULT_CONTACT: ContactInfo = {
     city: "Palaj, Gandhinagar",
     state: "Gujarat",
     postalCode: "382355",
-    country: "India"
+    country: "India",
   },
   phone: "+91-79-2395-2001",
   email: "technical.secretary@iitgn.ac.in",
   socialMedia: {
-    instagram: "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+    instagram:
+      "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
     youtube: "https://www.youtube.com/@tech_iitgn",
     linkedin: "https://www.linkedin.com/school/tech-council-iitgn/",
-    facebook: "https://www.facebook.com/tech.iitgn"
+    facebook: "https://www.facebook.com/tech.iitgn",
   },
   lastModified: new Date().toISOString(),
-  modifiedBy: "System"
+  modifiedBy: "System",
 };
 
 export function formatContactInfo(row: ContactInfoDB): ContactInfo {
@@ -61,71 +62,20 @@ export function formatContactInfo(row: ContactInfoDB): ContactInfo {
       linkedin: row.linkedin || "",
       facebook: row.facebook || "",
     },
-    lastModified: row.updatedAt ? new Date(row.updatedAt).toISOString() : new Date().toISOString(),
+    lastModified: row.updatedAt
+      ? new Date(row.updatedAt).toISOString()
+      : new Date().toISOString(),
     modifiedBy: row.modifiedBy || "System",
   };
 }
 
-/**
- * Ensures a default record exists in contact_info table.
- */
 async function ensureDefaultRecord(): Promise<ContactInfoDB> {
-  // Auto-create table if it doesn't exist on the target database
-  try {
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS "contact_info" (
-        "id" text PRIMARY KEY DEFAULT 'default',
-        "street" text NOT NULL DEFAULT '',
-        "city" text NOT NULL DEFAULT '',
-        "state" text NOT NULL DEFAULT '',
-        "postal_code" text NOT NULL DEFAULT '',
-        "country" text NOT NULL DEFAULT 'India',
-        "phone" text NOT NULL DEFAULT '',
-        "email" text NOT NULL DEFAULT '',
-        "instagram" text NOT NULL DEFAULT '',
-        "youtube" text NOT NULL DEFAULT '',
-        "linkedin" text NOT NULL DEFAULT '',
-        "facebook" text NOT NULL DEFAULT '',
-        "modified_by" text NOT NULL DEFAULT 'System',
-        "created_at" timestamp NOT NULL DEFAULT now(),
-        "updated_at" timestamp NOT NULL DEFAULT now()
-      );
-    `);
-  } catch (err) {
-    console.warn('Notice: verifying contact_info table existence:', err);
-  }
+  const seed = DEFAULT_CONTACT;
 
-  const [existing] = await db
-    .select()
-    .from(contactInfo)
-    .where(eq(contactInfo.id, 'default'))
-    .limit(1);
-
-  if (existing) {
-    return existing;
-  }
-
-  // Check if legacy json file has any data to seed with
-  let seed = { ...DEFAULT_CONTACT };
-  try {
-    const jsonPath = path.join(process.cwd(), 'data', 'contact-info.json');
-    if (fs.existsSync(jsonPath)) {
-      const fileData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-      seed = {
-        ...seed,
-        ...fileData,
-        address: { ...seed.address, ...(fileData.address || {}) },
-        socialMedia: { ...seed.socialMedia, ...(fileData.socialMedia || {}) },
-      };
-    }
-  } catch (e) {
-    console.warn('Could not read legacy contact-info.json for seeding:', e);
-  }
-
-  const [inserted] = await db
+  const [record] = await db
     .insert(contactInfo)
     .values({
-      id: 'default',
+      id: "default",
       street: seed.address.street,
       city: seed.address.city,
       state: seed.address.state,
@@ -137,25 +87,45 @@ async function ensureDefaultRecord(): Promise<ContactInfoDB> {
       youtube: seed.socialMedia.youtube,
       linkedin: seed.socialMedia.linkedin,
       facebook: seed.socialMedia.facebook,
-      modifiedBy: seed.modifiedBy || 'System',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      modifiedBy: seed.modifiedBy || "System",
     })
+    .onConflictDoNothing()
     .returning();
 
-  return inserted;
+  if (record) return record;
+
+  const [existing] = await db
+    .select()
+    .from(contactInfo)
+    .where(eq(contactInfo.id, "default"))
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("Default contact record could not be initialized");
+  }
+
+  return existing;
 }
 
 /**
- * Fetch contact info from database.
+ * Fetch existing contact info from the database.
  */
 export async function getContactInfoFromDB(): Promise<ContactInfo> {
   try {
-    const record = await ensureDefaultRecord();
+    const [record] = await db
+      .select()
+      .from(contactInfo)
+      .where(eq(contactInfo.id, "default"))
+      .limit(1);
+
+    if (!record) {
+      throw new Error("Default contact info record not found");
+    }
+
     return formatContactInfo(record);
   } catch (error) {
-    console.error('Error fetching contact info from database:', error);
-    return DEFAULT_CONTACT;
+    console.error("Error fetching contact info from database:", error);
+    throw error;
   }
 }
 
@@ -163,7 +133,7 @@ export async function getContactInfoFromDB(): Promise<ContactInfo> {
  * Save/update full contact info in database.
  */
 export async function saveContactInfoToDB(
-  info: Partial<ContactInfo> & { modifiedBy?: string }
+  info: Partial<ContactInfo> & { modifiedBy?: string },
 ): Promise<ContactInfo> {
   try {
     await ensureDefaultRecord();
@@ -185,30 +155,39 @@ export async function saveContactInfoToDB(
     }
 
     if (info.address) {
-      if (info.address.street !== undefined) updatePayload.street = info.address.street;
-      if (info.address.city !== undefined) updatePayload.city = info.address.city;
-      if (info.address.state !== undefined) updatePayload.state = info.address.state;
-      if (info.address.postalCode !== undefined) updatePayload.postalCode = info.address.postalCode;
-      if (info.address.country !== undefined) updatePayload.country = info.address.country;
+      if (info.address.street !== undefined)
+        updatePayload.street = info.address.street;
+      if (info.address.city !== undefined)
+        updatePayload.city = info.address.city;
+      if (info.address.state !== undefined)
+        updatePayload.state = info.address.state;
+      if (info.address.postalCode !== undefined)
+        updatePayload.postalCode = info.address.postalCode;
+      if (info.address.country !== undefined)
+        updatePayload.country = info.address.country;
     }
 
     if (info.socialMedia) {
-      if (info.socialMedia.instagram !== undefined) updatePayload.instagram = info.socialMedia.instagram;
-      if (info.socialMedia.youtube !== undefined) updatePayload.youtube = info.socialMedia.youtube;
-      if (info.socialMedia.linkedin !== undefined) updatePayload.linkedin = info.socialMedia.linkedin;
-      if (info.socialMedia.facebook !== undefined) updatePayload.facebook = info.socialMedia.facebook;
+      if (info.socialMedia.instagram !== undefined)
+        updatePayload.instagram = info.socialMedia.instagram;
+      if (info.socialMedia.youtube !== undefined)
+        updatePayload.youtube = info.socialMedia.youtube;
+      if (info.socialMedia.linkedin !== undefined)
+        updatePayload.linkedin = info.socialMedia.linkedin;
+      if (info.socialMedia.facebook !== undefined)
+        updatePayload.facebook = info.socialMedia.facebook;
     }
 
     const [updated] = await db
       .update(contactInfo)
       .set(updatePayload)
-      .where(eq(contactInfo.id, 'default'))
+      .where(eq(contactInfo.id, "default"))
       .returning();
 
     return formatContactInfo(updated);
   } catch (error) {
-    console.error('Error saving contact info to database:', error);
-    throw new Error('Failed to save contact info to database');
+    console.error("Error saving contact info to database:", error);
+    throw new Error("Failed to save contact info to database");
   }
 }
 
@@ -218,7 +197,7 @@ export async function saveContactInfoToDB(
 export async function updateContactFieldInDB(
   field: string,
   value: unknown,
-  modifiedBy: string
+  modifiedBy: string,
 ): Promise<ContactInfo> {
   try {
     await ensureDefaultRecord();
@@ -228,47 +207,49 @@ export async function updateContactFieldInDB(
       updatedAt: new Date(),
     };
 
-    if (field === 'phone') {
-      updatePayload.phone = String(value ?? '');
-    } else if (field === 'email') {
-      updatePayload.email = String(value ?? '');
-    } else if (field === 'address.street') {
-      updatePayload.street = String(value ?? '');
-    } else if (field === 'address.city') {
-      updatePayload.city = String(value ?? '');
-    } else if (field === 'address.state') {
-      updatePayload.state = String(value ?? '');
-    } else if (field === 'address.postalCode') {
-      updatePayload.postalCode = String(value ?? '');
-    } else if (field === 'address.country') {
-      updatePayload.country = String(value ?? '');
-    } else if (field === 'socialMedia.instagram') {
-      updatePayload.instagram = String(value ?? '');
-    } else if (field === 'socialMedia.youtube') {
-      updatePayload.youtube = String(value ?? '');
-    } else if (field === 'socialMedia.linkedin') {
-      updatePayload.linkedin = String(value ?? '');
-    } else if (field === 'socialMedia.facebook') {
-      updatePayload.facebook = String(value ?? '');
+    if (field === "phone") {
+      updatePayload.phone = String(value ?? "");
+    } else if (field === "email") {
+      updatePayload.email = String(value ?? "");
+    } else if (field === "address.street") {
+      updatePayload.street = String(value ?? "");
+    } else if (field === "address.city") {
+      updatePayload.city = String(value ?? "");
+    } else if (field === "address.state") {
+      updatePayload.state = String(value ?? "");
+    } else if (field === "address.postalCode") {
+      updatePayload.postalCode = String(value ?? "");
+    } else if (field === "address.country") {
+      updatePayload.country = String(value ?? "");
+    } else if (field === "socialMedia.instagram") {
+      updatePayload.instagram = String(value ?? "");
+    } else if (field === "socialMedia.youtube") {
+      updatePayload.youtube = String(value ?? "");
+    } else if (field === "socialMedia.linkedin") {
+      updatePayload.linkedin = String(value ?? "");
+    } else if (field === "socialMedia.facebook") {
+      updatePayload.facebook = String(value ?? "");
     }
 
     const [updated] = await db
       .update(contactInfo)
       .set(updatePayload)
-      .where(eq(contactInfo.id, 'default'))
+      .where(eq(contactInfo.id, "default"))
       .returning();
 
     return formatContactInfo(updated);
   } catch (error) {
-    console.error('Error updating contact field in database:', error);
-    throw new Error('Failed to update contact field in database');
+    console.error("Error updating contact field in database:", error);
+    throw new Error("Failed to update contact field in database");
   }
 }
 
 /**
  * Reset contact info to default in database.
  */
-export async function resetContactInfoInDB(modifiedBy: string): Promise<ContactInfo> {
+export async function resetContactInfoInDB(
+  modifiedBy: string,
+): Promise<ContactInfo> {
   try {
     await ensureDefaultRecord();
 
@@ -286,15 +267,15 @@ export async function resetContactInfoInDB(modifiedBy: string): Promise<ContactI
         youtube: DEFAULT_CONTACT.socialMedia.youtube,
         linkedin: DEFAULT_CONTACT.socialMedia.linkedin,
         facebook: DEFAULT_CONTACT.socialMedia.facebook,
-        modifiedBy: modifiedBy || 'System',
+        modifiedBy: modifiedBy || "System",
         updatedAt: new Date(),
       })
-      .where(eq(contactInfo.id, 'default'))
+      .where(eq(contactInfo.id, "default"))
       .returning();
 
     return formatContactInfo(reset);
   } catch (error) {
-    console.error('Error resetting contact info in database:', error);
-    throw new Error('Failed to reset contact info in database');
+    console.error("Error resetting contact info in database:", error);
+    throw new Error("Failed to reset contact info in database");
   }
 }
