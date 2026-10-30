@@ -18,7 +18,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Set build arguments and env variables for pre-rendering
-ARG DATABASE_URL
+ARG DATABASE_URL="postgresql://postgres:postgres_secure_tech2026@db:5432/techcouncil?sslmode=disable"
 ENV DATABASE_URL=$DATABASE_URL
 
 RUN npm run build
@@ -32,13 +32,17 @@ ENV PORT=3605
 ENV HOSTNAME="0.0.0.0"
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy only the necessary files for running the app
+# Copy application files for running the app and management scripts
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/backups ./backups
+COPY --from=builder /app/backup ./backup
+COPY --from=builder /app/drizzle ./drizzle
 
 EXPOSE 3605
 

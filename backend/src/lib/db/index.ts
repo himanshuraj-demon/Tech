@@ -9,7 +9,12 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable is not set');
 }
 
-const isLocal = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
+// Only enable SSL for Neon/Supabase cloud providers or when explicitly required
+const requiresSsl =
+  !databaseUrl.includes('sslmode=disable') &&
+  (databaseUrl.includes('sslmode=require') ||
+   databaseUrl.includes('neon.tech') ||
+   databaseUrl.includes('supabase.co'));
 
 // Global cache to prevent multiple connections in development hot reload
 const globalForDb = globalThis as unknown as {
@@ -20,7 +25,7 @@ const globalForDb = globalThis as unknown as {
 if (!globalForDb.conn) {
   globalForDb.conn = new Pool({
     connectionString: databaseUrl,
-    ssl: isLocal ? false : { rejectUnauthorized: false }
+    ssl: requiresSsl ? { rejectUnauthorized: false } : false
   });
 }
 

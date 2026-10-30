@@ -1,12 +1,36 @@
 version: '3.8'
 
 services:
+  # 1. PostgreSQL Database Container (Isolated in internal network)
+  db:
+    image: postgres:16-alpine
+    container_name: tech-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secure_tech2026}
+      POSTGRES_DB: ${POSTGRES_DB:-techcouncil}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - tech-db-data:/var/lib/postgresql/data
+    networks:
+      - backend-db-network
+    # Notice: NO host ports published. The database is strictly internal and private.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-techcouncil}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # 2. Backend Service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
       args:
         - DATABASE_URL=${DATABASE_URL}
+    container_name: tech-backend
     ports:
       - "3605:3605"
     environment:
@@ -23,18 +47,45 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
       - BACKEND_URL=${BACKEND_URL}
       - PORT=3605
+    networks:
+      - backend-db-network
+      - public-network
+    depends_on:
+      db:
+        condition: service_healthy
     restart: always
 
+  # 3. Frontend Service
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    container_name: tech-frontend
     ports:
       - "3604:3604"
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NODE_ENV=${NODE_ENV}
       - PORT=3604
+    networks:
+      - public-network
+    depends_on:
+      - backend
     restart: always
+
+networks:
+  # Internal network: isolated to db and backend only
+  backend-db-network:
+    driver: bridge
+    internal: true
+
+  # Public network for frontend and backend services
+  public-network:
+    driver: bridge
+
+volumes:
+  # Persistent volume for PostgreSQL database
+  tech-db-data:
+    driver: local
