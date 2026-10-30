@@ -1,0 +1,2 @@
+ALTER TABLE "event_registrations" ADD COLUMN "submission_data" jsonb DEFAULT '{}'::jsonb;--> statement-breakpoint
+ALTER TABLE "hackathons" ADD COLUMN "submission_fields" jsonb DEFAULT '[]'::jsonb NOT NULL;
